@@ -1,0 +1,8 @@
+"Hi. This project uses a Code Knowledge Graph. 
+
+1. Please read "Spashta-CKG/Code_Knowledge_Graph_Readme.md" first to understand the architecture.
+2. Check if "Spashta-CKG/code_knowledge_graph_AST_Enriched_by_AI.json" exists.
+   - If YES: Load it to understand the codebase.
+   - If NO: Analyze the codebase contents as described in "Spashta-CKG/Code_Knowledge_Graph_Readme.md" and create a NEW file named "code_knowledge_graph_AST_Enriched_by_AI.json" in Spashta-CKG/ folder with the required fields.
+
+Then, explain the project architecture to me."
