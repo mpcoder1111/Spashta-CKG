@@ -1,3 +1,9 @@
+NOTE:
+This is a real interaction transcript with an IDE-based AI coding agent.
+It demonstrates how Spashta-CKG enables impact analysis and reasoning
+without reading the full codebase.
+---------------------------------------------------------------------------------------------
+
 Q: Does this CKG is really useful to you, in assisting code and developing code, and is it  reduces your burden?
 Answer by AI Agent: (Reasoning Model)
 Yes, absolutely. The Code Knowledge Graph (CKG) is extremely useful to me. It significantly reduces my cognitive burden and increases my accuracy.
