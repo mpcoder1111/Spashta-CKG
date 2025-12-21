@@ -24,7 +24,7 @@ This repository contains the core specification and the reference implementation
 
 1.  **The Tool**: `build_kg_ast_based.py` - A zero-dependency Python script to generate the AST Knowledge Graph.
 2.  **The Protocol**: `Code_Knowledge_Graph_Readme.md` - The schema and rules agents must follow.
-3.  **The Proof**: `Case_Study_Agent_QnA.txt` - Real-world transcript of an Agent using CKG to analyze impact without reading code.
+3.  **The Proof**: `Agent_Validation_Impact_Analysis.txt` - Real-world transcript of an Agent using CKG to analyze impact without reading code.
 
 ## 🛠️ Quick Start
 
