@@ -47,7 +47,7 @@ Based on testing with mid-sized Django projects:
 
 > 💡 *These are indicative figures. Test on your own projects to measure actual impact!*
 >
-> 📖 See [AI Agent's Testimony on Spashta](_docs/Testimony_on_Spashta2.md) for real-world usage experience.
+> 📖 See [AI Agent's Testimony on Spashta](Spashta_2.0/_docs/Testimony_on_Spashta2.md) for real-world usage experience.
 
 ### 🧠 Dual-Brain Architecture
 
@@ -148,12 +148,12 @@ Read from bottom...
 
 ### 1️⃣ CORE – The Universal Laws
 
-**Location:** `core/`
+**Location:** `Spashta_2.0/core/`
 
 **Purpose:** Defines what software fundamentally *is* — language-agnostic, framework-agnostic, eternal.
 
 ```
-core/
+Spashta_2.0/core/
 └── software_schema/
     ├── nodes.json    # What can exist: File, Function, Class, Template, Route...
     └── edges.json    # How things connect: calls, imports, renders, depends_on...
@@ -170,12 +170,12 @@ core/
 
 ### 2️⃣ BUILDERS – The Observers
 
-**Location:** `builders/`
+**Location:** `Spashta_2.0/builders/`
 
 **Purpose:** Turn language-specific syntax into objective, structural facts — nothing more.
 
 ```
-builders/
+Spashta_2.0/builders/
 ├── builder_rules.json      # Global policies (error handling, recursion limits)
 │
 ├── python/
@@ -213,12 +213,12 @@ builders/
 
 ### 3️⃣ ADAPTERS – The Interpreters
 
-**Location:** `adapters/`
+**Location:** `Spashta_2.0/adapters/`
 
 **Purpose:** Explain framework-specific meaning on top of structural facts.
 
 ```
-adapters/
+Spashta_2.0/adapters/
 ├── django/
 │   └── framework_mapping.json          # Function + render() → View
 │   
@@ -249,12 +249,12 @@ adapters/
 
 ### 4️⃣ RUNTIME – The Execution Engine
 
-**Location:** `runtime/`
+**Location:** `Spashta_2.0/runtime/`
 
 **Purpose:** Orchestrate builders, merge outputs, apply enrichment, validate results.
 
 ```
-runtime/
+Spashta_2.0/runtime/
 ├── build_runtime_ast.py          # Run all builders → raw AST
 ├── diff_runtime_ast.py           # Detect changes in files. It is used to reduce LLM enrichments on already enriched files.(optional)
 ├── enrich_runtime_ast.py         # Apply adapter semantics → enriched AST (Rule based)
@@ -295,19 +295,19 @@ The query tool is how AI Agents access the CKG:
 
 ```bash
 # Find functions by name
-python runtime/query_spashta.py search "login" --type Function --json
+python Spashta_2.0/runtime/query_spashta.py search "login" --type Function --json
 
 # Get file location and line numbers
-python runtime/query_spashta.py locate "app/views.py::login" --json
+python Spashta_2.0/runtime/query_spashta.py locate "app/views.py::login" --json
 
 # Read actual source code
-python runtime/query_spashta.py read "app/views.py::login" --json
+python Spashta_2.0/runtime/query_spashta.py read "app/views.py::login" --json
 
 # Impact analysis: what breaks if I change this?
-python runtime/query_spashta.py impact "app/models.py::User" --depth 3 --json
+python Spashta_2.0/runtime/query_spashta.py impact "app/models.py::User" --depth 3 --json
 
 # Call graph: what does this function call?
-python runtime/query_spashta.py call-graph "app/views.py::search" --json
+python Spashta_2.0/runtime/query_spashta.py call-graph "app/views.py::search" --json
 ```
 
 | Command | Purpose |
@@ -331,12 +331,12 @@ python runtime/query_spashta.py call-graph "app/views.py::search" --json
 
 ### 5️⃣ PROJECT – The Declarations
 
-**Location:** `project/`
+**Location:** `Spashta_2.0/project/`
 
 **Purpose:** Declare what THIS project is — which languages, which frameworks apply HERE.
 
 ```
-project/
+Spashta_2.0/project/
 ├── profile.json          # Activation switchboard
 ├── context_loader.py     # Convert declarations → Python dict. input is profile.json
 ├── validation/           # Profile validators
@@ -468,7 +468,7 @@ This project uses Spashta-CKG as its Code Knowledge Graph.
 1. Query Spashta-CKG FIRST before reading project files
 2. Use: python Spashta-CKG/Spashta_2.0/runtime/query_spashta.py --help
 3. If queries are insufficient, you may read source files directly
-4. Never modify files in runtime/ — these are generated artifacts
+4. Never modify files in Spashta_2.0/runtime/ — these are generated artifacts
 
 Use Spashta as your primary source of truth about this codebase.
 ```
@@ -590,12 +590,12 @@ Read and follow: Spashta-CKG/Spashta_2.0/runtime/enrichment_through_LLM/Prompt_F
 ```
 
 This prompt internally guides the AI Agent to:
-1. Run `python runtime/enrichment_through_LLM/llm_enrich_runtime_ast.py --list-pending`
+1. Run `python Spashta_2.0/runtime/enrichment_through_LLM/llm_enrich_runtime_ast.py --list-pending`
 2. Read two JSON configuration files:
-   - `runtime/enrichment_through_LLM/llm_enrichment_rules.json` — enrichment rules
-   - `runtime/enrichment_through_LLM/llm_enrichment_prompt.json` — format & workflow
+   - `Spashta_2.0/runtime/enrichment_through_LLM/llm_enrichment_rules.json` — enrichment rules
+   - `Spashta_2.0/runtime/enrichment_through_LLM/llm_enrichment_prompt.json` — format & workflow
 3. Process each pending file and add semantic metadata
-4. Output to: `runtime/code_knowledge_graph_enriched_by_Agent.json`
+4. Output to: `Spashta_2.0/runtime/code_knowledge_graph_enriched_by_Agent.json`
 
 > 🤖 **Level 2 is performed by the AI Agent after reading each file.** It adds deep semantic understanding that static analysis cannot provide.
 
@@ -620,13 +620,13 @@ The CKG contains:
 1. Query CKG FIRST before reading project files
 2. Use `Spashta_2.0/runtime/query_spashta.py --help` for easy querying
 3. If query results are insufficient, you may read source files directly
-4. Never modify files in `runtime/` — these are generated artifacts
+4. Never modify files in `Spashta_2.0/runtime/` — these are generated artifacts
 
 🔧 Quick Query Examples:
-python runtime/query_spashta.py --list-files
-python runtime/query_spashta.py --list-functions
-python runtime/query_spashta.py --find "UserView"
-python runtime/query_spashta.py --deps "views.py"
+python Spashta_2.0/runtime/query_spashta.py --list-files
+python Spashta_2.0/runtime/query_spashta.py --list-functions
+python Spashta_2.0/runtime/query_spashta.py --find "UserView"
+python Spashta_2.0/runtime/query_spashta.py --deps "views.py"
 
 Remember: Use Spashta as your primary source of truth about this codebase.
 
@@ -648,7 +648,7 @@ I will now provide the coding task.
 │             │                                                                │
 │             ▼                                                                │
 │  ┌──────────────────────┐                                                   │
-│  │  2. BUILD AST        │  python runtime/build_runtime_ast.py              │
+│  │  2. BUILD AST        │  python Spashta_2.0/runtime/build_runtime_ast.py              │
 │  │                      │                                                   │
 │  │  → Extracts structure│  Output: code_knowledge_graph_ast.json            │
 │  │  → Files, Functions  │          (pure structure, no meaning)             │
@@ -657,7 +657,7 @@ I will now provide the coding task.
 │             │                                                                │
 │             ▼                                                                │
 │  ┌──────────────────────┐                                                   │
-│  │  3. L1 ENRICH        │  python runtime/enrich_runtime_ast.py             │
+│  │  3. L1 ENRICH        │  python Spashta_2.0/runtime/enrich_runtime_ast.py             │
 │  │     (Adapters)       │                                                   │
 │  │                      │  Output: code_knowledge_graph_enriched.json       │
 │  │  → Adds semantic_role│          (structure + framework semantics)        │
@@ -667,7 +667,7 @@ I will now provide the coding task.
 │             │                                                                │
 │             ▼                                                                │
 │  ┌──────────────────────┐                                                   │
-│  │  3a. VALIDATE        │  python runtime/validate_ast_equivalence.py       │
+│  │  3a. VALIDATE        │  python Spashta_2.0/runtime/validate_ast_equivalence.py       │
 │  │                      │                                                   │
 │  │  → Structure intact? │  Ensures enrichment didn't corrupt the graph      │
 │  │  → No missing nodes? │  🛡️ Safety check before using CKG                 │
@@ -700,11 +700,11 @@ I will now provide the coding task.
 
 | Document | Purpose |
 |----------|---------|
-| `_docs/Spashta2.0_Universal_Architecture_Readme.md` | Complete architecture philosophy |
-| `_docs/Spashta_Structure.md` | Why this structure exists |
-| `_docs/Runtime_Readme.md` | Runtime execution reference |
-| `_docs/adapter_Readme.md` | Complete adapter guide |
-| `_docs/Builders_Roadmap.md` | Builder capabilities & roadmap |
+| `Spashta_2.0/_docs/Spashta2.0_Universal_Architecture_Readme.md` | Complete architecture philosophy |
+| `Spashta_2.0/_docs/Spashta_Structure.md` | Why this structure exists |
+| `Spashta_2.0/_docs/Runtime_Readme.md` | Runtime execution reference |
+| `Spashta_2.0/_docs/adapter_Readme.md` | Complete adapter guide |
+| `Spashta_2.0/_docs/Builders_Roadmap.md` | Builder capabilities & roadmap |
 
 ---
 
