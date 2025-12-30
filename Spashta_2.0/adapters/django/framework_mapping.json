@@ -1,0 +1,125 @@
+{
+    "_meta": {
+        "description": "Maps Django constructs to Core Nodes + Semantic Roles.",
+        "role": "Enrichment Mapping"
+    },
+    "mappings": [
+        {
+            "core_node": "Class",
+            "semantic_role": "DataModel",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "models.Model",
+                    "django.db.models.Model"
+                ]
+            }
+        },
+        {
+            "core_node": "Function",
+            "semantic_role": "View",
+            "notes": "Temporary heuristic fallback until builder emits function argument metadata (e.g., request parameter).",
+            "detection_rules": {
+                "arg_names_include": [
+                    "request"
+                ],
+                "file_path_contains": "views",
+                "used_in_calls": [
+                    "render",
+                    "HttpResponse",
+                    "JsonResponse",
+                    "redirect"
+                ]
+            }
+        },
+        {
+            "core_node": "Class",
+            "semantic_role": "View",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "View",
+                    "APIView",
+                    "ViewSet",
+                    "TemplateView",
+                    "ListView",
+                    "DetailView",
+                    "CreateView",
+                    "UpdateView",
+                    "DeleteView",
+                    "django.views",
+                    "rest_framework.generics",
+                    "rest_framework.views"
+                ]
+            }
+        },
+        {
+            "core_node": "Call",
+            "semantic_role": "Route",
+            "detection_rules": {
+                "function_name": [
+                    "path",
+                    "re_path",
+                    "url"
+                ],
+                "context": "urlpatterns"
+            }
+        },
+        {
+            "core_node": "Class",
+            "semantic_role": "Form",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "forms.Form",
+                    "forms.ModelForm",
+                    "django.forms.Form",
+                    "django.forms.ModelForm"
+                ]
+            }
+        },
+        {
+            "core_node": "Class",
+            "semantic_role": "Serializer",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "serializers.Serializer",
+                    "serializers.ModelSerializer",
+                    "rest_framework.serializers.Serializer",
+                    "rest_framework.serializers.ModelSerializer"
+                ]
+            }
+        },
+        {
+            "core_node": "Class",
+            "semantic_role": "Admin",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "admin.ModelAdmin",
+                    "django.contrib.admin.ModelAdmin"
+                ]
+            }
+        },
+        {
+            "core_node": "Class",
+            "semantic_role": "Middleware",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "MiddlewareMixin",
+                    "django.utils.deprecation.MiddlewareMixin"
+                ],
+                "file_path_contains": "middleware"
+            }
+        },
+        {
+            "core_node": "Function",
+            "semantic_role": "Signal",
+            "detection_rules": {
+                "used_in_calls": [
+                    "receiver"
+                ],
+                "decorators": [
+                    "receiver",
+                    "django.dispatch.receiver"
+                ]
+            }
+        }
+    ]
+}

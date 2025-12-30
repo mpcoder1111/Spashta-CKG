@@ -1,0 +1,74 @@
+================================================================================
+SPASHTA-CKG 2.0: AI AGENT CONTEXT PROMPT
+================================================================================
+
+This project is equipped with SPASHTA-CKG (Single Project Adaptive Semantic Hyper-Tree Architecture)
+It provides you with "Situational Awareness" through a deterministic Code Knowledge Graph.
+
+⚠️  CORE DIRECTIVE:
+    Query the Spashta CKG **FIRST** before reading raw source code files.
+    It saves tokens, reduces hallucinations, and provides instant structural context.
+
+--------------------------------------------------------------------------------
+🛠️  QUERY TOOL USAGE
+--------------------------------------------------------------------------------
+
+LOCATION: Spashta_2.0/runtime/query_spashta.py
+
+ALWAYS use the `--json` flag for machine-readable output.
+
+1.  🔍 SEARCH & LOCATE
+    python Spashta_2.0/runtime/query_spashta.py search "auth" --json
+    python Spashta_2.0/runtime/query_spashta.py locate "app/views.py::login" --json
+
+2.  📖 READ CODE (Context-Aware)
+    python Spashta_2.0/runtime/query_spashta.py read "app/views.py::login" --json
+    (Returns code + docstrings + line numbers instantly)
+
+3.  🎯 IMPACT ANALYSIS (Crucial before editing)
+    python Spashta_2.0/runtime/query_spashta.py impact "app/models.py::User" --depth 2 --json
+    (Answers: "Who depends on this node?")
+
+4.  🔗 DEPENDENCY TRACING
+    python Spashta_2.0/runtime/query_spashta.py dependencies "app/views.py" --json
+    (Answers: "What does this node depend on?")
+
+5.  📞 CALL GRAPH (Python Only)
+    python Spashta_2.0/runtime/query_spashta.py call-graph "app/views.py::process_data" --json
+
+6.  📊 PROJECT STATS
+    python Spashta_2.0/runtime/query_spashta.py stats --json
+
+--------------------------------------------------------------------------------
+📂  KNOWLEDGE GRAPH ARTIFACTS (JSON)
+--------------------------------------------------------------------------------
+
+If the CLI tool is insufficient, you may read these JSONs directly:
+
+1.  🧠 L2 ENRICHED (Best): runtime/code_knowledge_graph_enriched_by_Agent.json
+    (Contains LLM-generated business intent, summaries, and complex reasoning)
+
+2.  🧬 L1 ENRICHED (Standard): runtime/code_knowledge_graph_enriched.json
+    (Contains deterministic structure + Adapter semantics like "View", "API", "Model")
+
+3.  🦴 RAW AST (Fallback): runtime/code_knowledge_graph_ast.json
+    (Pure syntax tree structure)
+
+--------------------------------------------------------------------------------
+🔄  MAINTENANCE (Rebuild CKG)
+--------------------------------------------------------------------------------
+
+If you make structural changes (new files, classes, functions), run this series:
+
+    python Spashta_2.0/runtime/build_runtime_ast.py
+    python Spashta_2.0/runtime/enrich_runtime_ast.py
+
+--------------------------------------------------------------------------------
+⚙️  RULES FOR AI AGENT
+--------------------------------------------------------------------------------
+1.  Activate virtual environment before running tools.
+2.  Use Spashta as the "Single Source of Truth" for file paths and structure.
+3.  Do NOT modify files in `Spashta_2.0/runtime/` manually (except via scripts).
+4.  If L2 graph (Enriched by Agent) is missing, rely on L1.
+
+================================================================================

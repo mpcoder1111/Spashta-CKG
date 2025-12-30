@@ -1,0 +1,15 @@
+{
+  "_generated_at": "2025-12-29T14:28:35.505905",
+  "nodes": {
+    "total": 50,
+    "enriched": 8,
+    "pending": 42,
+    "coverage_percent": 16.0
+  },
+  "ambiguities": {
+    "total": 78,
+    "resolved": 1,
+    "unresolved": 33,
+    "not_processed": 44
+  }
+}

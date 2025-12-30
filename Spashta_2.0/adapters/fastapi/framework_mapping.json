@@ -1,0 +1,74 @@
+{
+    "_meta": {
+        "description": "Maps FastAPI constructs to Core Nodes and Semantic Roles.",
+        "role": "Framework Mapping"
+    },
+    "mappings": [
+        {
+            "core_node": "Class",
+            "semantic_role": "DataModel",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "SQLModel",
+                    "Base"
+                ]
+            }
+        },
+        {
+            "core_node": "Class",
+            "semantic_role": "APIContract",
+            "notes": "Pydantic models define the API schema/contract.",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "BaseModel",
+                    "pydantic.BaseModel"
+                ]
+            }
+        },
+        {
+            "core_node": "Function",
+            "semantic_role": "View",
+            "notes": "In FastAPI, the path operation function acts as the View/Controller.",
+            "detection_rules": {
+                "decorated_by": [
+                    "app.get",
+                    "app.post",
+                    "app.put",
+                    "app.delete",
+                    "app.patch",
+                    "router.get",
+                    "router.post",
+                    "router.put",
+                    "router.delete",
+                    "router.patch",
+                    "api_router.get",
+                    "api_router.post",
+                    "api_router.put",
+                    "api_router.delete"
+                ]
+            }
+        },
+        {
+            "core_node": "Call",
+            "semantic_role": "Dependency",
+            "notes": "FastAPI dependency injection via Depends.",
+            "detection_rules": {
+                "function_name": [
+                    "Depends",
+                    "fastapi.Depends",
+                    "Security"
+                ]
+            }
+        },
+        {
+            "core_node": "Variable",
+            "semantic_role": "Router",
+            "notes": "APIRouter instances define modular route groups.",
+            "detection_rules": {
+                "assigned_value": [
+                    "APIRouter"
+                ]
+            }
+        }
+    ]
+}

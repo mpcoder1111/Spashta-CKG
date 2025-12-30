@@ -1,0 +1,18 @@
+=== SPASHTA-CKG: LLM ENRICHMENT REQUEST ===
+
+TASK: Perform Level-2 LLM Semantic Enrichment on the Code Knowledge Graph.
+
+FIRST STEP (Run this command):
+  python runtime/enrichment_through_LLM/llm_enrich_runtime_ast.py --list-pending
+
+THEN READ THESE FILES:
+  1. runtime/enrichment_through_LLM/llm_enrichment_rules.json (rules)
+  2. runtime/enrichment_through_LLM/llm_enrichment_prompt.json (format + workflow)
+
+Follow the workflow_summary in llm_enrichment_prompt.json.
+
+OUTPUT FILE:
+  runtime/code_knowledge_graph_enriched_by_Agent.json
+
+QUERY TOOL:
+  python runtime/query_spashta.py --help

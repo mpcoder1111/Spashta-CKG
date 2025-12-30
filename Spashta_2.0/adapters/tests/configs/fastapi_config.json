@@ -1,0 +1,18 @@
+{
+    "name": "FastAPI Adapter Verification",
+    "paths": {
+        "mapping_file": "../../fastapi/framework_mapping.json",
+        "dummy_dir": "../data/fastapi",
+        "dummy_files": [
+            "dummy_fastapi_app.py"
+        ],
+        "builder_script": "builders/python/build_python_ast.py"
+    },
+    "expectations": {
+        "roles_present": [
+            "DataModel",
+            "APIContract",
+            "View"
+        ]
+    }
+}

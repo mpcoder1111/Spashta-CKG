@@ -1,0 +1,357 @@
+{
+  "_meta": {
+    "builder": "build_html_ast.py",
+    "builder_version": "2.0-strict",
+    "generated_at": "2025-12-30T21:08:41.971428"
+  },
+  "nodes": [
+    {
+      "node_type": "Template",
+      "name": "_demo/app/templates/home_demo.html",
+      "id": "_demo/app/templates/home_demo.html",
+      "analysis_confidence": "structural",
+      "line_start": null,
+      "line_end": null,
+      "attributes": null,
+      "hash": "d3711a9c3ab8044cadace2f5c321af4d"
+    },
+    {
+      "node_type": "StaticAsset",
+      "name": "/static/style_demo.css",
+      "id": "_demo/app/templates/home_demo.html::StaticAsset::/static/style_demo.css",
+      "analysis_confidence": "heuristic",
+      "line_start": 14,
+      "line_end": null,
+      "attributes": {
+        "tag": "link"
+      }
+    },
+    {
+      "node_type": "Route",
+      "name": "/api/items",
+      "id": "_demo/app/templates/home_demo.html::Route::/api/items",
+      "analysis_confidence": "heuristic",
+      "line_start": 23,
+      "line_end": null,
+      "attributes": {
+        "tag": "button"
+      }
+    },
+    {
+      "node_type": "StyleID",
+      "name": "#list-demo",
+      "id": "_demo/app/templates/home_demo.html::StyleID::#list-demo",
+      "analysis_confidence": "heuristic",
+      "line_start": 23,
+      "line_end": null,
+      "attributes": {
+        "tag": "button"
+      }
+    },
+    {
+      "node_type": "StaticAsset",
+      "name": "/static/main_demo.js",
+      "id": "_demo/app/templates/home_demo.html::StaticAsset::/static/main_demo.js",
+      "analysis_confidence": "heuristic",
+      "line_start": 35,
+      "line_end": null,
+      "attributes": {
+        "tag": "script"
+      }
+    },
+    {
+      "node_type": "Template",
+      "name": "Spashta_2.0/adapters/tests/data/htmx/dummy_htmx.html",
+      "id": "Spashta_2.0/adapters/tests/data/htmx/dummy_htmx.html",
+      "analysis_confidence": "structural",
+      "line_start": null,
+      "line_end": null,
+      "attributes": null,
+      "hash": "6ae84a9293e4f08c6b773b6327685c1f"
+    },
+    {
+      "node_type": "Route",
+      "name": "/api/clicks",
+      "id": "Spashta_2.0/adapters/tests/data/htmx/dummy_htmx.html::Route::/api/clicks",
+      "analysis_confidence": "heuristic",
+      "line_start": 6,
+      "line_end": null,
+      "attributes": {
+        "tag": "button"
+      }
+    },
+    {
+      "node_type": "StyleID",
+      "name": "#result",
+      "id": "Spashta_2.0/adapters/tests/data/htmx/dummy_htmx.html::StyleID::#result",
+      "analysis_confidence": "heuristic",
+      "line_start": 6,
+      "line_end": null,
+      "attributes": {
+        "tag": "button"
+      }
+    },
+    {
+      "node_type": "Route",
+      "name": "/api/submit",
+      "id": "Spashta_2.0/adapters/tests/data/htmx/dummy_htmx.html::Route::/api/submit",
+      "analysis_confidence": "heuristic",
+      "line_start": 15,
+      "line_end": null,
+      "attributes": {
+        "tag": "form",
+        "method": "POST"
+      }
+    },
+    {
+      "node_type": "Event",
+      "name": "submit",
+      "id": "Spashta_2.0/adapters/tests/data/htmx/dummy_htmx.html::Event::submit",
+      "analysis_confidence": "heuristic",
+      "line_start": 15,
+      "line_end": null,
+      "attributes": {
+        "tag": "form",
+        "method": "POST"
+      }
+    },
+    {
+      "node_type": "Template",
+      "name": "Spashta_2.0/builders/tests/data/html_dummy.html",
+      "id": "Spashta_2.0/builders/tests/data/html_dummy.html",
+      "analysis_confidence": "structural",
+      "line_start": null,
+      "line_end": null,
+      "attributes": null,
+      "hash": "55caf6c7b9e977fc24b3319748be5434"
+    },
+    {
+      "node_type": "StaticAsset",
+      "name": "/static/styles.css",
+      "id": "Spashta_2.0/builders/tests/data/html_dummy.html::StaticAsset::/static/styles.css",
+      "analysis_confidence": "heuristic",
+      "line_start": 8,
+      "line_end": null,
+      "attributes": {
+        "tag": "link"
+      }
+    },
+    {
+      "node_type": "StaticAsset",
+      "name": "/favicon.ico",
+      "id": "Spashta_2.0/builders/tests/data/html_dummy.html::StaticAsset::/favicon.ico",
+      "analysis_confidence": "heuristic",
+      "line_start": 10,
+      "line_end": null,
+      "attributes": {
+        "tag": "link"
+      }
+    },
+    {
+      "node_type": "StaticAsset",
+      "name": "/static/logo.png",
+      "id": "Spashta_2.0/builders/tests/data/html_dummy.html::StaticAsset::/static/logo.png",
+      "analysis_confidence": "heuristic",
+      "line_start": 18,
+      "line_end": null,
+      "attributes": {
+        "tag": "img"
+      }
+    },
+    {
+      "node_type": "Route",
+      "name": "/dashboard/user",
+      "id": "Spashta_2.0/builders/tests/data/html_dummy.html::Route::/dashboard/user",
+      "analysis_confidence": "heuristic",
+      "line_start": 21,
+      "line_end": null,
+      "attributes": {
+        "tag": "a"
+      }
+    },
+    {
+      "node_type": "Route",
+      "name": "/api/submit_data",
+      "id": "Spashta_2.0/builders/tests/data/html_dummy.html::Route::/api/submit_data",
+      "analysis_confidence": "heuristic",
+      "line_start": 25,
+      "line_end": null,
+      "attributes": {
+        "tag": "form",
+        "method": "POST"
+      }
+    },
+    {
+      "node_type": "StaticAsset",
+      "name": "/static/app_bundle.js",
+      "id": "Spashta_2.0/builders/tests/data/html_dummy.html::StaticAsset::/static/app_bundle.js",
+      "analysis_confidence": "heuristic",
+      "line_start": 31,
+      "line_end": null,
+      "attributes": {
+        "tag": "script"
+      }
+    },
+    {
+      "node_type": "Route",
+      "name": "/api/like",
+      "id": "Spashta_2.0/builders/tests/data/html_dummy.html::Route::/api/like",
+      "analysis_confidence": "heuristic",
+      "line_start": 34,
+      "line_end": null,
+      "attributes": {
+        "tag": "button",
+        "method": "POST"
+      }
+    },
+    {
+      "node_type": "StyleID",
+      "name": "#like-count",
+      "id": "Spashta_2.0/builders/tests/data/html_dummy.html::StyleID::#like-count",
+      "analysis_confidence": "heuristic",
+      "line_start": 34,
+      "line_end": null,
+      "attributes": {
+        "tag": "button",
+        "method": "POST"
+      }
+    },
+    {
+      "node_type": "Route",
+      "name": "/update",
+      "id": "Spashta_2.0/builders/tests/data/html_dummy.html::Route::/update",
+      "analysis_confidence": "heuristic",
+      "line_start": 43,
+      "line_end": null,
+      "attributes": {
+        "tag": "div"
+      }
+    },
+    {
+      "node_type": "Event",
+      "name": "mouseenter",
+      "id": "Spashta_2.0/builders/tests/data/html_dummy.html::Event::mouseenter",
+      "analysis_confidence": "heuristic",
+      "line_start": 43,
+      "line_end": null,
+      "attributes": {
+        "tag": "div"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "edge": "links_static_asset",
+      "from": "_demo/app/templates/home_demo.html",
+      "to": "_demo/app/templates/home_demo.html::StaticAsset::/static/style_demo.css"
+    },
+    {
+      "edge": "calls_api",
+      "from": "_demo/app/templates/home_demo.html",
+      "to": "_demo/app/templates/home_demo.html::Route::/api/items"
+    },
+    {
+      "edge": "targets_element",
+      "from": "_demo/app/templates/home_demo.html",
+      "to": "_demo/app/templates/home_demo.html::StyleID::#list-demo"
+    },
+    {
+      "edge": "links_static_asset",
+      "from": "_demo/app/templates/home_demo.html",
+      "to": "_demo/app/templates/home_demo.html::StaticAsset::/static/main_demo.js"
+    },
+    {
+      "edge": "calls_api",
+      "from": "Spashta_2.0/adapters/tests/data/htmx/dummy_htmx.html",
+      "to": "Spashta_2.0/adapters/tests/data/htmx/dummy_htmx.html::Route::/api/clicks"
+    },
+    {
+      "edge": "targets_element",
+      "from": "Spashta_2.0/adapters/tests/data/htmx/dummy_htmx.html",
+      "to": "Spashta_2.0/adapters/tests/data/htmx/dummy_htmx.html::StyleID::#result"
+    },
+    {
+      "edge": "calls_api",
+      "from": "Spashta_2.0/adapters/tests/data/htmx/dummy_htmx.html",
+      "to": "Spashta_2.0/adapters/tests/data/htmx/dummy_htmx.html::Route::/api/submit"
+    },
+    {
+      "edge": "triggers_event",
+      "from": "Spashta_2.0/adapters/tests/data/htmx/dummy_htmx.html",
+      "to": "Spashta_2.0/adapters/tests/data/htmx/dummy_htmx.html::Event::submit"
+    },
+    {
+      "edge": "links_static_asset",
+      "from": "Spashta_2.0/builders/tests/data/html_dummy.html",
+      "to": "Spashta_2.0/builders/tests/data/html_dummy.html::StaticAsset::/static/styles.css"
+    },
+    {
+      "edge": "links_static_asset",
+      "from": "Spashta_2.0/builders/tests/data/html_dummy.html",
+      "to": "Spashta_2.0/builders/tests/data/html_dummy.html::StaticAsset::/favicon.ico"
+    },
+    {
+      "edge": "links_static_asset",
+      "from": "Spashta_2.0/builders/tests/data/html_dummy.html",
+      "to": "Spashta_2.0/builders/tests/data/html_dummy.html::StaticAsset::/static/logo.png"
+    },
+    {
+      "edge": "calls_api",
+      "from": "Spashta_2.0/builders/tests/data/html_dummy.html",
+      "to": "Spashta_2.0/builders/tests/data/html_dummy.html::Route::/dashboard/user"
+    },
+    {
+      "edge": "submits_form",
+      "from": "Spashta_2.0/builders/tests/data/html_dummy.html",
+      "to": "Spashta_2.0/builders/tests/data/html_dummy.html::Route::/api/submit_data"
+    },
+    {
+      "edge": "links_static_asset",
+      "from": "Spashta_2.0/builders/tests/data/html_dummy.html",
+      "to": "Spashta_2.0/builders/tests/data/html_dummy.html::StaticAsset::/static/app_bundle.js"
+    },
+    {
+      "edge": "calls_api",
+      "from": "Spashta_2.0/builders/tests/data/html_dummy.html",
+      "to": "Spashta_2.0/builders/tests/data/html_dummy.html::Route::/api/like"
+    },
+    {
+      "edge": "targets_element",
+      "from": "Spashta_2.0/builders/tests/data/html_dummy.html",
+      "to": "Spashta_2.0/builders/tests/data/html_dummy.html::StyleID::#like-count"
+    },
+    {
+      "edge": "calls_api",
+      "from": "Spashta_2.0/builders/tests/data/html_dummy.html",
+      "to": "Spashta_2.0/builders/tests/data/html_dummy.html::Route::/update"
+    },
+    {
+      "edge": "triggers_event",
+      "from": "Spashta_2.0/builders/tests/data/html_dummy.html",
+      "to": "Spashta_2.0/builders/tests/data/html_dummy.html::Event::mouseenter"
+    }
+  ],
+  "ambiguities": [
+    {
+      "id": "3404c938-da63-45a3-b4d3-2397dc517b6b",
+      "kind": "external_reference_unmodeled",
+      "source_file": "_demo/app/templates/home_demo.html",
+      "source_scope": "_demo/app/templates/home_demo.html",
+      "expression": "https://unpkg.com/htmx.org@1.9.10",
+      "reason": "External URL references are not structural edges",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    },
+    {
+      "id": "f165507d-4efd-47dc-8c04-b916b675b710",
+      "kind": "external_reference_unmodeled",
+      "source_file": "Spashta_2.0/builders/tests/data/html_dummy.html",
+      "source_scope": "Spashta_2.0/builders/tests/data/html_dummy.html",
+      "expression": "https://external.com/api",
+      "reason": "External URL references are not structural edges",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    }
+  ],
+  "logs": []
+}

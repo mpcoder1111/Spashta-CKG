@@ -1,0 +1,19 @@
+{
+    "name": "Django Adapter Verification",
+    "paths": {
+        "mapping_file": "../../django/framework_mapping.json",
+        "dummy_dir": "../data/django",
+        "dummy_files": [
+            "dummy_django_app.py",
+            "dummy_models.py",
+            "dummy_views.py",
+            "dummy_urls.py"
+        ]
+    },
+    "expectations": {
+        "roles_present": [
+            "DataModel",
+            "View"
+        ]
+    }
+}

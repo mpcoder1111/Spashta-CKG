@@ -1,0 +1,326 @@
+{
+    "_meta": {
+        "purpose": "Declarative governance and project-structure map for Spashta-CKG",
+        "philosophy": "Spashta explains itself explicitly to both humans and agents.",
+        "status": "stable",
+        "architecture_level": "governance_helper",
+        "last_updated": "2025-12-29",
+        "note": "This file defines what exists, who can modify it, and what rules apply."
+    },
+    "project_structure": {
+        "core/software_schema/nodes.json": {
+            "purpose": "Defines the universal node ontology (what can exist in any codebase).",
+            "file_type": "schema_json",
+            "status": "FROZEN",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Restricted to Spashta Designers",
+                "Treat as immutable architectural foundation",
+                "Only additive changes are allowed (never remove or rename existing nodes)",
+                "Changes require full schema impact review"
+            ],
+            "post_edit_validation": [
+                "builders/validation/validate_builder_output.py"
+            ]
+        },
+        "core/software_schema/edges.json": {
+            "purpose": "Defines all allowed relationships between core node types.",
+            "file_type": "schema_json",
+            "status": "FROZEN",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Restricted to Spashta Designers",
+                "Only introduce new edge types if universally applicable",
+                "Never weaken existing relationship constraints"
+            ],
+            "post_edit_validation": [
+                "builders/validation/validate_builder_output.py"
+            ]
+        },
+        "builders/python/build_python_ast.py": {
+            "purpose": "Python language builder - extracts AST from Python source files.",
+            "file_type": "builder_code",
+            "status": "ACTIVE",
+            "agent_relevant": false,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Must be fully schema-driven",
+                "Must not hardcode node or edge types",
+                "Must not inject semantic or framework meaning",
+                "Metadata additions (like call_line) are allowed"
+            ],
+            "post_edit_validation": [
+                "builders/validation/validate_builder_output.py"
+            ]
+        },
+        "builders/html/build_html_ast.py": {
+            "purpose": "HTML language builder - extracts templates and static asset references.",
+            "file_type": "builder_code",
+            "status": "ACTIVE",
+            "agent_relevant": false,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Must be fully schema-driven",
+                "Must extract HTMX attributes for interaction detection"
+            ],
+            "post_edit_validation": [
+                "builders/validation/validate_builder_output.py"
+            ]
+        },
+        "builders/css/build_css_ast.py": {
+            "purpose": "CSS language builder - extracts selectors and style definitions.",
+            "file_type": "builder_code",
+            "status": "ACTIVE",
+            "agent_relevant": false,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Must be fully schema-driven",
+                "Regex-based extraction is acceptable for current scope"
+            ],
+            "post_edit_validation": [
+                "builders/validation/validate_builder_output.py"
+            ]
+        },
+        "builders/*/*_language_mapping.json": {
+            "purpose": "Maps language-specific syntax to core schema concepts.",
+            "file_type": "mapping_json",
+            "status": "FROZEN",
+            "agent_relevant": false,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Mappings must reference only existing core nodes and edges",
+                "Do not invent semantics beyond language structure"
+            ],
+            "post_edit_validation": []
+        },
+        "builders/builder_rules.json": {
+            "purpose": "Global builder policies (exclusions, recursion limits, error handling).",
+            "file_type": "config_json",
+            "status": "ACTIVE",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Used to exclude directories like Spashta_2.0_Devlopment from scans"
+            ],
+            "post_edit_validation": []
+        },
+        "builders/validation/validate_builder_output.py": {
+            "purpose": "Validates builder output ASTs against Core Schema.",
+            "file_type": "validator_code",
+            "status": "ACTIVE",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Must remain language-agnostic",
+                "Must enforce strict schema compliance"
+            ],
+            "post_edit_validation": []
+        },
+        "adapters/*/framework_mapping.json": {
+            "purpose": "Maps framework constructs to core schema nodes for semantic labeling.",
+            "file_type": "mapping_json",
+            "status": "ACTIVE",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Must reference existing core nodes only",
+                "Must not invent new ontology",
+                "Used for enrichment by enrich_runtime_ast.py"
+            ],
+            "post_edit_validation": [
+                "adapters/validation/validate_adapter_rules.py"
+            ]
+        },
+        "adapters/adapter_Readme.md": {
+            "purpose": "Consolidated adapter documentation (Django, FastAPI, HTMX).",
+            "file_type": "documentation",
+            "status": "ACTIVE",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Single source of truth for adapter guidance"
+            ],
+            "post_edit_validation": []
+        },
+        "adapters/validation/validate_adapter_rules.py": {
+            "purpose": "Validates adapter rule structure and conformity against core rules.",
+            "file_type": "validator_code",
+            "status": "ACTIVE",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Must remain framework-agnostic",
+                "Must not mutate core or adapter data"
+            ],
+            "post_edit_validation": []
+        },
+        "runtime/build_runtime_ast.py": {
+            "purpose": "Orchestrates all builders, merges outputs into unified AST.",
+            "file_type": "runtime_code",
+            "status": "ACTIVE",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Must not perform enrichment",
+                "Must normalize node/edge schema"
+            ],
+            "output": "runtime/code_knowledge_graph_ast.json",
+            "post_edit_validation": []
+        },
+        "runtime/enrich_runtime_ast.py": {
+            "purpose": "Applies Level-1 semantic enrichment using adapter mappings.",
+            "file_type": "runtime_code",
+            "status": "ACTIVE",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Must not modify structure (only add semantic_roles)",
+                "Must preserve ambiguities from AST"
+            ],
+            "output": "runtime/code_knowledge_graph_enriched.json",
+            "post_edit_validation": [
+                "runtime/validate_ast_equivalence.py"
+            ]
+        },
+        "runtime/validate_ast_equivalence.py": {
+            "purpose": "Ensures enrichment did not alter AST structure.",
+            "file_type": "validator_code",
+            "status": "ACTIVE",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Must verify node IDs and edge topology preserved"
+            ],
+            "post_edit_validation": []
+        },
+        "runtime/diff_runtime_ast.py": {
+            "purpose": "Detects changes between AST versions for incremental processing.",
+            "file_type": "runtime_code",
+            "status": "ACTIVE",
+            "agent_relevant": false,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [],
+            "post_edit_validation": []
+        },
+        "runtime/enrichment_through_LLM/llm_enrich_runtime_ast.py": {
+            "purpose": "Helper script for L2 LLM enrichment (listing files, validating output).",
+            "file_type": "runtime_code",
+            "status": "ACTIVE",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Must not perform enrichment itself (Agent does that)",
+                "Must validate agent output against rules"
+            ],
+            "post_edit_validation": []
+        },
+        "runtime/enrichment_through_LLM/llm_enrichment_rules.json": {
+            "purpose": "Strict rules for AI Agents performing L2 enrichment.",
+            "file_type": "rule_json",
+            "status": "ACTIVE",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Defines prohibited actions (no structure mutation)"
+            ]
+        },
+        "runtime/Runtime_Readme.md": {
+            "purpose": "Consolidated runtime documentation (execution flow, enrichment, roadmap).",
+            "file_type": "documentation",
+            "status": "ACTIVE",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [],
+            "post_edit_validation": []
+        },
+        "project/profile.json": {
+            "purpose": "Defines active technology stack (languages, frameworks) and project root.",
+            "file_type": "config_json",
+            "status": "ACTIVE",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [
+                "Must reference existing builders and adapters only",
+                "project_root can be relative (for portability)"
+            ],
+            "post_edit_validation": [
+                "project/validation/validate_project_profile.py"
+            ]
+        },
+        "runtime/query_spashta.py": {
+            "purpose": "AI Agent's query tool for accessing the CKG.",
+            "file_type": "query_tool",
+            "status": "ACTIVE",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "commands": [
+                "search - Find nodes by name, ID, or attributes",
+                "locate - Get file path and line numbers",
+                "read - Read actual source code",
+                "details - Get full node JSON",
+                "impact - Who depends on this?",
+                "dependencies - What does this use?",
+                "call-graph - [PYTHON ONLY] Function call relationships",
+                "stats - Graph statistics",
+                "list-files - List indexed files"
+            ],
+            "edit_rules": [
+                "Always use --json flag for machine-readable output"
+            ],
+            "post_edit_validation": []
+        },
+        "docs/Builders_Roadmap.md": {
+            "purpose": "Consolidated roadmap for all language builders (Python, HTML, CSS).",
+            "file_type": "documentation",
+            "status": "ACTIVE",
+            "agent_relevant": true,
+            "agent_can_read": true,
+            "agent_can_write": false,
+            "editable_by_humans": true,
+            "edit_rules": [],
+            "post_edit_validation": []
+        }
+    }
+}

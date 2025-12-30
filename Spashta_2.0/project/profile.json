@@ -1,0 +1,40 @@
+{
+    "_meta": {
+        "description": "Defines the active technology stack and scan scope for this project.",
+        "role": "Project Activation Context",
+        "IMPORTANT": "Use exact spellings from supported lists below. Spelling mistakes will cause errors.",
+        "supported_languages": [
+            "python",
+            "html",
+            "css"
+        ],
+        "supported_frameworks": [
+            "django",
+            "fastapi",
+            "htmx"
+        ]
+    },
+    "project_root": ".",
+    "_project_root_CHANGE_HERE": "<-- Set absolute path to your project folder",
+    "project_type": "web_app",
+    "languages": [
+        "python",
+        "html",
+        "css"
+    ],
+    "_languages_CHANGE_HERE": "<-- Select from supported_languages above",
+    "frameworks": [
+        "django",
+        "htmx"
+    ],
+    "_frameworks_CHANGE_HERE": "<-- Select from supported_frameworks above",
+    "excluded": {
+        "frameworks": [
+            "fastapi"
+        ],
+        "languages": [
+            "javascript"
+        ]
+    },
+    "notes": "Django + HTMX example project."
+}

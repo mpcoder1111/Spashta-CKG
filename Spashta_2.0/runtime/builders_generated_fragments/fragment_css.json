@@ -1,0 +1,622 @@
+{
+  "_meta": {
+    "builder": "build_css_ast.py",
+    "builder_version": "1.0-strict",
+    "generated_at": "2025-12-30T21:08:42.090529"
+  },
+  "nodes": [
+    {
+      "node_type": "Stylesheet",
+      "name": "_demo/static/style_demo.css",
+      "id": "_demo/static/style_demo.css",
+      "analysis_confidence": "structural",
+      "line_start": null,
+      "line_end": null,
+      "attributes": null,
+      "file_hash": "75fa9cedb4a04575d948e43aa6af1223"
+    },
+    {
+      "node_type": "StyleClass",
+      "name": "container-demo",
+      "id": "_demo/static/style_demo.css::StyleClass::container-demo",
+      "analysis_confidence": "heuristic",
+      "line_start": 11,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleClass",
+      "name": "item-demo",
+      "id": "_demo/static/style_demo.css::StyleClass::item-demo",
+      "analysis_confidence": "heuristic",
+      "line_start": 25,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleID",
+      "name": "list-demo",
+      "id": "_demo/static/style_demo.css::StyleID::list-demo",
+      "analysis_confidence": "heuristic",
+      "line_start": 18,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "max-width",
+      "id": "_demo/static/style_demo.css::StyleElement::max-width",
+      "analysis_confidence": "heuristic",
+      "line_start": 12,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "margin",
+      "id": "_demo/static/style_demo.css::StyleElement::margin",
+      "analysis_confidence": "heuristic",
+      "line_start": 13,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "padding",
+      "id": "_demo/static/style_demo.css::StyleElement::padding",
+      "analysis_confidence": "heuristic",
+      "line_start": 14,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "background",
+      "id": "_demo/static/style_demo.css::StyleElement::background",
+      "analysis_confidence": "heuristic",
+      "line_start": 19,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "border-radius",
+      "id": "_demo/static/style_demo.css::StyleElement::border-radius",
+      "analysis_confidence": "heuristic",
+      "line_start": 20,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "border-bottom",
+      "id": "_demo/static/style_demo.css::StyleElement::border-bottom",
+      "analysis_confidence": "heuristic",
+      "line_start": 27,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "solid",
+      "id": "_demo/static/style_demo.css::StyleElement::solid",
+      "analysis_confidence": "heuristic",
+      "line_start": 27,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "hover",
+      "id": "_demo/static/style_demo.css::StyleElement::hover",
+      "analysis_confidence": "heuristic",
+      "line_start": 31,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "Stylesheet",
+      "name": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "analysis_confidence": "structural",
+      "line_start": null,
+      "line_end": null,
+      "attributes": null,
+      "file_hash": "5c39fb69ac0ee234bd88898ed9cde65b"
+    },
+    {
+      "node_type": "StyleClass",
+      "name": "container",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleClass::container",
+      "analysis_confidence": "heuristic",
+      "line_start": 8,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleClass",
+      "name": "tiny",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleClass::tiny",
+      "analysis_confidence": "heuristic",
+      "line_start": 56,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleClass",
+      "name": "spaced1",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleClass::spaced1",
+      "analysis_confidence": "heuristic",
+      "line_start": 65,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleID",
+      "name": "main-header",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleID::main-header",
+      "analysis_confidence": "heuristic",
+      "line_start": 12,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleID",
+      "name": "spaced2",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleID::spaced2",
+      "analysis_confidence": "heuristic",
+      "line_start": 66,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "import",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::import",
+      "analysis_confidence": "heuristic",
+      "line_start": 1,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "width",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::width",
+      "analysis_confidence": "heuristic",
+      "line_start": 9,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "background",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::background",
+      "analysis_confidence": "heuristic",
+      "line_start": 13,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "body",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::body",
+      "analysis_confidence": "heuristic",
+      "line_start": 16,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "margin",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::margin",
+      "analysis_confidence": "heuristic",
+      "line_start": 17,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "media",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::media",
+      "analysis_confidence": "heuristic",
+      "line_start": 26,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "max-width",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::max-width",
+      "analysis_confidence": "heuristic",
+      "line_start": 26,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "keyframes",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::keyframes",
+      "analysis_confidence": "heuristic",
+      "line_start": 37,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "slideIn",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::slideIn",
+      "analysis_confidence": "heuristic",
+      "line_start": 37,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "from",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::from",
+      "analysis_confidence": "heuristic",
+      "line_start": 38,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "left",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::left",
+      "analysis_confidence": "heuristic",
+      "line_start": 39,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "to",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::to",
+      "analysis_confidence": "heuristic",
+      "line_start": 42,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "div",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::div",
+      "analysis_confidence": "heuristic",
+      "line_start": 52,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "display",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::display",
+      "analysis_confidence": "heuristic",
+      "line_start": 53,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "block",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::block",
+      "analysis_confidence": "heuristic",
+      "line_start": 53,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "font-size",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::font-size",
+      "analysis_confidence": "heuristic",
+      "line_start": 57,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "color",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::color",
+      "analysis_confidence": "heuristic",
+      "line_start": 67,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "nav",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::nav",
+      "analysis_confidence": "heuristic",
+      "line_start": 74,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "before",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::before",
+      "analysis_confidence": "heuristic",
+      "line_start": 74,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "content",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::content",
+      "analysis_confidence": "heuristic",
+      "line_start": 75,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "button",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::button",
+      "analysis_confidence": "heuristic",
+      "line_start": 78,
+      "line_end": null,
+      "attributes": {
+        "pseudo_state": "hover"
+      }
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "hover",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::hover",
+      "analysis_confidence": "heuristic",
+      "line_start": 78,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "opacity",
+      "id": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::opacity",
+      "analysis_confidence": "heuristic",
+      "line_start": 79,
+      "line_end": null,
+      "attributes": null
+    }
+  ],
+  "edges": [
+    {
+      "edge": "defines",
+      "from": "_demo/static/style_demo.css",
+      "to": "_demo/static/style_demo.css::StyleClass::container-demo"
+    },
+    {
+      "edge": "defines",
+      "from": "_demo/static/style_demo.css",
+      "to": "_demo/static/style_demo.css::StyleClass::item-demo"
+    },
+    {
+      "edge": "defines",
+      "from": "_demo/static/style_demo.css",
+      "to": "_demo/static/style_demo.css::StyleID::list-demo"
+    },
+    {
+      "edge": "defines",
+      "from": "_demo/static/style_demo.css",
+      "to": "_demo/static/style_demo.css::StyleElement::max-width"
+    },
+    {
+      "edge": "defines",
+      "from": "_demo/static/style_demo.css",
+      "to": "_demo/static/style_demo.css::StyleElement::margin"
+    },
+    {
+      "edge": "defines",
+      "from": "_demo/static/style_demo.css",
+      "to": "_demo/static/style_demo.css::StyleElement::padding"
+    },
+    {
+      "edge": "defines",
+      "from": "_demo/static/style_demo.css",
+      "to": "_demo/static/style_demo.css::StyleElement::background"
+    },
+    {
+      "edge": "defines",
+      "from": "_demo/static/style_demo.css",
+      "to": "_demo/static/style_demo.css::StyleElement::border-radius"
+    },
+    {
+      "edge": "defines",
+      "from": "_demo/static/style_demo.css",
+      "to": "_demo/static/style_demo.css::StyleElement::border-bottom"
+    },
+    {
+      "edge": "defines",
+      "from": "_demo/static/style_demo.css",
+      "to": "_demo/static/style_demo.css::StyleElement::solid"
+    },
+    {
+      "edge": "defines",
+      "from": "_demo/static/style_demo.css",
+      "to": "_demo/static/style_demo.css::StyleElement::hover"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleClass::container"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleClass::tiny"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleClass::spaced1"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleID::main-header"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleID::spaced2"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::import"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::width"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::background"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::body"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::margin"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::media"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::max-width"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::keyframes"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::slideIn"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::from"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::left"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::to"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::div"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::display"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::block"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::font-size"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::color"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::nav"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::before"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::content"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::button"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::hover"
+    },
+    {
+      "edge": "defines",
+      "from": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "to": "Spashta_2.0/builders/tests/data/css_dummy.css::StyleElement::opacity"
+    }
+  ],
+  "ambiguities": [
+    {
+      "id": "71d4f046-89c6-49e8-9b1e-051497f46fd1",
+      "kind": "responsive_breakpoint",
+      "source_file": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "source_scope": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "expression": "@media (max-width: 600px)",
+      "reason": "Media Queries unmodeled",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    },
+    {
+      "id": "ea502937-353d-4c95-aa3d-5033c49d3e8c",
+      "kind": "css_animation_defined",
+      "source_file": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "source_scope": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "expression": "@keyframes blocks",
+      "reason": "Animations unmodeled",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    },
+    {
+      "id": "4a9023f0-d70a-4a5f-851e-b7874c483276",
+      "kind": "css_animation_defined",
+      "source_file": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "source_scope": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "expression": "@keyframes slideIn",
+      "reason": "Animations unmodeled",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    },
+    {
+      "id": "65d7db64-6f89-4441-96fc-c68195d14250",
+      "kind": "import_target_unresolved",
+      "source_file": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "source_scope": "Spashta_2.0/builders/tests/data/css_dummy.css",
+      "expression": "mixins.css",
+      "reason": "Imported stylesheet not proven as file",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    }
+  ],
+  "logs": []
+}

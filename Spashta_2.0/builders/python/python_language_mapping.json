@@ -1,0 +1,38 @@
+{
+  "_meta": {
+    "version": "1.5-strict",
+    "supported_core_schema": "1.3",
+    "language": "python",
+    "ast_source": "CPython ast module",
+    "principle": "Maps syntax to core nodes only. Adapter logic (heuristics, symbols) is excluded."
+  },
+  "node_mappings": {
+    "Module": "File",
+    "ClassDef": "Class",
+    "FunctionDef": "Function",
+    "AsyncFunctionDef": "Function",
+    "Assign": "Variable",
+    "AnnAssign": "Variable",
+    "AugAssign": "Variable",
+    "Name": "Variable"
+  },
+  "edge_mappings": {
+    "import": "imports",
+    "import_from": "imports",
+    "defines_class": "defines",
+    "defines_function": "defines",
+    "contains_method": "contains_member",
+    "contains_variable": "contains_member",
+    "inherits_from": "extends",
+    "extends": "extends",
+    "function_call": "calls",
+    "calls": "calls",
+    "method_call": "calls",
+    "reads_variable": "reads_from",
+    "writes_variable": "writes_to",
+    "writes_to": "writes_to",
+    "raises_exception": "throws_exception",
+    "decorates": "decorates",
+    "await_usage": "uses_async"
+  }
+}

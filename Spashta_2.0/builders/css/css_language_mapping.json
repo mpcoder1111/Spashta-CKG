@@ -1,0 +1,33 @@
+{
+    "_meta": {
+        "parser": "regex_v1",
+        "description": "Regex-based mapping for CSS selectors and imports (Structural Heuristics)."
+    },
+    "file_node_type": "Stylesheet",
+    "patterns": {
+        "class_selector": {
+            "regex": "\\.([a-zA-Z_-][a-zA-Z0-9_-]*)(?=[\\s,\\{:])",
+            "emit_node": "StyleClass",
+            "name_group": 1,
+            "defines_edge": "defines"
+        },
+        "id_selector": {
+            "regex": "#(?!(?:[a-fA-F0-9]{3}|[a-fA-F0-9]{6})\\b)([a-zA-Z][a-zA-Z0-9_-]*)",
+            "emit_node": "StyleID",
+            "name_group": 1,
+            "defines_edge": "defines"
+        },
+        "element_selector": {
+            "regex": "(?<![\\.#-])\\b([a-zA-Z][a-zA-Z0-9_-]*)(?=[\\s:\\{])",
+            "emit_node": "StyleElement",
+            "name_group": 1,
+            "defines_edge": "defines"
+        },
+        "import_rule": {
+            "regex": "@import\\s+['\"](.*?)['\"]",
+            "emit_edge": "imports",
+            "target_group": 1,
+            "target_node_type": "Stylesheet"
+        }
+    }
+}

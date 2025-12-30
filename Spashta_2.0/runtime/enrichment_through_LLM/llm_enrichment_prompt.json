@@ -1,0 +1,149 @@
+{
+    "_meta": {
+        "role": "LLM Enrichment Prompt Template",
+        "description": "Template showing the expected input context and output format for IDE Agent enrichment",
+        "version": "1.0",
+        "usage": "Agent reads this to understand what input it receives and what output is expected"
+    },
+    "instructions": {
+        "task": "Enrich CKG nodes with business semantics and attempt to resolve ambiguities",
+        "approach": "File-centric: Process one file at a time, reading its content and enriching all nodes belonging to it",
+        "rules_reference": "runtime/enrichment_through_LLM/llm_enrichment_rules.json",
+        "working_folder": "runtime/enrichment_through_LLM/LLM_working_files/",
+        "working_folder_usage": "Store intermediate files like progress logs, file processing status here"
+    },
+    "input_context_per_file": {
+        "_description": "For each file, Agent receives the following context:",
+        "file_info": {
+            "file_path": "app/views.py",
+            "file_content": "... full source code of the file ..."
+        },
+        "nodes_in_this_file": [
+            {
+                "id": "File:app/views.py",
+                "node_type": "File",
+                "name": "views.py",
+                "semantic_roles": []
+            },
+            {
+                "id": "app/views.py::login",
+                "node_type": "Function",
+                "name": "login",
+                "line_start": 15,
+                "line_end": 35,
+                "semantic_roles": [
+                    "View"
+                ]
+            },
+            {
+                "id": "app/views.py::login::user",
+                "node_type": "Variable",
+                "name": "user",
+                "line_start": 18
+            }
+        ],
+        "edges_involving_this_file": [
+            {
+                "source": "File:app/views.py",
+                "target": "File:app/models.py",
+                "type": "imports"
+            },
+            {
+                "source": "app/views.py::login",
+                "target": "app/models.py::User",
+                "type": "calls"
+            }
+        ],
+        "ambiguities_from_this_file": [
+            {
+                "index": 0,
+                "source": "app/views.py::login",
+                "unresolved_target": "get_user",
+                "type": "UNRESOLVED_CALL",
+                "context": "Called at line 22"
+            }
+        ],
+        "available_nodes_for_resolution": [
+            "File:app/views.py",
+            "File:app/models.py",
+            "File:app/utils.py",
+            "app/views.py::login",
+            "app/models.py::User",
+            "app/utils.py::get_user",
+            "app/utils.py::validate_password"
+        ]
+    },
+    "expected_output_per_file": {
+        "_description": "For each file, Agent produces the following output:",
+        "node_enrichments": {
+            "File:app/views.py": {
+                "intent": "Django views module handling user authentication endpoints",
+                "summary": "User auth views",
+                "complexity_score": 3,
+                "domain_tags": [
+                    "authentication",
+                    "web-views"
+                ],
+                "pure_logic": false,
+                "side_effects": [
+                    "session_management"
+                ],
+                "enriched_at_hash": "abc123def456",
+                "enriched_at": "2025-12-29T14:00:00Z"
+            },
+            "app/views.py::login": {
+                "intent": "Authenticates user credentials and creates a session",
+                "summary": "User login endpoint",
+                "complexity_score": 3,
+                "domain_tags": [
+                    "authentication",
+                    "session",
+                    "security"
+                ],
+                "pure_logic": false,
+                "side_effects": [
+                    "session_write",
+                    "database_read"
+                ],
+                "enriched_at_hash": "abc123def456",
+                "enriched_at": "2025-12-29T14:00:00Z"
+            },
+            "app/views.py::login::user": {
+                "intent": "Holds authenticated user object after validation",
+                "summary": "Authenticated user instance",
+                "complexity_score": 1,
+                "domain_tags": [
+                    "user-data"
+                ],
+                "pure_logic": true,
+                "side_effects": [],
+                "enriched_at_hash": "abc123def456",
+                "enriched_at": "2025-12-29T14:00:00Z"
+            }
+        },
+        "ambiguity_resolutions": {
+            "0": {
+                "status": "resolved",
+                "probable_target": "app/utils.py::get_user",
+                "confidence": 0.95,
+                "reasoning": "Import statement 'from utils import get_user' found at line 3 of the file"
+            }
+        }
+    },
+    "output_format_notes": {
+        "node_enrichments": "Keyed by node ID, each containing llm_enrichment fields",
+        "ambiguity_resolutions": "Keyed by ambiguity index (as string), each containing llm_resolution fields",
+        "all_nodes_required": "Every node in 'nodes_in_this_file' MUST have an enrichment entry",
+        "all_ambiguities_required": "Every ambiguity MUST have a resolution entry (even if unresolved)"
+    },
+    "workflow_summary": {
+        "step_1": "Run: python llm_enrich_runtime_ast.py --list-pending",
+        "step_2": "Read LLM_working_files/files_to_enrich.json for pending file list",
+        "step_3": "Read llm_enrichment_rules.json for strict rules",
+        "step_4": "Read code_knowledge_graph_enriched.json for full graph",
+        "step_5": "For each file in pending list: read source, gather nodes/edges/ambiguities",
+        "step_6": "Produce node_enrichments (with enriched_at_hash) and ambiguity_resolutions",
+        "step_7": "Merge into graph and save to code_knowledge_graph_enriched_by_Agent.json",
+        "step_8": "(Optional) Run: python llm_enrich_runtime_ast.py --validate"
+    }
+}

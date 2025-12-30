@@ -1,0 +1,55 @@
+{
+    "__meta": {
+        "config_role": "HTML Test Configuration",
+        "runner": "../run_tests.py"
+    },
+    "paths": {
+        "project_root_relative": "../data/html_dummy.html",
+        "builder_script": "../../html/build_html_ast.py",
+        "mapping_file": "../../html/html_language_mapping.json"
+    },
+    "output": {
+        "filename": "../outputs/test_output_html.json",
+        "clean_before_run": true,
+        "format": "json"
+    },
+    "manual_expectations": {
+        "nodes": [
+            "Template",
+            "Route",
+            "StaticAsset",
+            "StyleID",
+            "Event"
+        ],
+        "edges": [
+            "calls_api",
+            "links_static_asset",
+            "submits_form",
+            "targets_element",
+            "triggers_event"
+        ]
+    },
+    "contract_equivalences": {
+        "__meta_info": {
+            "what_is_this": "Translation of Strict Mode Ambiguities to Expected Edges.",
+            "source": "Derived from build_html_ast.py emission logic."
+        },
+        "rules": [
+            {
+                "required_edge": "calls_api",
+                "accepted_ambiguity": "external_reference_unmodeled",
+                "reason": "Builder strictly excludes external URLs from internal graph structure."
+            },
+            {
+                "required_edge": "calls_api",
+                "accepted_ambiguity": "dynamic_value_unresolved",
+                "reason": "Builder cannot resolve template expressions {{}} to static routes."
+            },
+            {
+                "required_edge": "targets_element",
+                "accepted_ambiguity": "dynamic_value_unresolved",
+                "reason": "Dynamic IDs cannot be linked."
+            }
+        ]
+    }
+}

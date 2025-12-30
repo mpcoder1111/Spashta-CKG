@@ -1,0 +1,19 @@
+<!-- 
+Spashta-CKG – HTMX Adapter Dummy Test Code (v1)
+-->
+<div id="main-content">
+    <!-- Interaction 1: Button GET -->
+    <button hx-get="/api/clicks" hx-target="#result" hx-swap="outerHTML">
+        Click Me
+    </button>
+
+    <div id="result">
+        <!-- Result goes here -->
+    </div>
+
+    <!-- Interaction 2: Form POST -->
+    <form hx-post="/api/submit" hx-trigger="submit">
+        <input type="text" name="name">
+        <button type="submit">Save</button>
+    </form>
+</div>

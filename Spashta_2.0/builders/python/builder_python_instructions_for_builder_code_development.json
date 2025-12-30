@@ -1,0 +1,137 @@
+{
+  "builder_identity": {
+    "name": "python_ast_builder",
+    "version": "2.0-strict",
+    "output_format": "json",
+    "scope": "structure_only"
+  },
+
+  "core_dependency_policy": {
+    "core_schema_sources": [
+      "core/nodes.json",
+      "core/edges.json"
+    ],
+    "hardcoding_forbidden": true,
+    "schema_is_runtime_authority": true
+  },
+
+  "builder_principles": {
+    "structure_only": true,
+    "no_best_guessing": true,
+    "unknown_is_explicit": true,
+    "facts_and_uncertainty_separated": true,
+    "framework_semantics_forbidden": true,
+    "contracts_not_enforced_here": true
+  },
+
+  "output_rules": {
+    "format": "json",
+    "sections": ["nodes", "edges", "ambiguities", "logs"],
+    "deterministic": true
+  },
+
+  "file_node_rules": {
+    "file_hash_required": true,
+    "hash_algorithm": "md5",
+    "file_node_must_exist_before_children": true
+  },
+
+  "node_emission_rules": {
+    "emit_node_only_if": [
+      "direct_ast_construct",
+      "node_type_allowed_by_core_schema"
+    ],
+    "never_emit_node_to_satisfy_edge": true,
+    "forbidden_inference": [
+      "callable_variable_as_function",
+      "decorator_target_as_function",
+      "runtime_symbol_as_class",
+      "imported_symbol_auto_upgrade"
+    ]
+  },
+
+  "edge_emission_rules": {
+    "mandatory_schema_checks": [
+      "edge_type_exists",
+      "source_node_exists",
+      "target_node_exists",
+      "source_type_allowed",
+      "target_type_allowed"
+    ],
+    "on_failure": {
+      "emit": "ambiguity",
+      "do_not_emit_edge": true
+    }
+  },
+
+  "python_strict_rules": {
+    "calls": {
+      "allowed_only_if": {
+        "caller": ["Function", "Method"],
+        "callee": ["Function", "Method"],
+        "callee_proven_by": "ast_definition"
+      },
+      "otherwise_emit": "call_target_unknown"
+    },
+
+    "decorators": {
+      "allowed_edge": "decorates",
+      "symbolic_only": true,
+      "never_creates_structure": true
+    },
+
+    "nested_functions": {
+      "never_treated_as_members": true,
+      "emit_ambiguity": "nested_function_unmodeled"
+    },
+
+    "imports": {
+      "allowed_targets": ["Module", "File", "Class", "Function"],
+      "unknown_symbol_emit": "import_symbol_type_unknown"
+    },
+
+    "writes": {
+      "allowed_sources": ["Function", "Method"],
+      "otherwise_emit": "write_origin_invalid"
+    }
+  },
+
+  "ambiguity_policy": {
+    "ambiguity_is_first_class": true,
+    "ambiguity_is_not_structure": true,
+    "storage_location": "ambiguities",
+    "must_include": [
+      "id",
+      "kind",
+      "source_file",
+      "source_scope",
+      "expression",
+      "reason",
+      "confidence",
+      "resolver"
+    ],
+    "default_resolver": "agent",
+    "default_confidence": "unresolved"
+  },
+
+  "contracts_policy": {
+    "contracts_json_may_be_loaded": true,
+    "contracts_enforced_in_builder": false,
+    "contracts_used_by": [
+      "adapters",
+      "agents",
+      "post_build_validation"
+    ]
+  },
+
+  "builder_success_criteria": {
+    "structural_validation_failures": 0,
+    "ambiguity_count": "acceptable",
+    "partial_coverage": "acceptable",
+    "any_structural_violation_means": "builder_bug"
+  },
+
+  "final_rule": {
+    "statement": "If a fact cannot be proven using Python AST semantics and allowed by core schema, it must not be asserted and must be recorded as explicit ambiguity."
+  }
+}

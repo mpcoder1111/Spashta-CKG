@@ -1,0 +1,42 @@
+{
+    "_meta": {
+        "framework": "HTMX",
+        "description": "Maps HTMX attributes (hx-*) to Spashta CKG Semantic Roles."
+    },
+    "mappings": [
+        {
+            "core_node": "Template",
+            "semantic_role": "Component",
+            "notes": "Templates with HTMX attributes act as interactive UI Components (logic-bound).",
+            "detection_rules": {
+                "contains_attributes": [
+                    "hx-get",
+                    "hx-post",
+                    "hx-put",
+                    "hx-delete",
+                    "hx-patch",
+                    "hx-trigger",
+                    "hx-swap",
+                    "hx-target"
+                ]
+            }
+        },
+        {
+            "core_node": "Fragment",
+            "semantic_role": "Component",
+            "notes": "HTML Fragments (partials) used in HTMX swaps are logical components.",
+            "detection_rules": {
+                "contains_attributes": [
+                    "hx-get",
+                    "hx-post",
+                    "hx-put",
+                    "hx-delete",
+                    "hx-patch",
+                    "hx-trigger",
+                    "hx-swap",
+                    "hx-target"
+                ]
+            }
+        }
+    ]
+}

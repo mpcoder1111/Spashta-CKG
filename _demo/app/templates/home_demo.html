@@ -1,0 +1,37 @@
+<!--
+  home_demo.html - Demo Template for Spashta-CKG
+  
+  This is a DEMO file used to test Spashta-CKG's HTML/Template extraction.
+  Demonstrates how Spashta extracts template structures and HTMX attributes.
+  
+  Part of: Spashta-CKG Demo Project (_demo/)
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spashta-CKG Demo</title>
+    <link rel="stylesheet" href="/static/style_demo.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <div class="container-demo">
+        <h1>Spashta-CKG Demo Project</h1>
+        <p>This template demonstrates Spashta's HTML extraction capabilities.</p>
+        
+        <!-- HTMX demo usage -->
+        <button hx-get="/api/items" hx-target="#list-demo" hx-swap="innerHTML">
+            Load Demo Items
+        </button>
+        
+        <div id="list-demo">
+            <!-- Items will be loaded here via HTMX -->
+            {% for item in items %}
+                <div class="item-demo">{{ item.name }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <script src="/static/main_demo.js"></script>
+</body>
+</html>

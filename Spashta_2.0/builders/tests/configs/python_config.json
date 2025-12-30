@@ -1,0 +1,57 @@
+{
+    "__meta": {
+        "config_role": "Python Test Configuration",
+        "runner": "../run_tests.py"
+    },
+    "paths": {
+        "project_root_relative": "../data/python_dummy.py",
+        "builder_script": "../../python/build_python_ast.py",
+        "mapping_file": "../../python/python_language_mapping.json"
+    },
+    "output": {
+        "filename": "../outputs/test_output_python.json",
+        "clean_before_run": true,
+        "format": "json"
+    },
+    "manual_expectations": {
+        "nodes": [
+            "Class",
+            "Method",
+            "File"
+        ],
+        "edges": [
+            "imports",
+            "extends",
+            "calls",
+            "decorates"
+        ]
+    },
+    "contract_equivalences": {
+        "__meta_info": {
+            "what_is_this": "Translation of Strict Mode Ambiguities to Expected Edges.",
+            "source": "Derived from build_python_ast.py emission logic."
+        },
+        "rules": [
+            {
+                "required_edge": "imports",
+                "accepted_ambiguity": "import_module_unknown",
+                "reason": "Builder strictly verifies import targets; missing data -> ambiguity."
+            },
+            {
+                "required_edge": "extends",
+                "accepted_ambiguity": "inheritance_target_unproven",
+                "reason": "Base classes must be resolvable nodes; external/missing bases -> ambiguity."
+            },
+            {
+                "required_edge": "calls",
+                "accepted_ambiguity": "call_target_unknown",
+                "reason": "Function calls strictly resolved to defined nodes."
+            },
+            {
+                "required_edge": "decorates",
+                "accepted_ambiguity": "decorator_unknown",
+                "reason": "Decorators must be resolved symbols."
+            }
+        ]
+    }
+}

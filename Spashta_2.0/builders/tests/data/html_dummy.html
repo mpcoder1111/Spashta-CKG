@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Spashta CKG Dummy HTML</title>
+    <!-- CSS Link -->
+    <link rel="stylesheet" href="/static/styles.css">
+    <!-- Icon Link (Should be ignored by specific rule if we want, or captured) -->
+    <link rel="icon" href="/favicon.ico">
+</head>
+
+<body>
+    <div id="main-app">
+        <h1>Welcome</h1>
+
+        <!-- Image Asset -->
+        <img src="/static/logo.png" alt="Logo">
+
+        <!-- Standard Link -->
+        <a href="/dashboard/user">Go to Dashboard</a>
+        <a href="https://external.com/api">External Import</a>
+
+        <!-- Form Submission -->
+        <form action="/api/submit_data" method="POST">
+            <input type="text" name="username">
+            <button type="submit">Submit</button>
+        </form>
+
+        <!-- Script Tag -->
+        <script src="/static/app_bundle.js"></script>
+
+        <!-- HTMX Interaction (Coverage for targets_element / StyleID) -->
+        <button hx-post="/api/like" hx-target="#like-count">Like</button>
+        <span id="like-count">0</span>
+
+        <!-- Inline Script (Might be ignored or flagged as heuristic) -->
+        <script>
+            console.log("Inline script");
+        </script>
+
+        <!-- Coverage for triggers_event -->
+        <div hx-get="/update" hx-trigger="mouseenter">Hover me</div>
+    </div>
+</body>
+
+</html>

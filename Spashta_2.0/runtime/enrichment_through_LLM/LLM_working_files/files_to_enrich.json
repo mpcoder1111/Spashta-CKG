@@ -1,0 +1,156 @@
+{
+  "_generated_at": "2025-12-30T20:51:19.091417",
+  "_mode": "incremental",
+  "_summary": {
+    "total_files": 24,
+    "pending_enrichment": 24,
+    "skipped": 0
+  },
+  "files_to_enrich": [
+    {
+      "id": "File:_demo/app/models_demo.py",
+      "file_path": "_demo/app/models_demo.py",
+      "current_hash": "14b400fe4fefc55acc7c2cd7bac4dd11",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:_demo/app/views_demo.py",
+      "file_path": "_demo/app/views_demo.py",
+      "current_hash": "c98e675a3210ce4c8fb62f71db2876dc",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/adapters/tests/data/django/dummy_django_app.py",
+      "file_path": "Spashta_2.0/adapters/tests/data/django/dummy_django_app.py",
+      "current_hash": "ed554b128e6c0859331d00640f693e1d",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/adapters/tests/data/django/dummy_models.py",
+      "file_path": "Spashta_2.0/adapters/tests/data/django/dummy_models.py",
+      "current_hash": "1d6c74edebbee6ce03c15a5ee5a7a6d9",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/adapters/tests/data/django/dummy_urls.py",
+      "file_path": "Spashta_2.0/adapters/tests/data/django/dummy_urls.py",
+      "current_hash": "e29ac5bcee0df6291bfdf52a6a263fe0",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/adapters/tests/data/django/dummy_views.py",
+      "file_path": "Spashta_2.0/adapters/tests/data/django/dummy_views.py",
+      "current_hash": "efb7e4882c8fb9ffd5427b5c27ccf2e1",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/adapters/tests/data/fastapi/dummy_fastapi_app.py",
+      "file_path": "Spashta_2.0/adapters/tests/data/fastapi/dummy_fastapi_app.py",
+      "current_hash": "eea724a618906532caa6dfdae6b20231",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/adapters/tests/run_tests.py",
+      "file_path": "Spashta_2.0/adapters/tests/run_tests.py",
+      "current_hash": "4bf448202774c00373bbe8305707fdf6",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/adapters/validation/validate_adapter_rules.py",
+      "file_path": "Spashta_2.0/adapters/validation/validate_adapter_rules.py",
+      "current_hash": "5eee96aa2530363a92bbb9b3edb918d2",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/builders/css/build_css_ast.py",
+      "file_path": "Spashta_2.0/builders/css/build_css_ast.py",
+      "current_hash": "e691651a1f8571284a50a8d18f12d5e2",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/builders/html/build_html_ast.py",
+      "file_path": "Spashta_2.0/builders/html/build_html_ast.py",
+      "current_hash": "12db2d39af16044c52d1840b85363cdc",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/builders/python/build_python_ast.py",
+      "file_path": "Spashta_2.0/builders/python/build_python_ast.py",
+      "current_hash": "160c7589412721460a2d59a49b14d991",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/builders/tests/data/python_dummy.py",
+      "file_path": "Spashta_2.0/builders/tests/data/python_dummy.py",
+      "current_hash": "a53eed4e0e7c1fdcd268e4c1d9de14be",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/builders/tests/run_tests.py",
+      "file_path": "Spashta_2.0/builders/tests/run_tests.py",
+      "current_hash": "5b94d606be28e3596b783ae2c73729a1",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/builders/validation/validate_builder_output.py",
+      "file_path": "Spashta_2.0/builders/validation/validate_builder_output.py",
+      "current_hash": "c703c1451eae85cf2feebc4f0818dd7c",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/project/context_loader.py",
+      "file_path": "Spashta_2.0/project/context_loader.py",
+      "current_hash": "448d5f6a23f2d0a5bf15372534ec29f8",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/project/validation/validate_project_profile.py",
+      "file_path": "Spashta_2.0/project/validation/validate_project_profile.py",
+      "current_hash": "42957b836954e20513a2170e33f5cda3",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/runtime/build_runtime_ast.py",
+      "file_path": "Spashta_2.0/runtime/build_runtime_ast.py",
+      "current_hash": "48843a7343f475d40941caee1ef9b977",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/runtime/diff_runtime_ast.py",
+      "file_path": "Spashta_2.0/runtime/diff_runtime_ast.py",
+      "current_hash": "c6e28e7000671456ae32082113b7de58",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/runtime/enrich_runtime_ast.py",
+      "file_path": "Spashta_2.0/runtime/enrich_runtime_ast.py",
+      "current_hash": "537ad257fc29b97b03faed1819141806",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/runtime/enrichment_through_LLM/llm_enrich_runtime_ast.py",
+      "file_path": "Spashta_2.0/runtime/enrichment_through_LLM/llm_enrich_runtime_ast.py",
+      "current_hash": "f2f4cf5abe67829e868a19d2299d7403",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/runtime/enrichment_through_LLM/LLM_working_files/demo_enrich.py",
+      "file_path": "Spashta_2.0/runtime/enrichment_through_LLM/LLM_working_files/demo_enrich.py",
+      "current_hash": "792dedb5a6595a4c397b9b18b9182a5e",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/runtime/query_spashta.py",
+      "file_path": "Spashta_2.0/runtime/query_spashta.py",
+      "current_hash": "374d81511a8e20e5f7e5b8e95ad229c8",
+      "reason": "new_file"
+    },
+    {
+      "id": "File:Spashta_2.0/runtime/validate_ast_equivalence.py",
+      "file_path": "Spashta_2.0/runtime/validate_ast_equivalence.py",
+      "current_hash": "58b50cb1b83482f73b97b0e90c6e80ac",
+      "reason": "new_file"
+    }
+  ],
+  "files_skipped": []
+}

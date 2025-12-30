@@ -1,0 +1,211 @@
+{
+  "_meta": {
+    "logic": "Separates syntax-level facts from framework-level assumptions."
+  },
+  "direct_structural": {
+    "imports": {
+      "from": [
+        "File",
+        "Module",
+        "Stylesheet"
+      ],
+      "to": [
+        "Module",
+        "Package",
+        "Stylesheet",
+        "Class",
+        "Function",
+        "Variable",
+        "File"
+      ]
+    },
+    "defines": {
+      "from": [
+        "File",
+        "Stylesheet"
+      ],
+      "to": [
+        "Class",
+        "Function",
+        "Interface",
+        "Enum",
+        "Route",
+        "Trait",
+        "Component",
+        "Hook",
+        "StyleClass",
+        "StyleID",
+        "StyleElement"
+      ]
+    },
+    "contains_member": {
+      "from": [
+        "Class",
+        "Trait"
+      ],
+      "to": [
+        "Method",
+        "Variable"
+      ],
+      "meaning": "Defines internal object structure"
+    },
+    "extends": {
+      "from": [
+        "Class"
+      ],
+      "to": [
+        "Class"
+      ]
+    },
+    "implements_interface": {
+      "from": [
+        "Class"
+      ],
+      "to": [
+        "Interface"
+      ]
+    },
+    "uses_trait": {
+      "from": [
+        "Class"
+      ],
+      "to": [
+        "Trait"
+      ]
+    },
+    "calls": {
+      "from": [
+        "Function",
+        "Method",
+        "Hook",
+        "File"
+      ],
+      "to": [
+        "Function",
+        "Method"
+      ]
+    },
+    "registers_event_handler": {
+      "from": [
+        "Function",
+        "Method",
+        "Hook",
+        "File"
+      ],
+      "to": [
+        "Event"
+      ]
+    },
+    "throws_exception": {
+      "from": [
+        "Function",
+        "Method"
+      ],
+      "to": [
+        "Class"
+      ],
+      "meaning": "Declares or raises an exception type"
+    },
+    "reads_from": {
+      "from": [
+        "Function",
+        "Method"
+      ],
+      "to": [
+        "Variable",
+        "DataModel",
+        "File"
+      ],
+      "meaning": "Reads state or data"
+    },
+    "writes_to": {
+      "from": [
+        "Function",
+        "Method"
+      ],
+      "to": [
+        "Variable",
+        "DataModel"
+      ],
+      "meaning": "Mutates state or data"
+    }
+  },
+  "reference_symbolic": {
+    "decorates": {
+      "from": [
+        "Function",
+        "Class"
+      ],
+      "to": [
+        "Function",
+        "Class"
+      ]
+    },
+    "renders_template": {
+      "from": [
+        "Route",
+        "Function"
+      ],
+      "to": [
+        "Template",
+        "Fragment"
+      ]
+    },
+    "calls_api": {
+      "from": [
+        "Function",
+        "Template",
+        "Component"
+      ],
+      "to": [
+        "Route"
+      ]
+    },
+    "submits_form": {
+      "from": [
+        "Template"
+      ],
+      "to": [
+        "Route"
+      ]
+    },
+    "links_static_asset": {
+      "from": [
+        "Template"
+      ],
+      "to": [
+        "StaticAsset"
+      ]
+    },
+    "targets_element": {
+      "from": [
+        "StaticAsset",
+        "Template"
+      ],
+      "to": [
+        "Template",
+        "StyleID",
+        "StyleClass"
+      ],
+      "meaning": "CSS selector targets HTML elements"
+    },
+    "triggers_event": {
+      "from": [
+        "Template",
+        "Fragment"
+      ],
+      "to": [
+        "Event"
+      ]
+    },
+    "expects_contract": {
+      "from": [
+        "Route",
+        "Function"
+      ],
+      "to": [
+        "APIContract"
+      ]
+    }
+  }
+}
