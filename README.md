@@ -87,6 +87,60 @@ Spashta 2.0 is a **complete architectural redesign** from 1.0:
 
 ---
 
+## 🚀 Quick Start (One-Click Option)
+
+The easiest way to use Spashta is to let your AI Agent handle everything automatically:
+
+1. **Copy** the `Spashta-CKG` folder into your project's root directory:
+   ```
+   YourProject/
+   ├── Spashta-CKG/      <-- Copy this folder here
+   ├── your_app/
+   ├── manage.py
+   └── ...
+   ```
+
+2. **Configure** `Spashta-CKG/Spashta_2.0/project/profile.json`:
+   - Set `project_root` to your project's absolute path (or use `"."` for current directory)
+   - Set `languages` and `frameworks` as needed (check `_meta` for supported values)
+
+3. **Provide this prompt** to your AI Agent:
+   ```
+   Read and follow: Spashta-CKG/Spashta_2.0/runtime/execution_protocol.json
+   ```
+
+That's it! The AI Agent will:
+- Validate your configuration
+- Build the AST
+- Apply L1 enrichment (adapters)
+- Ask if you want L2 enrichment (LLM)
+- Set up the CKG for querying
+
+> 💡 The `execution_protocol.json` contains the complete step-by-step workflow with user confirmations built-in.
+
+**✅ Your Agent Now Knows About Spashta!**
+
+For future sessions, reinforce this by providing:
+
+```
+This project uses Spashta-CKG as its Code Knowledge Graph.
+
+📁 CKG Location:
+   L1 (Adapter-enriched): Spashta-CKG/Spashta_2.0/runtime/code_knowledge_graph_enriched.json
+   L2 (LLM-enriched):     Spashta-CKG/Spashta_2.0/runtime/code_knowledge_graph_enriched_by_Agent.json
+   (Use L2 if available, otherwise use L1)
+
+📌 Your Rules:
+1. Query Spashta-CKG FIRST before reading project files
+2. Use: python Spashta-CKG/Spashta_2.0/runtime/query_spashta.py --help
+3. If queries are insufficient, you may read source files directly
+4. Never modify files in Spashta_2.0/runtime/ — these are generated artifacts
+
+Use Spashta as your primary source of truth about this codebase.
+```
+
+---
+
 ## 🏗️ Spashta 2.0 Architecture
 
 ```
@@ -420,60 +474,6 @@ Spashta_2.0/project/
 ---
 
 ## 🛠️ How to Use
-
-### 🚀 Quick Start (One-Click Option)
-
-The easiest way to use Spashta is to let your AI Agent handle everything automatically:
-
-1. **Copy** the `Spashta-CKG` folder into your project's root directory:
-   ```
-   YourProject/
-   ├── Spashta-CKG/      <-- Copy this folder here
-   ├── your_app/
-   ├── manage.py
-   └── ...
-   ```
-
-2. **Configure** `Spashta-CKG/Spashta_2.0/project/profile.json`:
-   - Set `project_root` to your project's absolute path (or use `"."` for current directory)
-   - Set `languages` and `frameworks` as needed (check `_meta` for supported values)
-
-3. **Provide this prompt** to your AI Agent:
-   ```
-   Read and follow: Spashta-CKG/Spashta_2.0/runtime/execution_protocol.json
-   ```
-
-That's it! The AI Agent will:
-- Validate your configuration
-- Build the AST
-- Apply L1 enrichment (adapters)
-- Ask if you want L2 enrichment (LLM)
-- Set up the CKG for querying
-
-> 💡 The `execution_protocol.json` contains the complete step-by-step workflow with user confirmations built-in.
-
-**✅ Your Agent Now Knows About Spashta!**
-
-For future sessions, reinforce this by providing:
-
-```
-This project uses Spashta-CKG as its Code Knowledge Graph.
-
-📁 CKG Location:
-   L1 (Adapter-enriched): Spashta-CKG/Spashta_2.0/runtime/code_knowledge_graph_enriched.json
-   L2 (LLM-enriched):     Spashta-CKG/Spashta_2.0/runtime/code_knowledge_graph_enriched_by_Agent.json
-   (Use L2 if available, otherwise use L1)
-
-📌 Your Rules:
-1. Query Spashta-CKG FIRST before reading project files
-2. Use: python Spashta-CKG/Spashta_2.0/runtime/query_spashta.py --help
-3. If queries are insufficient, you may read source files directly
-4. Never modify files in Spashta_2.0/runtime/ — these are generated artifacts
-
-Use Spashta as your primary source of truth about this codebase.
-```
-
----
 
 ### Manual Steps (Detailed Walkthrough)
 
