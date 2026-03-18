@@ -44,7 +44,7 @@ CORE_EDGES_PATH = PROJECT_ROOT / "core" / "software_schema" / "edges.json"
 BUILDER_RULES_PATH = SCRIPT_DIR.parent / "builder_rules.json"
 
 def load_scan_exclusions():
-    """Loads exclusion rules from builder_rules.json."""
+    """Loads exclusion rules from builder_rules.json + project/profile.json."""
     exclude_dirs = set([".venv", "__pycache__"])  # Defaults
     exclude_patterns = []
     if BUILDER_RULES_PATH.exists():
@@ -52,7 +52,15 @@ def load_scan_exclusions():
             rules = json.loads(BUILDER_RULES_PATH.read_text("utf-8"))
             policy = rules.get("scan_policy", {})
             exclude_dirs.update(policy.get("exclude_dirs", []))
-            exclude_patterns = policy.get("exclude_file_patterns", [])            
+            exclude_patterns = policy.get("exclude_file_patterns", [])
+        except Exception:
+            pass
+    # Project-specific exclusions from profile.json
+    profile_path = SCRIPT_DIR.parent.parent / "project" / "profile.json"
+    if profile_path.exists():
+        try:
+            profile = json.loads(profile_path.read_text("utf-8"))
+            exclude_dirs.update(profile.get("excluded", {}).get("directories", []))
         except Exception:
             pass
     return exclude_dirs, exclude_patterns

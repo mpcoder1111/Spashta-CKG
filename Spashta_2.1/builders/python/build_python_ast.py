@@ -84,8 +84,10 @@ TEST_BASE_CLASSES = {"TestCase", "TransactionTestCase", "SimpleTestCase",
 
 
 def load_scan_exclusions():
-    """Loads exclusion rules from builder_rules.json."""
+    """Loads exclusion rules from builder_rules.json + project/profile.json."""
     exclude_dirs = set([".venv", "__pycache__"])  # Defaults
+
+    # 1. Universal exclusions from builder_rules.json
     exclude_patterns = []
     if BUILDER_RULES_PATH.exists():
         try:
@@ -95,6 +97,17 @@ def load_scan_exclusions():
             exclude_patterns = policy.get("exclude_file_patterns", [])
         except Exception:
             pass
+
+    # 2. Project-specific exclusions from profile.json
+    profile_path = PROJECT_ROOT / "project" / "profile.json"
+    if profile_path.exists():
+        try:
+            profile = json.loads(profile_path.read_text("utf-8"))
+            project_excluded = profile.get("excluded", {}).get("directories", [])
+            exclude_dirs.update(project_excluded)
+        except Exception:
+            pass
+
     return exclude_dirs, exclude_patterns
 
 # ---------------------------------------------------------

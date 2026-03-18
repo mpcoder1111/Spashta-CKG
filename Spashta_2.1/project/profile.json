@@ -34,6 +34,10 @@
         ],
         "languages": [
             "javascript"
-        ]
+        ],
+        "directories": [
+            "Spashta-CKG"
+        ],
+        "_directories_note": "Project-specific folders to exclude from scanning. Added to builder_rules.json universal exclusions (node_modules, .git, __pycache__, etc.)"
     }
 }
