@@ -1,0 +1,33 @@
+{
+    "__meta": {
+        "config_role": "CSS Test Configuration (Centralized Hub)",
+        "runner": "../run_tests.py"
+    },
+    "paths": {
+        "project_root_relative": "../data/css_dummy.css",
+        "real_project_root_note": "We point to dummy data as the 'root' for testing to isolate it.",
+        "builder_script": "../../css/build_css_ast.py",
+        "mapping_file": "../../css/css_language_mapping.json"
+    },
+    "output": {
+        "filename": "../outputs/test_output_css.json",
+        "clean_before_run": true,
+        "format": "json"
+    },
+    "contract_equivalences": {
+        "__meta_info": {
+            "what_is_this": "A translation layer between Ideal Mapping expectations and Practical Builder implementation.",
+            "source_of_truth": "Derived from 'build_css_ast.py' docstrings (Strict Mode Policies).",
+            "why_important": "The Mapping demands an Edge (e.g., 'imports'). The Builder, for safety, may output an Ambiguity Ticket instead. This section tells the Test Runner: 'If you see Ticket X, count it as Edge Y'.",
+            "if_omitted": "The Test Runner will fail with 'Missing Edge', causing a False Negative result."
+        },
+        "__guide": "Defines valid fallback behavior.",
+        "rules": [
+            {
+                "required_edge": "imports",
+                "accepted_ambiguity": "import_target_unresolved",
+                "reason": "Builder verifies @import exists but cannot strictly resolve file targets without IO."
+            }
+        ]
+    }
+}

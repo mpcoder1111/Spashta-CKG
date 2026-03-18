@@ -1,0 +1,477 @@
+{
+  "_meta": {
+    "builder": "build_python_ast.py",
+    "builder_version": "2.0-strict",
+    "schema_version": "1.3",
+    "generated_at": "2025-12-28T03:24:14.566075"
+  },
+  "nodes": [
+    {
+      "node_type": "File",
+      "name": "python_dummy.py",
+      "file_path": "python_dummy.py",
+      "id": "python_dummy.py",
+      "hash": "a53eed4e0e7c1fdcd268e4c1d9de14be",
+      "analysis_confidence": "structural"
+    },
+    {
+      "node_type": "Variable",
+      "name": "query",
+      "id": "python_dummy.py::query",
+      "analysis_confidence": "structural",
+      "line_start": 8,
+      "line_end": 8
+    },
+    {
+      "node_type": "Variable",
+      "name": "html_frag",
+      "id": "python_dummy.py::html_frag",
+      "analysis_confidence": "structural",
+      "line_start": 11,
+      "line_end": 11
+    },
+    {
+      "node_type": "Class",
+      "name": "BaseClass",
+      "id": "python_dummy.py::BaseClass",
+      "analysis_confidence": "structural",
+      "line_start": 14,
+      "line_end": 18,
+      "docstring": "This is a test docstring for BaseClass."
+    },
+    {
+      "node_type": "Variable",
+      "name": "base_var",
+      "id": "python_dummy.py::BaseClass::base_var",
+      "analysis_confidence": "structural",
+      "line_start": 16,
+      "line_end": 16
+    },
+    {
+      "node_type": "Method",
+      "name": "__init__",
+      "id": "python_dummy.py::BaseClass::__init__",
+      "is_async": false,
+      "analysis_confidence": "structural",
+      "line_start": 17,
+      "line_end": 18,
+      "signature": {
+        "args": [
+          "self"
+        ],
+        "defaults": [],
+        "decorators": [],
+        "returns": null
+      }
+    },
+    {
+      "node_type": "Class",
+      "name": "ChildClass",
+      "id": "python_dummy.py::ChildClass",
+      "analysis_confidence": "structural",
+      "line_start": 20,
+      "line_end": 21
+    },
+    {
+      "node_type": "Class",
+      "name": "UserModel",
+      "id": "python_dummy.py::UserModel",
+      "analysis_confidence": "structural",
+      "line_start": 23,
+      "line_end": 25
+    },
+    {
+      "node_type": "Variable",
+      "name": "id",
+      "id": "python_dummy.py::UserModel::id",
+      "analysis_confidence": "structural",
+      "line_start": 24,
+      "line_end": 24
+    },
+    {
+      "node_type": "Variable",
+      "name": "name",
+      "id": "python_dummy.py::UserModel::name",
+      "analysis_confidence": "structural",
+      "line_start": 25,
+      "line_end": 25
+    },
+    {
+      "node_type": "Function",
+      "name": "variable_ops",
+      "id": "python_dummy.py::variable_ops",
+      "is_async": false,
+      "analysis_confidence": "structural",
+      "line_start": 28,
+      "line_end": 30,
+      "signature": {
+        "args": [],
+        "defaults": [],
+        "decorators": [],
+        "returns": null
+      }
+    },
+    {
+      "node_type": "Variable",
+      "name": "x",
+      "id": "python_dummy.py::variable_ops::x",
+      "analysis_confidence": "structural",
+      "line_start": 29,
+      "line_end": 29
+    },
+    {
+      "node_type": "Variable",
+      "name": "y",
+      "id": "python_dummy.py::variable_ops::y",
+      "analysis_confidence": "structural",
+      "line_start": 30,
+      "line_end": 30
+    },
+    {
+      "node_type": "Function",
+      "name": "error_func",
+      "id": "python_dummy.py::error_func",
+      "is_async": false,
+      "analysis_confidence": "structural",
+      "line_start": 33,
+      "line_end": 34,
+      "signature": {
+        "args": [],
+        "defaults": [],
+        "decorators": [],
+        "returns": null
+      }
+    },
+    {
+      "node_type": "Function",
+      "name": "async_helper",
+      "id": "python_dummy.py::async_helper",
+      "is_async": true,
+      "analysis_confidence": "structural",
+      "line_start": 37,
+      "line_end": 38,
+      "signature": {
+        "args": [],
+        "defaults": [],
+        "decorators": [],
+        "returns": null
+      }
+    },
+    {
+      "node_type": "Function",
+      "name": "async_func",
+      "id": "python_dummy.py::async_func",
+      "is_async": true,
+      "analysis_confidence": "structural",
+      "line_start": 40,
+      "line_end": 41,
+      "signature": {
+        "args": [],
+        "defaults": [],
+        "decorators": [],
+        "returns": null
+      }
+    },
+    {
+      "node_type": "Function",
+      "name": "my_dec",
+      "id": "python_dummy.py::my_dec",
+      "is_async": false,
+      "analysis_confidence": "structural",
+      "line_start": 45,
+      "line_end": 46,
+      "signature": {
+        "args": [
+          "f"
+        ],
+        "defaults": [],
+        "decorators": [],
+        "returns": null
+      }
+    },
+    {
+      "node_type": "Function",
+      "name": "decorated_func",
+      "id": "python_dummy.py::decorated_func",
+      "is_async": false,
+      "analysis_confidence": "structural",
+      "line_start": 49,
+      "line_end": 50,
+      "signature": {
+        "args": [],
+        "defaults": [],
+        "decorators": [
+          "@my_dec"
+        ],
+        "returns": null
+      }
+    },
+    {
+      "node_type": "Function",
+      "name": "view",
+      "id": "python_dummy.py::view",
+      "is_async": false,
+      "analysis_confidence": "structural",
+      "line_start": 52,
+      "line_end": 59,
+      "signature": {
+        "args": [
+          "request"
+        ],
+        "defaults": [],
+        "decorators": [],
+        "returns": null
+      }
+    }
+  ],
+  "edges": [
+    {
+      "edge": "defines",
+      "from": "python_dummy.py",
+      "to": "python_dummy.py::BaseClass"
+    },
+    {
+      "edge": "contains_member",
+      "from": "python_dummy.py::BaseClass",
+      "to": "python_dummy.py::BaseClass::base_var"
+    },
+    {
+      "edge": "contains_member",
+      "from": "python_dummy.py::BaseClass",
+      "to": "python_dummy.py::BaseClass::__init__"
+    },
+    {
+      "edge": "defines",
+      "from": "python_dummy.py",
+      "to": "python_dummy.py::ChildClass"
+    },
+    {
+      "edge": "defines",
+      "from": "python_dummy.py",
+      "to": "python_dummy.py::UserModel"
+    },
+    {
+      "edge": "contains_member",
+      "from": "python_dummy.py::UserModel",
+      "to": "python_dummy.py::UserModel::id"
+    },
+    {
+      "edge": "contains_member",
+      "from": "python_dummy.py::UserModel",
+      "to": "python_dummy.py::UserModel::name"
+    },
+    {
+      "edge": "defines",
+      "from": "python_dummy.py",
+      "to": "python_dummy.py::variable_ops"
+    },
+    {
+      "edge": "defines",
+      "from": "python_dummy.py",
+      "to": "python_dummy.py::error_func"
+    },
+    {
+      "edge": "defines",
+      "from": "python_dummy.py",
+      "to": "python_dummy.py::async_helper"
+    },
+    {
+      "edge": "defines",
+      "from": "python_dummy.py",
+      "to": "python_dummy.py::async_func"
+    },
+    {
+      "edge": "defines",
+      "from": "python_dummy.py",
+      "to": "python_dummy.py::my_dec"
+    },
+    {
+      "edge": "defines",
+      "from": "python_dummy.py",
+      "to": "python_dummy.py::decorated_func"
+    },
+    {
+      "edge": "defines",
+      "from": "python_dummy.py",
+      "to": "python_dummy.py::view"
+    },
+    {
+      "edge": "extends",
+      "from": "python_dummy.py::ChildClass",
+      "to": "python_dummy.py::BaseClass"
+    },
+    {
+      "edge": "writes_to",
+      "from": "python_dummy.py::variable_ops",
+      "to": "python_dummy.py::variable_ops::x"
+    },
+    {
+      "edge": "writes_to",
+      "from": "python_dummy.py::variable_ops",
+      "to": "python_dummy.py::variable_ops::y"
+    },
+    {
+      "edge": "calls",
+      "from": "python_dummy.py::async_func",
+      "to": "python_dummy.py::async_helper"
+    },
+    {
+      "edge": "decorates",
+      "from": "python_dummy.py::my_dec",
+      "to": "python_dummy.py::decorated_func"
+    }
+  ],
+  "ambiguities": [
+    {
+      "id": "6bb7669f-b785-4781-bc8e-19cc865deb2a",
+      "kind": "mapping_violation",
+      "source_file": "python_dummy.py",
+      "source_scope": "python_dummy.py",
+      "expression": "defines",
+      "reason": "Logical edge 'defines' not found in language mapping",
+      "confidence": "structural_violation",
+      "resolver": "agent"
+    },
+    {
+      "id": "5c16768c-d6d0-4147-8a2a-7d78ffeddd07",
+      "kind": "mapping_violation",
+      "source_file": "python_dummy.py",
+      "source_scope": "python_dummy.py",
+      "expression": "defines",
+      "reason": "Logical edge 'defines' not found in language mapping",
+      "confidence": "structural_violation",
+      "resolver": "agent"
+    },
+    {
+      "id": "e099e87e-5d07-45d3-b860-8148cbd3b1a8",
+      "kind": "schema_violation",
+      "source_file": "python_dummy.py",
+      "source_scope": "python_dummy.py::variable_ops",
+      "expression": "contains_variable -> contains_member",
+      "reason": "Edge not allowed between Function and Variable",
+      "confidence": "structural_violation",
+      "resolver": "agent"
+    },
+    {
+      "id": "bc527d10-03d9-4f65-854e-4d8dbd81f0ee",
+      "kind": "schema_violation",
+      "source_file": "python_dummy.py",
+      "source_scope": "python_dummy.py::variable_ops",
+      "expression": "contains_variable -> contains_member",
+      "reason": "Edge not allowed between Function and Variable",
+      "confidence": "structural_violation",
+      "resolver": "agent"
+    },
+    {
+      "id": "ccd243a2-523d-4d90-883e-00ce6ce4903d",
+      "kind": "import_module_unknown",
+      "source_file": "python_dummy.py",
+      "source_scope": "python_dummy.py",
+      "expression": "os",
+      "reason": "File not found",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    },
+    {
+      "id": "4b8251c9-2208-4a81-bebe-de7097561ddc",
+      "kind": "import_module_unknown",
+      "source_file": "python_dummy.py",
+      "source_scope": "python_dummy.py",
+      "expression": "sys",
+      "reason": "File not found",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    },
+    {
+      "id": "69fe3a09-edc0-4a37-b24b-45d0dfa9a3ac",
+      "kind": "import_module_unknown",
+      "source_file": "python_dummy.py",
+      "source_scope": "python_dummy.py",
+      "expression": "asyncio",
+      "reason": "File not found",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    },
+    {
+      "id": "6677851b-d8b6-4c1e-9f85-c330fd311a16",
+      "kind": "import_module_unknown",
+      "source_file": "python_dummy.py",
+      "source_scope": "python_dummy.py",
+      "expression": "typing",
+      "reason": "Module not found",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    },
+    {
+      "id": "02bfd5cd-3cb4-4d06-9f95-28b5c1e22e68",
+      "kind": "import_module_unknown",
+      "source_file": "python_dummy.py",
+      "source_scope": "python_dummy.py",
+      "expression": "requests",
+      "reason": "File not found",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    },
+    {
+      "id": "b79c94c8-1a80-4bc9-bd86-5c43f446aa38",
+      "kind": "schema_violation",
+      "source_file": "python_dummy.py",
+      "source_scope": "python_dummy.py",
+      "expression": "writes_to -> writes_to",
+      "reason": "Edge not allowed between File and Variable",
+      "confidence": "structural_violation",
+      "resolver": "agent"
+    },
+    {
+      "id": "64d98268-f300-4b65-90d5-c25c55c887ce",
+      "kind": "schema_violation",
+      "source_file": "python_dummy.py",
+      "source_scope": "python_dummy.py",
+      "expression": "writes_to -> writes_to",
+      "reason": "Edge not allowed between File and Variable",
+      "confidence": "structural_violation",
+      "resolver": "agent"
+    },
+    {
+      "id": "29af4a42-88db-42ae-9033-e6475e0701a7",
+      "kind": "schema_violation",
+      "source_file": "python_dummy.py",
+      "source_scope": "python_dummy.py::BaseClass",
+      "expression": "writes_to -> writes_to",
+      "reason": "Edge not allowed between Class and Variable",
+      "confidence": "structural_violation",
+      "resolver": "agent"
+    },
+    {
+      "id": "7a79f783-2bfa-4250-9411-765865032111",
+      "kind": "call_target_unknown",
+      "source_file": "python_dummy.py",
+      "source_scope": "python_dummy.py::error_func",
+      "expression": "Name(id='ValueError', ctx=Load())",
+      "reason": "Target not proven",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    },
+    {
+      "id": "e6d3b9d3-e844-402d-bc19-d7a5bc09f927",
+      "kind": "call_target_unknown",
+      "source_file": "python_dummy.py",
+      "source_scope": "python_dummy.py::view",
+      "expression": "Attribute(value=Name(id='requests', ctx=Load()), attr='get', ctx=Load())",
+      "reason": "Target not proven",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    },
+    {
+      "id": "2d6000d6-d691-402a-835a-8cf7b5ab953b",
+      "kind": "call_target_unknown",
+      "source_file": "python_dummy.py",
+      "source_scope": "python_dummy.py::view",
+      "expression": "Name(id='render', ctx=Load())",
+      "reason": "Target not proven",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    }
+  ],
+  "logs": []
+}

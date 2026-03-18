@@ -1,0 +1,96 @@
+@import "mixins.css";
+@import url('fonts.css');
+
+/* -----------------------------------------------------------
+   Baseline Verification: Standard Syntax
+   Reason: Verify basic Class, ID, and Element detection.
+   ----------------------------------------------------------- */
+.container {
+    width: 100%;
+}
+
+#main-header {
+    background: #fff;
+}
+
+body {
+    margin: 0;
+}
+
+/* -----------------------------------------------------------
+   Stress Test: Ambiguity Detection - Media Queries
+   Reason: Verify that @media blocks trigger 'responsive_breakpoint' 
+   ambiguity tickets and do not emit nodes for the internal rules
+   if blocked by strict rules.
+   ----------------------------------------------------------- */
+@media (max-width: 600px) {
+    .container {
+        width: 100%;
+    }
+}
+
+/* -----------------------------------------------------------
+   Stress Test: Ambiguity Detection - Keyframes
+   Reason: Verify that @keyframes blocks trigger 'css_animation_defined'
+   ambiguity tickets.
+   ----------------------------------------------------------- */
+@keyframes slideIn {
+    from {
+        left: 0;
+    }
+
+    to {
+        left: 100%;
+    }
+}
+
+/* -----------------------------------------------------------
+   Stress Test: Minification
+   Reason: Verify regex handles multiple rules on a single line
+   without whitespace separation.
+   ----------------------------------------------------------- */
+div {
+    display: block
+}
+
+.tiny {
+    font-size: 10px
+}
+
+/* -----------------------------------------------------------
+   Stress Test: Whitespace Vatiations
+   Reason: Verify regex handles irregular whitespace and newlines
+   in selector lists.
+   ----------------------------------------------------------- */
+.spaced1,
+#spaced2 {
+    color: red;
+}
+
+/* -----------------------------------------------------------
+   Stress Test: Pseudo-elements and States
+   Reason: Verify behavior on ::before, :hover. 
+   ----------------------------------------------------------- */
+nav::before {
+    content: '';
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+/* -----------------------------------------------------------
+   Stress Test: Attribute Selectors
+   Reason: Check if complex attribute syntax is ignored or handled.
+   ----------------------------------------------------------- */
+a[href*="example.com"] {
+    color: green;
+}
+
+/* -----------------------------------------------------------
+   Stress Test: Escaped Characters
+   Reason: Verify behavior on Tailwind-like escaped class names.
+   ----------------------------------------------------------- */
+.w-1\/2 {
+    width: 50%;
+}

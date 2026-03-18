@@ -1,0 +1,136 @@
+{
+  "_meta": {
+    "description": "Maps HTML Tags and Attributes to CKG Nodes and Edges.",
+    "parser": "html.parser",
+    "version": "2.1-strict",
+    "note": "Only statically provable structural relations are emitted. Behavioral effects are deferred to ambiguities."
+  },
+
+  "file_node_type": "Template",
+
+  "attribute_interactions": [
+    {
+      "attribute": "hx-get",
+      "emits_edge": "calls_api",
+      "target_node_type": "Route"
+    },
+    {
+      "attribute": "hx-post",
+      "emits_edge": "calls_api",
+      "target_node_type": "Route"
+    },
+    {
+      "attribute": "hx-put",
+      "emits_edge": "calls_api",
+      "target_node_type": "Route"
+    },
+    {
+      "attribute": "hx-delete",
+      "emits_edge": "calls_api",
+      "target_node_type": "Route"
+    },
+    {
+      "attribute": "hx-patch",
+      "emits_edge": "calls_api",
+      "target_node_type": "Route"
+    },
+    {
+      "attribute": "hx-target",
+      "emits_edge": "targets_element",
+      "target_node_type": "StyleID"
+    },
+    {
+      "attribute": "hx-trigger",
+      "emits_edge": "triggers_event",
+      "target_node_type": "Event"
+    }
+  ],
+
+  "tag_interactions": {
+    "img": [
+      {
+        "attribute": "src",
+        "emits_edge": "links_static_asset",
+        "target_node_type": "StaticAsset"
+      }
+    ],
+
+    "iframe": [
+      {
+        "attribute": "src",
+        "emits_edge": "links_static_asset",
+        "target_node_type": "StaticAsset"
+      }
+    ],
+
+    "video": [
+      {
+        "attribute": "src",
+        "emits_edge": "links_static_asset",
+        "target_node_type": "StaticAsset"
+      }
+    ],
+
+    "audio": [
+      {
+        "attribute": "src",
+        "emits_edge": "links_static_asset",
+        "target_node_type": "StaticAsset"
+      }
+    ],
+
+    "source": [
+      {
+        "attribute": "src",
+        "emits_edge": "links_static_asset",
+        "target_node_type": "StaticAsset"
+      }
+    ],
+
+    "link": [
+      {
+        "attribute": "href",
+        "condition": {
+          "rel": ["stylesheet", "icon", "shortcut icon"]
+        },
+        "emits_edge": "links_static_asset",
+        "target_node_type": "StaticAsset"
+      }
+    ],
+
+    "script": [
+      {
+        "attribute": "src",
+        "emits_edge": "links_static_asset",
+        "target_node_type": "StaticAsset"
+      }
+    ],
+
+    "meta": [
+      {
+        "attribute": "content",
+        "condition": {
+          "property": "og:image"
+        },
+        "emits_edge": "links_static_asset",
+        "target_node_type": "StaticAsset"
+      }
+    ],
+
+    "a": [
+      {
+        "attribute": "href",
+        "emits_edge": "calls_api",
+        "target_node_type": "Route"
+      }
+    ],
+
+    "form": [
+      {
+        "attribute": "action",
+        "emits_edge": "submits_form",
+        "target_node_type": "Route"
+      }
+    ]
+  }
+}

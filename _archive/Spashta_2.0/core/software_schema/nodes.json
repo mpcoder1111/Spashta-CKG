@@ -1,0 +1,259 @@
+{
+  "_meta": {
+    "version": "1.3",
+    "principle": "Superset ontology defining potential nodes; absence is not an error."
+  },
+  "Call": {
+    "description": "Invocation of a function or method",
+    "languages": [
+      "any"
+    ]
+  },
+  "File": {
+    "description": "Physical source file on disk",
+    "languages": [
+      "python",
+      "html",
+      "css",
+      "js",
+      "java",
+      "php"
+    ]
+  },
+  "Module": {
+    "description": "Logical grouping inside a runtime",
+    "languages": [
+      "python",
+      "js"
+    ]
+  },
+  "Package": {
+    "description": "Namespace-level grouping",
+    "languages": [
+      "java",
+      "php"
+    ]
+  },
+  "Class": {
+    "description": "Object-oriented type",
+    "languages": [
+      "python",
+      "java",
+      "php",
+      "js"
+    ]
+  },
+  "Interface": {
+    "description": "Behavioral contract",
+    "languages": [
+      "java",
+      "php"
+    ]
+  },
+  "Trait": {
+    "description": "Horizontal code reuse unit",
+    "languages": [
+      "php"
+    ]
+  },
+  "Enum": {
+    "description": "Fixed value set",
+    "languages": [
+      "java",
+      "python"
+    ]
+  },
+  "Decorator": {
+    "description": "Behavior-modifying annotation on functions or classes",
+    "languages": [
+      "python"
+    ]
+  },
+  "Function": {
+    "description": "Callable unit of logic",
+    "languages": [
+      "python",
+      "js",
+      "php"
+    ]
+  },
+  "Method": {
+    "description": "Class-bound function",
+    "languages": [
+      "python",
+      "java",
+      "php",
+      "js"
+    ]
+  },
+  "Variable": {
+    "description": "Named state or configuration",
+    "languages": [
+      "python",
+      "js",
+      "php",
+      "java"
+    ]
+  },
+  "Route": {
+    "description": "HTTP endpoint",
+    "languages": [
+      "python",
+      "java",
+      "php",
+      "js"
+    ],
+    "framework_bound": true
+  },
+  "Template": {
+    "description": "Renderable UI document",
+    "languages": [
+      "html"
+    ]
+  },
+  "Fragment": {
+    "description": "Partial template (AJAX / HTMX swap)",
+    "languages": [
+      "html"
+    ]
+  },
+  "Component": {
+    "description": "UI-bound logical unit",
+    "languages": [
+      "js"
+    ]
+  },
+  "Hook": {
+    "description": "Lifecycle or state hook",
+    "languages": [
+      "js"
+    ]
+  },
+  "Stylesheet": {
+    "description": "CSS or Style file",
+    "languages": [
+      "css"
+    ]
+  },
+  "StyleClass": {
+    "description": "CSS Class selector definition",
+    "languages": [
+      "css"
+    ]
+  },
+  "StyleID": {
+    "description": "CSS ID selector definition",
+    "languages": [
+      "css"
+    ]
+  },
+  "StyleElement": {
+    "description": "CSS Element selector definition",
+    "languages": [
+      "css"
+    ]
+  },
+  "StaticAsset": {
+    "description": "Non-executable resource",
+    "types": [
+      "css",
+      "image",
+      "font",
+      "js"
+    ]
+  },
+  "Event": {
+    "description": "UI or runtime event",
+    "languages": [
+      "js",
+      "html"
+    ]
+  },
+  "DataModel": {
+    "description": "Persistent data representation",
+    "languages": [
+      "python",
+      "java",
+      "php"
+    ]
+  },
+  "Config": {
+    "description": "Configuration or environment definition",
+    "languages": [
+      "any"
+    ]
+  },
+  "APIContract": {
+    "description": "Request/response interface contract",
+    "languages": [
+      "any"
+    ]
+  },
+  "Assign": {
+    "description": "Variable assignment or binding",
+    "languages": [
+      "any"
+    ]
+  },
+  "View": {
+    "description": "Logic handling a user interface or API request",
+    "languages": [
+      "python",
+      "js",
+      "php",
+      "java"
+    ]
+  },
+  "Router": {
+    "description": "Routing configuration or logic",
+    "languages": [
+      "python",
+      "js",
+      "php"
+    ]
+  },
+  "Form": {
+    "description": "User input validation contract",
+    "languages": [
+      "python",
+      "php",
+      "js"
+    ]
+  },
+  "Serializer": {
+    "description": "Data transformation contract",
+    "languages": [
+      "python",
+      "js"
+    ]
+  },
+  "Admin": {
+    "description": "Administrative interface logic",
+    "languages": [
+      "python",
+      "php"
+    ]
+  },
+  "Middleware": {
+    "description": "Request/Response reference pipeline",
+    "languages": [
+      "python",
+      "js",
+      "php"
+    ]
+  },
+  "Signal": {
+    "description": "Event handler or producer",
+    "languages": [
+      "python",
+      "js"
+    ]
+  },
+  "Dependency": {
+    "description": "injected dependency or service",
+    "languages": [
+      "python",
+      "java"
+    ]
+  }
+}

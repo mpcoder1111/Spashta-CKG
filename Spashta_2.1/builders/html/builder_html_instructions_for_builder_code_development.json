@@ -1,0 +1,149 @@
+{
+  "builder_identity": {
+    "name": "html_ast_builder",
+    "version": "2.0-strict",
+    "output_format": "json",
+    "scope": "structure_only"
+  },
+
+  "core_dependency_policy": {
+    "core_schema_sources": [
+      "core/software_schema/nodes.json",
+      "core/software_schema/edges.json"
+    ],
+    "hardcoding_forbidden": true,
+    "schema_is_runtime_authority": true
+  },
+
+  "builder_principles": {
+    "structure_only": true,
+    "no_dom_tree_construction": true,
+    "no_best_guessing": true,
+    "unknown_is_explicit": true,
+    "facts_and_uncertainty_separated": true,
+    "framework_semantics_forbidden": true,
+    "contracts_not_enforced_here": true
+  },
+
+  "output_rules": {
+    "format": "json",
+    "sections": ["nodes", "edges", "ambiguities", "logs"],
+    "deterministic": true
+  },
+
+  "file_node_rules": {
+    "file_node_type": "Template",
+    "file_hash_required": true,
+    "hash_algorithm": "md5",
+    "file_node_must_exist_before_children": true,
+    "one_file_equals_one_template_node": true
+  },
+
+  "node_emission_rules": {
+    "emit_node_only_if": [
+      "explicit_html_file",
+      "explicit_attribute_or_tag_value",
+      "node_type_allowed_by_core_schema"
+    ],
+    "never_emit_node_to_satisfy_edge": true,
+    "never_infer_backend_structure": true,
+    "forbidden_inference": [
+      "route_existence_from_url",
+      "event_existence_from_string",
+      "css_selector_resolution",
+      "dom_parent_child_relationships",
+      "js_execution_logic"
+    ]
+  },
+
+  "edge_emission_rules": {
+    "mandatory_schema_checks": [
+      "edge_type_exists",
+      "source_node_exists",
+      "target_node_exists",
+      "source_type_allowed",
+      "target_type_allowed"
+    ],
+    "on_failure": {
+      "emit": "ambiguity",
+      "do_not_emit_edge": true
+    }
+  },
+
+  "html_strict_rules": {
+    "assets": {
+      "allowed_edges": ["links_static_asset"],
+      "allowed_targets": ["StaticAsset"],
+      "emit_only_if": "literal_src_or_href"
+    },
+
+    "navigation_and_forms": {
+      "allowed_edges": ["calls_api", "submits_form"],
+      "allowed_targets": ["Route"],
+      "symbolic_only": true,
+      "never_validate_existence": true
+    },
+
+    "htmx": {
+      "http_verbs": ["hx-get", "hx-post", "hx-put", "hx-delete", "hx-patch"],
+      "http_edge": "calls_api",
+      "target_node": "Route",
+      "events": {
+        "attribute": "hx-trigger",
+        "edge": "triggers_event",
+        "target_node": "Event"
+      },
+      "targets": {
+        "attribute": "hx-target",
+        "edge": "targets_element",
+        "target_node": "StyleID"
+      }
+    }
+  },
+
+  "ambiguity_policy": {
+    "ambiguity_is_first_class": true,
+    "ambiguity_is_not_structure": true,
+    "storage_location": "ambiguities",
+    "must_include": [
+      "id",
+      "kind",
+      "source_file",
+      "source_scope",
+      "expression",
+      "reason",
+      "confidence",
+      "resolver"
+    ],
+    "default_resolver": "agent",
+    "default_confidence": "unresolved"
+  },
+
+  "dynamic_content_policy": {
+    "template_expressions": ["{{ }}", "{% %}"],
+    "handling": "emit_literal_value",
+    "never_resolve": true,
+    "emit_ambiguity_if_used_as_target": true
+  },
+
+  "contracts_policy": {
+    "contracts_json_may_be_loaded": true,
+    "contracts_enforced_in_builder": false,
+    "contracts_used_by": [
+      "adapters",
+      "agents",
+      "post_build_validation"
+    ]
+  },
+
+  "builder_success_criteria": {
+    "structural_validation_failures": 0,
+    "ambiguity_count": "acceptable",
+    "partial_coverage": "acceptable",
+    "any_structural_violation_means": "builder_bug"
+  },
+
+  "final_rule": {
+    "statement": "If an HTML relationship cannot be proven purely from static tags or attributes and allowed by the core schema, it must not be asserted and must be recorded as an explicit ambiguity."
+  }
+}

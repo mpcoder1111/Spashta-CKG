@@ -1,0 +1,51 @@
+{
+  "_meta": {
+    "role": "Schema & Example for Spashta Session Log",
+    "used_by": ["agents", "validators"],
+    "not_written_at_runtime": true
+  },
+  "schema": {
+    "session_id": "ISO-8601 timestamp string",
+    "trigger": "agent | manual | ci",
+    "execution_loop": "path to execution_loop.json",
+    "steps": {
+      "validate_project_profile": "pass | fail",
+      "load_project_context": "pass | fail",
+      "build_runtime_ast": "pass | fail",
+      "enrich_runtime_ast": "pass | fail",
+      "validate_ast_equivalence": "pass | fail"
+    },
+    "artifacts": {
+      "raw_ast": "path",
+      "enriched_ast": "path"
+    },
+    "agent_action": {
+      "type": "read_only | code_edit",
+      "files_modified": ["list of files"],
+      "reason": "short string"
+    },
+    "result": "success | failure"
+  },
+  "example": {
+    "session_id": "2025-09-25T14:12:03Z",
+    "trigger": "agent",
+    "execution_loop": "project/runtime_logs/execution_loop.json",
+    "steps": {
+      "validate_project_profile": "pass",
+      "load_project_context": "pass",
+      "build_runtime_ast": "pass",
+      "enrich_runtime_ast": "pass",
+      "validate_ast_equivalence": "pass"
+    },
+    "artifacts": {
+      "raw_ast": "runtime/code_knowledge_graph_ast.json",
+      "enriched_ast": "runtime/code_knowledge_graph_enriched.json"
+    },
+    "agent_action": {
+      "type": "code_edit",
+      "files_modified": ["views.py"],
+      "reason": "Add pagination"
+    },
+    "result": "success"
+  }
+}

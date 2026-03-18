@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "version": "1.2",
+    "scope": "language_agnostic",
+    "principle": "Defines builder behavior and fallback policy; never defines syntax meaning."
+  },
+  "general_behavior": {
+    "emit_only_observed_nodes": true,
+    "do_not_infer_semantics": true,
+    "fail_on_schema_mismatch": true,
+    "allow_partial_graph": true
+  },
+  "node_emission_policy": {
+    "emit_on_detection": true,
+    "skip_unknown_node_types": true,
+    "mark_heuristic_nodes": true
+  },
+  "edge_emission_policy": {
+    "emit_only_if_mapping_exists": true,
+    "skip_unmapped_edges": true,
+    "preserve_edge_type": true
+  },
+  "symbolic_reference_policy": {
+    "allow_unresolved_targets": true,
+    "emit_edge_without_target_if_dynamic": true,
+    "mark_symbolic_edges": true
+  },
+  "heuristic_policy": {
+    "allow_heuristics": true,
+    "heuristic_confidence_label": "heuristic",
+    "do_not_upgrade_heuristic_to_fact": true
+  },
+  "recursion_depth_policy": {
+    "limit_nested_expressions": true,
+    "max_depth": 10,
+    "on_exceed": "stop_descend_and_log"
+  },
+  "ambiguity_handling": {
+    "emit_resolution_request": true,
+    "ticket_type": "AMBIGUOUS_REFERENCE",
+    "priority": "medium"
+  },
+  "error_handling": {
+    "on_parse_error": "skip_file",
+    "on_mapping_error": "fail_builder",
+    "on_schema_violation": "fail_builder"
+  },
+  "logging": {
+    "log_unmapped_syntax": true,
+    "log_heuristic_usage": true,
+    "log_skipped_edges": true,
+    "log_recursion_limit_hits": true,
+    "log_ambiguity_tickets": true
+  },
+  "scan_policy": {
+    "exclude_dirs": [
+      "node_modules",
+      ".git",
+      "dist",
+      "build",
+      "__pycache__",
+      "venv",
+      ".env",
+      "_archive"
+    ],
+    "exclude_file_patterns": [
+      "*.min.html",
+      "test_output*"
+    ]
+  }
+}

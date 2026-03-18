@@ -1,0 +1,414 @@
+{
+    "_meta": {
+        "role": "Spashta Execution Protocol",
+        "description": "Defines the mandatory, user-gated execution lifecycle for generating, enriching, and validating a Code Knowledge Graph (CKG) for a project codebase.",
+        "what_is_spashta": "Spashta provides a Code Knowledge Graph of a chosen project root folder by extracting ASTs from selected languages and frameworks, enabling safe, context-aware future development.",
+        "authority": "This file is the first and authoritative reference for IDE agents interacting with Spashta."
+    },
+    "path_resolution": {
+        "SPASHTA_ROOT": {
+            "description": "All paths in this file are relative to SPASHTA_ROOT (the Spashta_2.0 folder)",
+            "how_to_find": "This file is located at SPASHTA_ROOT/runtime/execution_protocol.json",
+            "example": "If this file is at /project/Spashta_2.0/runtime/execution_protocol.json, then SPASHTA_ROOT = /project/Spashta_2.0"
+        },
+        "path_examples": {
+            "runtime/query_spashta.py": "SPASHTA_ROOT/runtime/query_spashta.py",
+            "project/profile.json": "SPASHTA_ROOT/project/profile.json",
+            "builders/builder_rules.json": "SPASHTA_ROOT/builders/builder_rules.json"
+        },
+        "USER_PROJECT_ROOT": {
+            "description": "The user's project being analyzed (different from SPASHTA_ROOT)",
+            "defined_in": "SPASHTA_ROOT/project/profile.json under 'project_root' key",
+            "IMPORTANT": "Agent MUST NOT edit files in USER_PROJECT_ROOT"
+        }
+    },
+    "quick_commands": {
+        "description": "Shortcuts for common mid-project operations. Agent can jump directly to these instead of running full protocol.",
+        "available_commands": {
+            "refresh_l2_enrichment": {
+                "trigger_phrases": [
+                    "refresh enrichment",
+                    "update L2",
+                    "re-enrich",
+                    "refresh LLM enrichment"
+                ],
+                "action": "Jump directly to Step 7 (llm_semantic_enrichment)",
+                "prerequisite": "L1 CKG (code_knowledge_graph_enriched.json) must exist",
+                "workflow": [
+                    "Run: python runtime/enrichment_through_LLM/llm_enrich_runtime_ast.py --list-pending",
+                    "Read files_to_enrich.json",
+                    "Process only pending files",
+                    "Write to code_knowledge_graph_enriched_by_Agent.json"
+                ]
+            },
+            "rebuild_ckg": {
+                "trigger_phrases": [
+                    "rebuild CKG",
+                    "regenerate graph",
+                    "full rebuild"
+                ],
+                "action": "Run Steps 3-6 (build → diff → enrich → validate)",
+                "note": "Does NOT include L2 LLM enrichment. Ask user if they want L2 after."
+            },
+            "full_refresh": {
+                "trigger_phrases": [
+                    "full refresh",
+                    "rebuild everything",
+                    "start fresh"
+                ],
+                "action": "Run Steps 1-7 (complete protocol)",
+                "note": "Use when project profile or configuration changed"
+            },
+            "query_ckg": {
+                "trigger_phrases": [
+                    "query CKG",
+                    "search graph",
+                    "find in CKG"
+                ],
+                "action": "Use runtime/query_spashta.py",
+                "note": "No rebuild needed, just query existing CKG"
+            },
+            "check_stats": {
+                "trigger_phrases": [
+                    "enrichment stats",
+                    "check coverage",
+                    "how much enriched"
+                ],
+                "action": "Run: python runtime/enrichment_through_LLM/llm_enrich_runtime_ast.py --stats"
+            }
+        },
+        "agent_behavior": "When user asks for refresh/update, check which quick_command matches and execute directly without starting from Step 1"
+    },
+    "entry_point": {
+        "source": "project/profile.json",
+        "key": "project_root",
+        "description": "Root directory of the user's project codebase to analyze.",
+        "agent_action": {
+            "i": "Read 'project_root' from 'project/profile.json'",
+            "ii": "Display the current project root path to the user",
+            "iii": "Explicitly ask: 'Do you want to use this path, or would you like to provide a new project root folder path?'",
+            "iv": "If user provides a new path, validate and persist it to 'project/profile.json'"
+        },
+        "interaction": {
+            "allow_override": true,
+            "display_current_value": true,
+            "prompt_sequence": [
+                "Current project root (from profile.json): {current_value}",
+                "Do you want to use this project root? (yes/no)",
+                "If no: Please enter the new project root directory path:"
+            ],
+            "persist_to": "Spashta_2.0\\project\\profile.json"
+        },
+        "require_user_confirmation": true,
+        "on_failure": "halt_execution"
+    },
+    "environment": {
+        "execution_mode": "python",
+        "virtual_environment": {
+            "required": true,
+            "description": "All Python scripts MUST be executed using the project's virtual environment.",
+            "windows_hint": "venv/Scripts/python.exe",
+            "unix_hint": "venv/bin/python",
+            "on_violation": "halt_and_report"
+        }
+    },
+    "execution_policy": {
+        "CRITICAL_RULE": "The Agent MUST NOT edit any files in the user's project codebase. Spashta is READ-ONLY for the analyzed project.",
+        "file_modification_allowed": {
+            "description": "ONLY these files may be written to by the Agent:",
+            "files": [
+                "runtime/code_knowledge_graph_enriched_by_Agent.json",
+                "project/runtime_logs/session_log.json"
+            ],
+            "temporary_working_folder": {
+                "path": "runtime/enrichment_through_LLM/LLM_working_files/",
+                "purpose": "Store intermediate files, progress logs, and temporary data during LLM enrichment",
+                "examples": [
+                    "files_to_enrich.json",
+                    "enrichment_stats.json",
+                    "processing_progress.json"
+                ]
+            }
+        },
+        "file_modification_forbidden": {
+            "description": "The Agent MUST NOT modify:",
+            "categories": [
+                "Any file in the user's project root (project_root from profile.json)",
+                "Spashta configuration files (*.json in builders/, adapters/, core/)",
+                "Spashta scripts (*.py files)",
+                "Level-1 CKG outputs (code_knowledge_graph_ast.json, code_knowledge_graph_enriched.json)",
+                "Any file not explicitly listed in 'file_modification_allowed'"
+            ]
+        },
+        "on_violation": "halt_execution_and_report"
+    },
+    "steps": [
+        {
+            "id": "validate_project_profile",
+            "script": "project/validation/validate_project_profile.py",
+            "purpose": "Verify that the project profile correctly declares languages, frameworks, exclusions, and project root.",
+            "agent_action": "Resolve project_root from profile.json and validate stack.",
+            "must_display_before_confirmation": [
+                "project_root (relative)",
+                "project_root (absolute)",
+                "languages",
+                "frameworks"
+            ],
+            "user_prompt": "Project profile validated. Confirm that the resolved project root and stack are correct.",
+            "require_user_confirmation": true,
+            "on_failure": "halt_execution"
+        },
+        {
+            "id": "load_project_context",
+            "script": "project/context_loader.py",
+            "purpose": "Load agent rules, architectural boundaries, purity rules, and adapter configurations into a single execution context.",
+            "agent_action": "Bind all rules that will constrain reasoning, enrichment, and future edits.",
+            "user_prompt": "Project rules and boundaries loaded. Proceed to structural analysis?",
+            "require_user_confirmation": true,
+            "on_failure": "halt_execution"
+        },
+        {
+            "id": "build_runtime_ast",
+            "step": 3,
+            "script": "runtime/build_runtime_ast.py",
+            "purpose": "Generate canonical structural AST from source code.",
+            "inputs": [
+                "active_builders",
+                "builders/builder_rules.json"
+            ],
+            "outputs": [
+                "runtime/code_knowledge_graph_ast.json"
+            ],
+            "user_prompt": "Raw structural AST generated. Proceed to change detection?",
+            "require_user_confirmation": true,
+            "on_failure": "halt_execution"
+        },
+        {
+            "id": "diff_runtime_ast",
+            "step": 4,
+            "script": "runtime/diff_runtime_ast.py",
+            "purpose": "Detect incremental changes between New Raw AST and Old Enriched AST.",
+            "inputs": [
+                "runtime/code_knowledge_graph_ast.json",
+                "runtime/code_knowledge_graph_enriched.json"
+            ],
+            "outputs": [
+                "runtime/diff_report.json"
+            ],
+            "user_prompt": "Change detection complete. Proceed to incremental enrichment?",
+            "require_user_confirmation": true,
+            "on_failure": "halt_execution"
+        },
+        {
+            "id": "enrich_runtime_ast",
+            "step": 5,
+            "script": "runtime/enrich_runtime_ast.py",
+            "purpose": "Apply framework-level semantics using adapters without modifying the structural AST.",
+            "agent_action": "Overlay meaning (Django, FastAPI, HTMX, etc.) onto the raw AST.",
+            "inputs": [
+                "runtime/diff_report.json"
+            ],
+            "outputs": [
+                "runtime/code_knowledge_graph_enriched.json"
+            ],
+            "user_prompt": "Adapter-based semantic enrichment complete. Proceed to structural equivalence validation?",
+            "require_user_confirmation": true,
+            "on_failure": "halt_execution"
+        },
+        {
+            "id": "validate_ast_equivalence",
+            "step": 6,
+            "script": "runtime/validate_ast_equivalence.py",
+            "purpose": "Ensure the enriched AST preserves the exact structure of the raw AST (no hallucination, no mutation).",
+            "agent_action": "Compare node identities and edge relationships between raw and enriched ASTs.",
+            "require_user_confirmation": false,
+            "on_failure": "halt_execution"
+        },
+        {
+            "id": "llm_semantic_enrichment",
+            "step": 7,
+            "purpose": "Apply Level-2 AI Inference (Business Logic, Intent) to the CKG via LLM.",
+            "description": "This is an OPTIONAL step. If skipped, the Level-1 enriched CKG is still fully usable.",
+            "user_warning": {
+                "IMPORTANT": "Before proceeding, the Agent MUST inform the user:",
+                "message_to_display": [
+                    "=== LEVEL-2 LLM ENRICHMENT ===",
+                    "",
+                    "This step will have the IDE AI Agent READ your entire codebase to add:",
+                    "  • Business intent and meaning for each code element",
+                    "  • Domain tags (e.g., authentication, payment, user-management)",
+                    "  • Complexity scores and side-effect analysis",
+                    "  • Resolution of ambiguous calls and imports",
+                    "",
+                    "📍 INCREMENTAL: If you've done this before, only MODIFIED files will be processed.",
+                    "📍 First time: ALL files in your project will be read once.",
+                    "",
+                    "WHY IS THIS USEFUL?",
+                    "  • Enables AI agents to understand the 'why' behind your code, not just 'what'",
+                    "  • Improves code navigation, refactoring suggestions, and impact analysis",
+                    "  • Helps onboard new developers with semantic context",
+                    "  • Allows querying by business concepts (e.g., 'show all authentication code')",
+                    "",
+                    "You can SKIP this step now and do it later anytime.",
+                    ""
+                ],
+                "then_ask": "Proceed with Level-2 LLM Enrichment? (yes/skip)"
+            },
+            "workflow": {
+                "step_7a": {
+                    "action": "Run helper script to identify pending files",
+                    "command": "python runtime/enrichment_through_LLM/llm_enrich_runtime_ast.py --list-pending",
+                    "output": "runtime/enrichment_through_LLM/LLM_working_files/files_to_enrich.json",
+                    "purpose": "Compare file hashes to identify new/modified files needing enrichment"
+                },
+                "step_7b": {
+                    "action": "Read rules and format",
+                    "files": [
+                        "runtime/enrichment_through_LLM/llm_enrichment_rules.json",
+                        "runtime/enrichment_through_LLM/llm_enrichment_prompt.json"
+                    ],
+                    "purpose": "Understand constraints and expected output format"
+                },
+                "step_7c": {
+                    "action": "Process pending files",
+                    "input": "runtime/enrichment_through_LLM/LLM_working_files/files_to_enrich.json",
+                    "for_each_file": [
+                        "Read source code",
+                        "Gather nodes/edges/ambiguities from L1 CKG",
+                        "Add llm_enrichment to each node (include enriched_at_hash)",
+                        "Add llm_resolution to ambiguities"
+                    ],
+                    "purpose": "Enrich nodes with business intent and resolve ambiguities"
+                },
+                "step_7d": {
+                    "action": "Write enriched graph",
+                    "output": "runtime/code_knowledge_graph_enriched_by_Agent.json",
+                    "purpose": "Persist LLM enrichments to output file"
+                },
+                "step_7e": {
+                    "action": "Validate output (optional)",
+                    "command": "python runtime/enrichment_through_LLM/llm_enrich_runtime_ast.py --validate",
+                    "purpose": "Verify output structure is correct"
+                }
+            },
+            "inputs": [
+                "runtime/code_knowledge_graph_enriched.json",
+                "runtime/enrichment_through_LLM/LLM_working_files/files_to_enrich.json"
+            ],
+            "outputs": [
+                "runtime/code_knowledge_graph_enriched_by_Agent.json"
+            ],
+            "trigger_file": "runtime/enrichment_through_LLM/Prompt_For_LLM_Enrichment.txt",
+            "documentation": "runtime/enrichment_through_LLM/LLM_Enrichment_Procedure.md",
+            "user_prompt": "Proceed with Level-2 LLM Enrichment? (yes/skip)",
+            "options": {
+                "yes": "Run full workflow with hash-based incremental enrichment",
+                "skip": "Skip LLM enrichment and proceed with L1 CKG only (can be done later)"
+            },
+            "require_user_confirmation": true,
+            "on_failure": "halt_execution"
+        },
+        {
+            "id": "finalize_session_log",
+            "step": 8,
+            "script": "internal:commit_session_log",
+            "purpose": "Commit the execution summary to the immutable session log and confirm readiness.",
+            "agent_action": "Append run details to 'project/runtime_logs/session_log.json' following the schema.",
+            "inputs": {
+                "destination": "project/runtime_logs/session_log.json",
+                "schema_source": "project/runtime_logs/session_log.schema.json",
+                "required_fields": [
+                    "step_id",
+                    "timestamp",
+                    "status",
+                    "user_confirmation",
+                    "notes"
+                ]
+            },
+            "user_prompt": "Audit log updated. I am ready for IDE tasks.",
+            "require_user_confirmation": true,
+            "on_failure": "halt_execution"
+        }
+    ],
+    "error_handling_policy": {
+        "mode": "REPORT_ONLY",
+        "description": "On any error, validation failure, or unexpected condition, the agent MUST report findings and STOP. No file modifications are allowed unless explicitly authorized by the user.",
+        "allowed_actions": [
+            "read_files",
+            "analyze_outputs",
+            "report_findings"
+        ],
+        "forbidden_actions": [
+            "edit_files",
+            "rewrite_scripts",
+            "relax_validations",
+            "mutate_core_schema",
+            "auto_fix_errors"
+        ]
+    },
+    "rules": {
+        "allow_skip_steps": false,
+        "allow_reorder_steps": false,
+        "allow_parallel_execution": false,
+        "on_any_failure": "halt_execution"
+    },
+    "post_completion": {
+        "what_is_spashta_ckg": {
+            "description": "Spashta-CKG (Code Knowledge Graph) is a structured JSON representation of your entire codebase.",
+            "contains": [
+                "All files, classes, functions, methods, variables",
+                "Import/export relationships between modules",
+                "Call relationships (what calls what)",
+                "Framework-specific semantics (Django views, FastAPI routes, etc.)",
+                "Business intent and domain tags (if L2 enrichment was done)"
+            ],
+            "purpose": "Enables AI agents to understand project structure WITHOUT reading all source files every time"
+        },
+        "query_tool": {
+            "path": "runtime/query_spashta.py",
+            "usage": "python runtime/query_spashta.py --help",
+            "key_commands": {
+                "list-files": "List all files in the CKG",
+                "list-functions": "List all functions/methods",
+                "list-classes": "List all classes",
+                "search-calls": "Find what calls a specific function",
+                "search-callers": "Find what is called by a function",
+                "search-imports": "Find import relationships",
+                "impact-analysis": "Analyze impact of changing a file/function"
+            }
+        },
+        "agent_guidelines_after_completion": {
+            "FIRST_STEP": "Before any code-related task, query the CKG to understand project structure",
+            "for_impact_analysis": "Use 'python runtime/query_spashta.py impact-analysis <file_or_function>'",
+            "for_finding_code": "Use CKG queries instead of grep/find to locate code elements",
+            "for_understanding_flow": "Query call relationships to understand data/control flow",
+            "remember": [
+                "CKG is the source of truth for project structure",
+                "User's project files are READ-ONLY for Spashta",
+                "Only code_knowledge_graph_enriched_by_Agent.json can be written to",
+                "Run quick_command 'refresh enrichment' if codebase changed significantly"
+            ]
+        },
+        "message_to_display_on_completion": [
+            "",
+            "=== SPASHTA-CKG READY ===",
+            "",
+            "Your Code Knowledge Graph is now available!",
+            "",
+            "Query tool: python runtime/query_spashta.py --help",
+            "",
+            "Example queries:",
+            "  • List files: python runtime/query_spashta.py list-files",
+            "  • Find callers: python runtime/query_spashta.py search-callers <function>",
+            "  • Impact analysis: python runtime/query_spashta.py impact-analysis <file>",
+            "",
+            "DIRECT JSON ACCESS:",
+            "If query script doesn't meet your needs, you can directly search:",
+            "  • L1 CKG: runtime/code_knowledge_graph_enriched.json",
+            "  • L2 CKG: runtime/code_knowledge_graph_enriched_by_Agent.json",
+            "",
+            "TIP: Ask me to query the CKG before any code changes for better context!",
+            ""
+        ]
+    }
+}

@@ -1,7 +1,0 @@
-{
-    "_meta": {
-        "role": "Spashta Runtime & Agent Audit Log",
-        "append_only": true
-    },
-    "sessions": []
-}

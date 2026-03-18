@@ -1,0 +1,98 @@
+{
+    "_meta": {
+        "description": "Maps FastAPI constructs to Core Nodes and Semantic Roles.",
+        "role": "Framework Mapping",
+        "version": "2.1",
+        "changelog_2.1": "Fixed View decorators to include all common patterns. Added Middleware, EventHandler mappings. Marked Dependency and Router as known limitations. Total: 5 -> 7 mappings (2 dead rules documented)."
+    },
+    "mappings": [
+        {
+            "core_node": "Class",
+            "semantic_role": "DataModel",
+            "notes": "SQLAlchemy/SQLModel ORM classes.",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "SQLModel",
+                    "Base",
+                    "DeclarativeBase",
+                    "db.Model"
+                ]
+            }
+        },
+        {
+            "core_node": "Class",
+            "semantic_role": "APIContract",
+            "notes": "Pydantic models define the API schema/contract.",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "BaseModel",
+                    "pydantic.BaseModel",
+                    "BaseSettings",
+                    "pydantic.BaseSettings"
+                ]
+            }
+        },
+        {
+            "core_node": "Function",
+            "semantic_role": "View",
+            "notes": "FastAPI path operation functions. Uses decorators rule (implemented in engine 2.1).",
+            "detection_rules": {
+                "decorators": [
+                    "get",
+                    "post",
+                    "put",
+                    "delete",
+                    "patch",
+                    "options",
+                    "head",
+                    "websocket"
+                ]
+            }
+        },
+        {
+            "core_node": "Function",
+            "semantic_role": "EventHandler",
+            "notes": "FastAPI startup/shutdown event handlers.",
+            "detection_rules": {
+                "decorators": [
+                    "on_event",
+                    "on_startup",
+                    "on_shutdown"
+                ]
+            }
+        },
+        {
+            "core_node": "Function",
+            "semantic_role": "Middleware",
+            "notes": "FastAPI middleware functions decorated with @app.middleware.",
+            "detection_rules": {
+                "decorators": [
+                    "middleware"
+                ]
+            }
+        },
+        {
+            "core_node": "Call",
+            "semantic_role": "Dependency",
+            "_known_limitation": "Call nodes are NOT emitted by Python builder. This rule is DEAD until builder emits Call nodes.",
+            "detection_rules": {
+                "function_name": [
+                    "Depends",
+                    "fastapi.Depends",
+                    "Security"
+                ]
+            }
+        },
+        {
+            "core_node": "Variable",
+            "semantic_role": "Router",
+            "_known_limitation": "assigned_value detection NOT implemented in enrichment engine. This rule is DEAD until engine supports assigned_value.",
+            "detection_rules": {
+                "assigned_value": [
+                    "APIRouter",
+                    "FastAPI"
+                ]
+            }
+        }
+    ]
+}

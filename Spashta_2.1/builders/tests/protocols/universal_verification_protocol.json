@@ -1,0 +1,62 @@
+{
+    "protocol_meta": {
+        "protocol_id": "centralized_builder_verification_v3",
+        "target_audience": "AI Agents & Developers",
+        "scope": "Universal (Python, HTML, CSS)",
+        "architecture_type": "Centralized Runner + Config-Driven"
+    },
+    "prerequisites_check": [
+        {
+            "item": "Central Test Runner",
+            "path": "builders/tests/run_tests.py",
+            "mandatory": true,
+            "role": "Single verification engine for all languages."
+        },
+        {
+            "item": "Language Configuration",
+            "path": "builders/tests/configs/[lang]_config.json",
+            "mandatory": true,
+            "role": "Defines specific paths, expectations, and contract equivalences."
+        },
+        {
+            "item": "Test Data",
+            "path": "builders/tests/data/[lang]_dummy.[ext]",
+            "mandatory": true,
+            "role": "Source code that triggers mapping rules."
+        }
+    ],
+    "execution_steps": [
+        {
+            "step": 1,
+            "name": "Select Configuration",
+            "agent_instruction": "Identify the target language config (e.g., `python_config.json`, `html_config.json`) in `builders/tests/configs/`."
+        },
+        {
+            "step": 2,
+            "name": "Run Centralized Test",
+            "agent_instruction": "Execute the runner with the selected config.",
+            "command_template": "python builders/tests/run_tests.py --config builders/tests/configs/[lang]_config.json"
+        },
+        {
+            "step": 3,
+            "name": "Analyze Outcome",
+            "agent_instruction": "Check the detailed Console Report.",
+            "logic": {
+                "IF PASS": "Builder is compliant. Artifacts verified.",
+                "IF FAIL": "Analyze the 'Missing Nodes/Edges' report. 1. Is 'dummy_data' missing a feature? 2. Is the Builder logic broken?"
+            }
+        },
+        {
+            "step": 4,
+            "name": "Structural Validation",
+            "agent_instruction": "Run the schema validator on the generated output to ensure Core Schema compliance.",
+            "command_template": "python builders/validation/validate_builder_output.py builders/tests/outputs/test_output_[lang].json"
+        },
+        {
+            "step": 5,
+            "name": "Artifact Location",
+            "agent_instruction": "Inspect generated JSON outputs if needed.",
+            "path": "builders/tests/outputs/test_output_[lang].json"
+        }
+    ]
+}

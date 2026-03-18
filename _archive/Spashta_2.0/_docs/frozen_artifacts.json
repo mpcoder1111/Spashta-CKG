@@ -1,0 +1,68 @@
+{
+    "registry_description": "Tracks the Frozen/Active status of critical project artifacts. Agents MUST check this before editing.",
+    "__schema_guide": {
+        "key_format": "Relative path from workspace root (e.g., 'Spashta_2.0_Devlopment/builders/component/script.py')",
+        "value_format": {
+            "status": "Must be either 'frozen' (Immutable by Agent) or 'active' (Editable)",
+            "reason": "Brief explanation of why the file is in this state",
+            "frozen_Full_TimeStamp_IST": "Format: DD-MM-YYYY_HH:MM (e.g., 26-12-2025_16:15)"
+        }
+    },
+    "artifacts": {
+        "Spashta_2.0_Devlopment/builders": {
+            "status": "frozen",
+            "reason": "Entire Builder Infrastructure (Python, HTML, CSS, Tests, Protocols) is VERIFIED STABLE.",
+            "frozen_Full_TimeStamp_IST": "26-12-2025_23:22"
+        },
+        "Spashta_2.0_Devlopment/builders/css/build_css_ast.py": {
+            "status": "frozen",
+            "reason": "Updated to be Path-Robust and support Single-File I/O.",
+            "frozen_Full_TimeStamp_IST": "26-12-2025_19:59"
+        },
+        "Spashta_2.0_Devlopment/builders/css/css_language_mapping.json": {
+            "status": "frozen",
+            "reason": "Standardized schema defined.",
+            "frozen_Full_TimeStamp_IST": "26-12-2025_15:06"
+        },
+        "Spashta_2.0_Devlopment/builders/python/build_python_ast.py": {
+            "status": "frozen",
+            "reason": "Verified by Centralized Test Runner. Path-Robust & Single-File capable.",
+            "frozen_Full_TimeStamp_IST": "26-12-2025_23:20"
+        },
+        "Spashta_2.0_Devlopment/builders/html/build_html_ast.py": {
+            "status": "frozen",
+            "reason": "Verified by Centralized Test Runner. Path-Robust & Single-File capable.",
+            "frozen_Full_TimeStamp_IST": "26-12-2025_23:20"
+        },
+        "Spashta_2.0_Devlopment/builders/tests/run_tests.py": {
+            "status": "frozen",
+            "reason": "Universal Test Runner V3 (Console Logging, Clean Outputs).",
+            "frozen_Full_TimeStamp_IST": "26-12-2025_23:20"
+        },
+        "Spashta_2.0_Devlopment/builders/validation/validate_builder_output.py": {
+            "status": "frozen",
+            "reason": "Structural Integrity & Ambiguity Validator (The Standard Compliance Officer).",
+            "frozen_Full_TimeStamp_IST": "26-12-2025_23:20"
+        },
+        "Spashta_2.0_Devlopment/builders/tests/protocols/universal_verification_protocol.json": {
+            "status": "frozen",
+            "reason": "Master Protocol for Builders.",
+            "frozen_Full_TimeStamp_IST": "26-12-2025_23:20"
+        },
+        "Spashta_2.0_Devlopment/docs/coder_style.json": {
+            "status": "frozen",
+            "reason": "Governance source of truth for Project Architecture and Agent Persona.",
+            "frozen_Full_TimeStamp_IST": "26-12-2025_16:39"
+        },
+        "Spashta_2.0_Devlopment/adapters": {
+            "status": "frozen",
+            "reason": "User requested freeze. Adapters are verified and stable.",
+            "frozen_Full_TimeStamp_IST": "27-12-2025_01:19"
+        },
+        "Spashta_2.0_Devlopment/runtime/build_runtime_ast.py": {
+            "status": "frozen",
+            "reason": "Deterministic Merging Logic & Strong Identity Strategy Verified.",
+            "frozen_Full_TimeStamp_IST": "27-12-2025_01:52"
+        }
+    }
+}

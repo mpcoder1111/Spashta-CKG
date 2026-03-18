@@ -1,0 +1,195 @@
+{
+  "builder_identity": {
+    "name": "css_ast_builder",
+    "version": "1.0-strict",
+    "output_format": "json",
+    "scope": "structure_only"
+  },
+
+  "core_dependency_policy": {
+    "core_schema_sources": [
+      "core/nodes.json",
+      "core/edges.json"
+    ],
+    "hardcoding_forbidden": true,
+    "schema_is_runtime_authority": true
+  },
+
+  "builder_principles": {
+    "structure_only": true,
+    "no_best_guessing": true,
+    "unknown_is_explicit": true,
+    "facts_and_uncertainty_separated": true,
+    "framework_semantics_forbidden": true,
+    "behavioral_inference_forbidden": true,
+    "contracts_not_enforced_here": true
+  },
+
+  "output_rules": {
+    "format": "json",
+    "sections": ["nodes", "edges", "ambiguities", "logs"],
+    "deterministic": true
+  },
+
+  "file_node_rules": {
+    "file_node_type": "Stylesheet",
+    "file_hash_required": true,
+    "hash_algorithm": "md5",
+    "file_node_must_exist_before_children": true
+  },
+
+  "node_emission_rules": {
+    "emit_node_only_if": [
+      "direct_css_syntax_construct",
+      "node_type_allowed_by_core_schema"
+    ],
+    "allowed_node_types": [
+      "Stylesheet",
+      "StyleClass",
+      "StyleID",
+      "StyleElement",
+      "StaticAsset"
+    ],
+    "never_emit_node_to_satisfy_edge": true,
+    "forbidden_inference": [
+      "animation_as_node",
+      "font_family_as_node",
+      "css_variable_as_core_variable",
+      "media_query_as_node",
+      "supports_query_as_node",
+      "pseudo_class_as_event",
+      "nested_selector_inference"
+    ]
+  },
+
+  "edge_emission_rules": {
+    "mandatory_schema_checks": [
+      "edge_type_exists",
+      "source_node_exists",
+      "target_node_exists",
+      "source_type_allowed",
+      "target_type_allowed"
+    ],
+    "allowed_edges": [
+      "imports",
+      "defines"
+    ],
+    "on_failure": {
+      "emit": "ambiguity",
+      "do_not_emit_edge": true
+    }
+  },
+
+  "css_strict_rules": {
+    "imports": {
+      "allowed_syntax": [
+        "@import \"file.css\"",
+        "@import 'file.css'",
+        "@import url(file.css)",
+        "@import url(\"file.css\")",
+        "@import url('file.css')"
+      ],
+      "allowed_edge": "imports",
+      "allowed_source": "Stylesheet",
+      "allowed_target": [
+        "Stylesheet",
+        "StaticAsset",
+        "File"
+      ],
+      "unknown_target_emit": "import_target_unresolved"
+    },
+
+    "selectors": {
+      "class_selector": {
+        "emit_node": "StyleClass",
+        "confidence": "heuristic"
+      },
+      "id_selector": {
+        "emit_node": "StyleID",
+        "confidence": "heuristic"
+      },
+      "element_selector": {
+        "emit_node": "StyleElement",
+        "confidence": "heuristic"
+      },
+      "multiple_selectors": {
+        "split_allowed": true,
+        "do_not_merge": true
+      }
+    },
+
+    "pseudo_classes": {
+      "never_emit_node": true,
+      "emit_ambiguity": "interaction_state"
+    },
+
+    "media_queries": {
+      "never_emit_node": true,
+      "emit_ambiguity": "responsive_breakpoint"
+    },
+
+    "supports_queries": {
+      "never_emit_node": true,
+      "emit_ambiguity": "feature_support_query"
+    },
+
+    "keyframes": {
+      "never_emit_node": true,
+      "emit_ambiguity": "css_animation_defined"
+    },
+
+    "custom_properties": {
+      "never_emit_node": true,
+      "emit_ambiguity": "css_custom_property"
+    },
+
+    "font_face": {
+      "never_emit_node": true,
+      "emit_ambiguity": "font_family_declared"
+    },
+
+    "nested_rules": {
+      "forbidden": true,
+      "emit_ambiguity": "nested_css_rule_unmodeled"
+    }
+  },
+
+  "ambiguity_policy": {
+    "ambiguity_is_first_class": true,
+    "ambiguity_is_not_structure": true,
+    "storage_location": "ambiguities",
+    "must_include": [
+      "id",
+      "kind",
+      "source_file",
+      "source_scope",
+      "expression",
+      "reason",
+      "confidence",
+      "resolver"
+    ],
+    "default_resolver": "agent",
+    "default_confidence": "unresolved"
+  },
+
+  "contracts_policy": {
+    "contracts_json_may_be_loaded": false,
+    "contracts_enforced_in_builder": false,
+    "contracts_used_by": [
+      "adapters",
+      "agents",
+      "post_build_validation"
+    ]
+  },
+
+  "builder_success_criteria": {
+    "structural_validation_failures": 0,
+    "ambiguity_count": "acceptable",
+    "partial_coverage": "acceptable",
+    "any_structural_violation_means": "builder_bug"
+  },
+
+  "final_rule": {
+    "statement": "If a CSS fact cannot be proven syntactically and mapped to an existing Core node or edge, it must not be asserted and must be recorded as explicit ambiguity."
+  }
+}

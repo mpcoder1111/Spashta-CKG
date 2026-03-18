@@ -1,0 +1,70 @@
+{
+    "coder_profile": {
+        "name": "Spashta-CKG Lead Architect Persona",
+        "version": "1.2"
+    },
+    "current_project_core_philosophy": {
+        "mapping_files": {
+            "role": "The Declaration of Truth",
+            "rule": "POSITIVE FACTS ONLY. No procedural logic, no fallbacks, no 'if/else'. Just 'Structure X = Meaning Y'.",
+            "file_type": "Static JSON"
+        },
+        "builder_scripts": {
+            "role": "The Enforcer",
+            "rule": "Strict Compliance. If a fact cannot be proven 100%, emit an 'Ambiguity Ticket' (e.g., 'import_target_unresolved'). DO NOT GUESS. DO NOT hardcode business logic."
+        },
+        "test_scripts": {
+            "role": "The Verifier",
+            "rule": "Dual Purpose Validation. Verify (1) Test Data Completeness AND (2) Builder Compliance. Use 'Contract Expectations' to validate Ambiguity Tickets as valid success cases."
+        }
+    },
+    "coding_patterns": {
+        "configuration": {
+            "preferred_style": "Top Zone Config",
+            "description": "All configuration variables must be placed at the very top of the script (after imports) in a clearly marked 'TOP ZONE' section using UPPERCASE constants.",
+            "exception_case": "Use External JSON Config ONLY if reusability across multiple contexts is explicitly required or requested."
+        },
+        "modularity": {
+            "style": "Single Responsibility Functions",
+            "description": "Split scripts into distinct jobs (e.g., `run_builder`, `verify_coverage`) returning status dicts."
+        },
+        "docstrings": {
+            "style": "Mandatory Module Documentation",
+            "rules": [
+                "Every module and function MUST have a clear, layman-friendly docstring.",
+                "Docstrings must explicitly name involved files (e.g., 'Reads dummy_code.css').",
+                "Docstrings must use ASCII diagrams for data flow visualization."
+            ]
+        }
+    },
+    "workflow_protocols": {
+        "note_taking": {
+            "trigger": "User says 'Take a note' or 'Note this'.",
+            "file_path": "docs/Note_taking_through_Agent.md",
+            "method": "Append Only",
+            "format": "Hierarchical Bullets. Top level is the #Category (Multiple tags allowed: #tag1 #tag2). Sub-levels are details/steps.",
+            "example": "- #mappings #core\n  - Mappings must be purely declarative.\n  - No procedural logic allowed.",
+            "note_md_file_info_command": "(Get-Content Spashta_2.0_Devlopment/docs/Note_taking_through_Agent.md -Raw) -match '(?sm)<!--(.*?)-->' | Out-Null; $matches[1].Trim()"
+        },
+        "note_retrieval": {
+            "trigger": "Agent starts a new task (e.g., Editing logic, Writing tests).",
+            "action": "MUST Read 'docs/Note_taking_through_Agent.md' and search for relevant #keywords.",
+            "note_md_file_info_command": "(Get-Content Spashta_2.0_Devlopment/docs/Note_taking_through_Agent.md -Raw) -match '(?sm)<!--(.*?)-->' | Out-Null; $matches[1].Trim()"
+        },
+        "code_freezing": {
+            "concept": "Immutable Artifacts",
+            "registry_file": "docs/frozen_artifacts.json",
+            "rule": "Before editing any core file, CHECK the registry. If status is 'frozen', the Agent is FORBIDDEN from modifying it unless actively 'unfrozen' by the user.",
+            "states": [
+                "frozen",
+                "active"
+            ],
+            "action": "When User says 'Freeze X', add entry to registry. When User says 'Unfreeze X', update status to 'active'."
+        }
+    },
+    "documentation_style": {
+        "output_messages": {
+            "pass_fail": "Interpretative & Actionable (Pass = Healthy, Fail = Data Gap vs Bug)."
+        }
+    }
+}

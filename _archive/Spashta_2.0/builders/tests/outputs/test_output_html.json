@@ -1,0 +1,197 @@
+{
+  "_meta": {
+    "builder": "build_html_ast.py",
+    "builder_version": "2.0-strict",
+    "generated_at": "2025-12-28T03:24:22.420382"
+  },
+  "nodes": [
+    {
+      "node_type": "Template",
+      "name": "html_dummy.html",
+      "id": "html_dummy.html",
+      "analysis_confidence": "structural",
+      "line_start": null,
+      "line_end": null,
+      "attributes": null,
+      "hash": "55caf6c7b9e977fc24b3319748be5434"
+    },
+    {
+      "node_type": "StaticAsset",
+      "name": "/static/styles.css",
+      "id": "html_dummy.html::StaticAsset::/static/styles.css",
+      "analysis_confidence": "heuristic",
+      "line_start": 8,
+      "line_end": null,
+      "attributes": {
+        "tag": "link"
+      }
+    },
+    {
+      "node_type": "StaticAsset",
+      "name": "/favicon.ico",
+      "id": "html_dummy.html::StaticAsset::/favicon.ico",
+      "analysis_confidence": "heuristic",
+      "line_start": 10,
+      "line_end": null,
+      "attributes": {
+        "tag": "link"
+      }
+    },
+    {
+      "node_type": "StaticAsset",
+      "name": "/static/logo.png",
+      "id": "html_dummy.html::StaticAsset::/static/logo.png",
+      "analysis_confidence": "heuristic",
+      "line_start": 18,
+      "line_end": null,
+      "attributes": {
+        "tag": "img"
+      }
+    },
+    {
+      "node_type": "Route",
+      "name": "/dashboard/user",
+      "id": "html_dummy.html::Route::/dashboard/user",
+      "analysis_confidence": "heuristic",
+      "line_start": 21,
+      "line_end": null,
+      "attributes": {
+        "tag": "a"
+      }
+    },
+    {
+      "node_type": "Route",
+      "name": "/api/submit_data",
+      "id": "html_dummy.html::Route::/api/submit_data",
+      "analysis_confidence": "heuristic",
+      "line_start": 25,
+      "line_end": null,
+      "attributes": {
+        "tag": "form",
+        "method": "POST"
+      }
+    },
+    {
+      "node_type": "StaticAsset",
+      "name": "/static/app_bundle.js",
+      "id": "html_dummy.html::StaticAsset::/static/app_bundle.js",
+      "analysis_confidence": "heuristic",
+      "line_start": 31,
+      "line_end": null,
+      "attributes": {
+        "tag": "script"
+      }
+    },
+    {
+      "node_type": "Route",
+      "name": "/api/like",
+      "id": "html_dummy.html::Route::/api/like",
+      "analysis_confidence": "heuristic",
+      "line_start": 34,
+      "line_end": null,
+      "attributes": {
+        "tag": "button",
+        "method": "POST"
+      }
+    },
+    {
+      "node_type": "StyleID",
+      "name": "#like-count",
+      "id": "html_dummy.html::StyleID::#like-count",
+      "analysis_confidence": "heuristic",
+      "line_start": 34,
+      "line_end": null,
+      "attributes": {
+        "tag": "button",
+        "method": "POST"
+      }
+    },
+    {
+      "node_type": "Route",
+      "name": "/update",
+      "id": "html_dummy.html::Route::/update",
+      "analysis_confidence": "heuristic",
+      "line_start": 43,
+      "line_end": null,
+      "attributes": {
+        "tag": "div"
+      }
+    },
+    {
+      "node_type": "Event",
+      "name": "mouseenter",
+      "id": "html_dummy.html::Event::mouseenter",
+      "analysis_confidence": "heuristic",
+      "line_start": 43,
+      "line_end": null,
+      "attributes": {
+        "tag": "div"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "edge": "links_static_asset",
+      "from": "html_dummy.html",
+      "to": "html_dummy.html::StaticAsset::/static/styles.css"
+    },
+    {
+      "edge": "links_static_asset",
+      "from": "html_dummy.html",
+      "to": "html_dummy.html::StaticAsset::/favicon.ico"
+    },
+    {
+      "edge": "links_static_asset",
+      "from": "html_dummy.html",
+      "to": "html_dummy.html::StaticAsset::/static/logo.png"
+    },
+    {
+      "edge": "calls_api",
+      "from": "html_dummy.html",
+      "to": "html_dummy.html::Route::/dashboard/user"
+    },
+    {
+      "edge": "submits_form",
+      "from": "html_dummy.html",
+      "to": "html_dummy.html::Route::/api/submit_data"
+    },
+    {
+      "edge": "links_static_asset",
+      "from": "html_dummy.html",
+      "to": "html_dummy.html::StaticAsset::/static/app_bundle.js"
+    },
+    {
+      "edge": "calls_api",
+      "from": "html_dummy.html",
+      "to": "html_dummy.html::Route::/api/like"
+    },
+    {
+      "edge": "targets_element",
+      "from": "html_dummy.html",
+      "to": "html_dummy.html::StyleID::#like-count"
+    },
+    {
+      "edge": "calls_api",
+      "from": "html_dummy.html",
+      "to": "html_dummy.html::Route::/update"
+    },
+    {
+      "edge": "triggers_event",
+      "from": "html_dummy.html",
+      "to": "html_dummy.html::Event::mouseenter"
+    }
+  ],
+  "ambiguities": [
+    {
+      "id": "2cfb0c97-86bc-42bf-ace3-7b5bcc45d2b8",
+      "kind": "external_reference_unmodeled",
+      "source_file": "html_dummy.html",
+      "source_scope": "html_dummy.html",
+      "expression": "https://external.com/api",
+      "reason": "External URL references are not structural edges",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    }
+  ],
+  "logs": []
+}

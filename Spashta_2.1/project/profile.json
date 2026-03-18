@@ -1,0 +1,39 @@
+{
+    "_meta": {
+        "description": "Defines the active technology stack and scan scope for this project.",
+        "role": "Project Activation Context",
+        "version": "2.1",
+        "core_schema_version": "1.4",
+        "IMPORTANT": "Use exact spellings from supported lists below. Spelling mistakes will cause errors.",
+        "supported_languages": [
+            "python",
+            "html",
+            "css"
+        ],
+        "supported_frameworks": [
+            "django",
+            "fastapi",
+            "htmx"
+        ]
+    },
+    "project_root": "..",
+    "_project_root_note": "Relative to Spashta-CKG folder. '..' means parent directory (the project root). Use absolute path if Spashta-CKG is not inside the project.",
+    "project_type": "web_app",
+    "languages": [
+        "python",
+        "html",
+        "css"
+    ],
+    "frameworks": [
+        "django",
+        "htmx"
+    ],
+    "excluded": {
+        "frameworks": [
+            "fastapi"
+        ],
+        "languages": [
+            "javascript"
+        ]
+    }
+}

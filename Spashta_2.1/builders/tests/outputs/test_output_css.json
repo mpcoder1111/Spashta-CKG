@@ -1,0 +1,458 @@
+{
+  "_meta": {
+    "builder": "build_css_ast.py",
+    "builder_version": "1.0-strict",
+    "generated_at": "2025-12-28T03:24:33.031421"
+  },
+  "nodes": [
+    {
+      "node_type": "Stylesheet",
+      "name": "css_dummy.css",
+      "id": "css_dummy.css",
+      "analysis_confidence": "structural",
+      "line_start": null,
+      "line_end": null,
+      "attributes": null,
+      "file_hash": "5c39fb69ac0ee234bd88898ed9cde65b"
+    },
+    {
+      "node_type": "StyleClass",
+      "name": "container",
+      "id": "css_dummy.css::StyleClass::container",
+      "analysis_confidence": "heuristic",
+      "line_start": 8,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleClass",
+      "name": "tiny",
+      "id": "css_dummy.css::StyleClass::tiny",
+      "analysis_confidence": "heuristic",
+      "line_start": 56,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleClass",
+      "name": "spaced1",
+      "id": "css_dummy.css::StyleClass::spaced1",
+      "analysis_confidence": "heuristic",
+      "line_start": 65,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleID",
+      "name": "main-header",
+      "id": "css_dummy.css::StyleID::main-header",
+      "analysis_confidence": "heuristic",
+      "line_start": 12,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleID",
+      "name": "spaced2",
+      "id": "css_dummy.css::StyleID::spaced2",
+      "analysis_confidence": "heuristic",
+      "line_start": 66,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "import",
+      "id": "css_dummy.css::StyleElement::import",
+      "analysis_confidence": "heuristic",
+      "line_start": 1,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "width",
+      "id": "css_dummy.css::StyleElement::width",
+      "analysis_confidence": "heuristic",
+      "line_start": 9,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "background",
+      "id": "css_dummy.css::StyleElement::background",
+      "analysis_confidence": "heuristic",
+      "line_start": 13,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "body",
+      "id": "css_dummy.css::StyleElement::body",
+      "analysis_confidence": "heuristic",
+      "line_start": 16,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "margin",
+      "id": "css_dummy.css::StyleElement::margin",
+      "analysis_confidence": "heuristic",
+      "line_start": 17,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "media",
+      "id": "css_dummy.css::StyleElement::media",
+      "analysis_confidence": "heuristic",
+      "line_start": 26,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "max-width",
+      "id": "css_dummy.css::StyleElement::max-width",
+      "analysis_confidence": "heuristic",
+      "line_start": 26,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "keyframes",
+      "id": "css_dummy.css::StyleElement::keyframes",
+      "analysis_confidence": "heuristic",
+      "line_start": 37,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "slideIn",
+      "id": "css_dummy.css::StyleElement::slideIn",
+      "analysis_confidence": "heuristic",
+      "line_start": 37,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "from",
+      "id": "css_dummy.css::StyleElement::from",
+      "analysis_confidence": "heuristic",
+      "line_start": 38,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "left",
+      "id": "css_dummy.css::StyleElement::left",
+      "analysis_confidence": "heuristic",
+      "line_start": 39,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "to",
+      "id": "css_dummy.css::StyleElement::to",
+      "analysis_confidence": "heuristic",
+      "line_start": 42,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "div",
+      "id": "css_dummy.css::StyleElement::div",
+      "analysis_confidence": "heuristic",
+      "line_start": 52,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "display",
+      "id": "css_dummy.css::StyleElement::display",
+      "analysis_confidence": "heuristic",
+      "line_start": 53,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "block",
+      "id": "css_dummy.css::StyleElement::block",
+      "analysis_confidence": "heuristic",
+      "line_start": 53,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "font-size",
+      "id": "css_dummy.css::StyleElement::font-size",
+      "analysis_confidence": "heuristic",
+      "line_start": 57,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "color",
+      "id": "css_dummy.css::StyleElement::color",
+      "analysis_confidence": "heuristic",
+      "line_start": 67,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "nav",
+      "id": "css_dummy.css::StyleElement::nav",
+      "analysis_confidence": "heuristic",
+      "line_start": 74,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "before",
+      "id": "css_dummy.css::StyleElement::before",
+      "analysis_confidence": "heuristic",
+      "line_start": 74,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "content",
+      "id": "css_dummy.css::StyleElement::content",
+      "analysis_confidence": "heuristic",
+      "line_start": 75,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "button",
+      "id": "css_dummy.css::StyleElement::button",
+      "analysis_confidence": "heuristic",
+      "line_start": 78,
+      "line_end": null,
+      "attributes": {
+        "pseudo_state": "hover"
+      }
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "hover",
+      "id": "css_dummy.css::StyleElement::hover",
+      "analysis_confidence": "heuristic",
+      "line_start": 78,
+      "line_end": null,
+      "attributes": null
+    },
+    {
+      "node_type": "StyleElement",
+      "name": "opacity",
+      "id": "css_dummy.css::StyleElement::opacity",
+      "analysis_confidence": "heuristic",
+      "line_start": 79,
+      "line_end": null,
+      "attributes": null
+    }
+  ],
+  "edges": [
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleClass::container"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleClass::tiny"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleClass::spaced1"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleID::main-header"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleID::spaced2"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::import"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::width"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::background"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::body"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::margin"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::media"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::max-width"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::keyframes"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::slideIn"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::from"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::left"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::to"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::div"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::display"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::block"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::font-size"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::color"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::nav"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::before"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::content"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::button"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::hover"
+    },
+    {
+      "edge": "defines",
+      "from": "css_dummy.css",
+      "to": "css_dummy.css::StyleElement::opacity"
+    }
+  ],
+  "ambiguities": [
+    {
+      "id": "3c4fbb97-03b9-44a1-a3fd-e2cf8c668790",
+      "kind": "responsive_breakpoint",
+      "source_file": "css_dummy.css",
+      "source_scope": "css_dummy.css",
+      "expression": "@media (max-width: 600px)",
+      "reason": "Media Queries unmodeled",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    },
+    {
+      "id": "6b283546-b369-44f4-bec4-c9abb58d43a9",
+      "kind": "css_animation_defined",
+      "source_file": "css_dummy.css",
+      "source_scope": "css_dummy.css",
+      "expression": "@keyframes blocks",
+      "reason": "Animations unmodeled",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    },
+    {
+      "id": "e0cc0219-98a3-4951-8cdf-2ca404da6238",
+      "kind": "css_animation_defined",
+      "source_file": "css_dummy.css",
+      "source_scope": "css_dummy.css",
+      "expression": "@keyframes slideIn",
+      "reason": "Animations unmodeled",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    },
+    {
+      "id": "ad09c9d0-4c05-42d5-a19f-fb96993146f0",
+      "kind": "import_target_unresolved",
+      "source_file": "css_dummy.css",
+      "source_scope": "css_dummy.css",
+      "expression": "mixins.css",
+      "reason": "Imported stylesheet not proven as file",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    }
+  ],
+  "logs": []
+}

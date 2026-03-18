@@ -1,0 +1,6 @@
+check integrity by executing
+Spashta_2.0_Devlopment\builders\validation\validate_builder_output.py
+Spashta_2.0_Devlopment\adapters\validation\validate_adapter_rules.py
+Spashta_2.0_Devlopment\runtime\build_runtime_ast.py
+Spashta_2.0_Devlopment\runtime\enrich_runtime_ast.py
+Spashta_2.0_Devlopment\runtime\validate_ast_equivalence.py

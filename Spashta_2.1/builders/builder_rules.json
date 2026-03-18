@@ -1,0 +1,115 @@
+{
+  "_meta": {
+    "version": "1.3",
+    "scope": "language_agnostic",
+    "principle": "Defines builder behavior and fallback policy; never defines syntax meaning.",
+    "changelog_1.3": "Added node_classification_policy (Field/Constant/TestCase detection hints), call_resolution_policy (self-call, super-call), import_scope_policy (lazy import tracking), string_reference_policy (template/config string resolution)."
+  },
+  "general_behavior": {
+    "emit_only_observed_nodes": true,
+    "do_not_infer_semantics": true,
+    "fail_on_schema_mismatch": true,
+    "allow_partial_graph": true
+  },
+  "node_emission_policy": {
+    "emit_on_detection": true,
+    "skip_unknown_node_types": true,
+    "mark_heuristic_nodes": true
+  },
+  "node_classification_policy": {
+    "_comment": "Hints for builders to classify nodes into specialized Core types (Field, Constant, TestCase). Classification is based on structural patterns, not semantic inference.",
+    "detect_fields": true,
+    "field_detection_patterns": [
+      "assignment where RHS is a call to a known ORM field constructor (e.g. models.CharField, Column, @Column)",
+      "builder emits Field node instead of Variable when pattern matches"
+    ],
+    "detect_constants": true,
+    "constant_detection_patterns": [
+      "module-level assignment where LHS name is UPPER_CASE (Python convention)",
+      "class-level assignment where LHS name is UPPER_CASE",
+      "builder emits Constant node instead of Variable when pattern matches"
+    ],
+    "detect_test_cases": true,
+    "test_detection_patterns": [
+      "class inheriting from known test base (TestCase, TransactionTestCase, etc.)",
+      "function whose name starts with test_ in a file whose name starts with test_",
+      "builder emits TestCase node instead of Class/Function when pattern matches"
+    ]
+  },
+  "edge_emission_policy": {
+    "emit_only_if_mapping_exists": true,
+    "skip_unmapped_edges": true,
+    "preserve_edge_type": true
+  },
+  "call_resolution_policy": {
+    "_comment": "Controls how builders resolve function/method calls that require context beyond simple name lookup.",
+    "resolve_self_calls": true,
+    "resolve_self_calls_note": "When inside a class method, resolve self.X() to ClassName::X. Emit calls edge if target exists in registry.",
+    "resolve_super_calls": true,
+    "resolve_super_calls_note": "Resolve super().X() to parent class method via extends edge. Emit calls edge if target found.",
+    "resolve_class_instantiation": false,
+    "resolve_class_instantiation_note": "MyClass() → MyClass.__init__. Deferred — requires type tracking beyond current scope."
+  },
+  "import_scope_policy": {
+    "_comment": "Controls how builders handle imports at different scope levels.",
+    "track_lazy_imports": true,
+    "track_lazy_imports_note": "Imports inside function/method bodies should be emitted as imports edges with metadata lazy=true. This enables impact analysis to find function-scoped dependencies.",
+    "lazy_import_metadata_key": "lazy",
+    "lazy_import_metadata_value": true
+  },
+  "string_reference_policy": {
+    "_comment": "Controls how builders handle string literals that reference other nodes (templates, configs, URLs).",
+    "resolve_string_references": true,
+    "resolve_string_references_note": "Extract string arguments from known functions (render, get_template, template_name=) and match to Template nodes in registry. Emit renders_template edge if match found.",
+    "known_template_functions": ["render", "get_template", "render_to_string", "select_template"],
+    "known_template_attributes": ["template_name"]
+  },
+  "symbolic_reference_policy": {
+    "allow_unresolved_targets": true,
+    "emit_edge_without_target_if_dynamic": true,
+    "mark_symbolic_edges": true
+  },
+  "heuristic_policy": {
+    "allow_heuristics": true,
+    "heuristic_confidence_label": "heuristic",
+    "do_not_upgrade_heuristic_to_fact": true
+  },
+  "recursion_depth_policy": {
+    "limit_nested_expressions": true,
+    "max_depth": 10,
+    "on_exceed": "stop_descend_and_log"
+  },
+  "ambiguity_handling": {
+    "emit_resolution_request": true,
+    "ticket_type": "AMBIGUOUS_REFERENCE",
+    "priority": "medium"
+  },
+  "error_handling": {
+    "on_parse_error": "skip_file",
+    "on_mapping_error": "fail_builder",
+    "on_schema_violation": "fail_builder"
+  },
+  "logging": {
+    "log_unmapped_syntax": true,
+    "log_heuristic_usage": true,
+    "log_skipped_edges": true,
+    "log_recursion_limit_hits": true,
+    "log_ambiguity_tickets": true
+  },
+  "scan_policy": {
+    "exclude_dirs": [
+      "node_modules",
+      ".git",
+      "dist",
+      "build",
+      "__pycache__",
+      "venv",
+      ".env",
+      "_archive"
+    ],
+    "exclude_file_patterns": [
+      "*.min.html",
+      "test_output*"
+    ]
+  }
+}

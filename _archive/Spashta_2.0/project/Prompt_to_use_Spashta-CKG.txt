@@ -1,0 +1,476 @@
+================================================================================
+SPASHTA-CKG 2.0: AI AGENT CONTEXT PROMPT  (v3 - Reinforced)
+================================================================================
+
+This project uses SPASHTA-CKG (Single Project Adaptive Semantic Hyper-Tree
+Architecture) to give you "Situational Awareness" via a deterministic Code
+Knowledge Graph (CKG).
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+CORE DIRECTIVE  [NON-NEGOTIABLE]
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    >>> Query Spashta FIRST. Read raw source files ONLY when Spashta is
+        insufficient. Saves 40-60% tokens. Eliminates hallucinated file paths.
+
+    >>> NEVER start implementing before completing Section 3 (Canonical
+        Workflow) AND Section 4's matching task workflow IN FULL.
+
+    >>> Impact MUST be run on EVERY node you plan to modify — including
+        MODEL CLASSES when you add or remove fields. Not just the services.
+        [SKIPPING IMPACT = GUARANTEED BLIND SPOTS]
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+WORKING DIRECTORY FOR ALL COMMANDS:
+    cd Spashta-CKG   (all paths below are relative to this directory)
+
+================================================================================
+SECTION 1: COMMAND REFERENCE
+================================================================================
+
+ALWAYS add --json flag. All commands run from Spashta-CKG/ directory.
+
+------------------------------------------------------------------------
+CMD 1: STATS  (run this first — EVERY session, no exceptions)
+------------------------------------------------------------------------
+    python Spashta_2.0/runtime/query_spashta.py stats --json
+
+    Output: { "nodes": 15367, "edges": 14817, "meta": { ... } }
+    Use:    Confirm CKG is built. Expect 10K+ nodes for medium projects.
+            If nodes < 1000 --> STOP. Rebuild CKG before continuing.
+            (See Section 7: Maintenance)
+
+------------------------------------------------------------------------
+CMD 2: SEARCH  (start here for any discovery)
+------------------------------------------------------------------------
+    python Spashta_2.0/runtime/query_spashta.py search "keyword" --json
+
+    Output: LIST of node dicts  [ { "node_type", "name", "id", "file_path",
+                                     "docstring", "line_start", ... }, ... ]
+    Use:    Find files, classes, methods by keyword.
+            Filter results by node_type: "File", "Class", "Method", "Function"
+            Filter out: "old_code_reference" in id  [ALWAYS. NO EXCEPTIONS.]
+
+    EXAMPLES:
+        search "upload"            -- finds all upload-related nodes
+        search "tabular_service"   -- finds the file node
+        search "TabularFile"       -- finds class + all usage variables
+
+    KEY: file_path field is populated for File nodes ONLY.
+         For Method/Class nodes, parse the path from the "id" field.
+         id format: "path/file.py::ClassName::method_name"
+
+------------------------------------------------------------------------
+CMD 3: LOCATE  (use for exact known nodes)
+------------------------------------------------------------------------
+    # For FILE nodes  -- REQUIRES "File:" prefix
+    python Spashta_2.0/runtime/query_spashta.py locate "File:path/to/file.py" --json
+
+    # For CLASS or METHOD nodes
+    python Spashta_2.0/runtime/query_spashta.py locate "path/file.py::ClassName" --json
+
+    Output: Single dict { "id", "file", "line_start", "line_end", "docstring" }
+    Use:    Confirm a node exists. Get its line range and docstring quickly.
+
+    [COMMON MISTAKE -- See TRAP 1]:
+        WRONG:  locate "core_utils/models.py"           -- missing File: prefix
+        RIGHT:  locate "File:core_utils/models.py"      -- correct
+        RIGHT:  search "models.py"                      -- also works for discovery
+
+------------------------------------------------------------------------
+CMD 4: READ  (get actual code of a specific node)
+------------------------------------------------------------------------
+    python Spashta_2.0/runtime/query_spashta.py read "path/file.py::Class::method" --json
+
+    Output: { "content": "<code>", "mode": "snippet", "lines": "42-89" }
+    Use:    Read only the code you need. Saves 60% tokens vs full file read.
+
+    LEVELS (most to least specific -- ALWAYS use most specific):
+        read "path/file.py::Class::method"   -- single method  [PREFER THIS]
+        read "path/file.py::Class"           -- full class
+        read "File:path/file.py"             -- full file      [LAST RESORT ONLY]
+
+    WINDOWS / UNICODE NOTE:
+        If piping through python -c causes UnicodeEncodeError, use subprocess:
+
+        python -c "
+        import json, subprocess, sys
+        r = subprocess.run(
+            ['python', 'Spashta_2.0/runtime/query_spashta.py',
+             'read', 'path/file.py::Class::method', '--json'],
+            capture_output=True
+        )
+        d = json.loads(r.stdout)
+        content = d.get('content','').encode('ascii','replace').decode()
+        sys.stdout.write(content)
+        "
+
+------------------------------------------------------------------------
+CMD 5: DEPENDENCIES  (list what's INSIDE a node)
+------------------------------------------------------------------------
+    # List all CLASSES inside a file
+    python Spashta_2.0/runtime/query_spashta.py dependencies "File:path/file.py" --json
+
+    # List all METHODS/FIELDS inside a class
+    python Spashta_2.0/runtime/query_spashta.py dependencies "path/file.py::ClassName" --json
+
+    Output: LIST OF STRINGS  [ "path/file.py::ClassName", "path/file.py::OtherClass", ... ]
+            !!! NOT a list of dicts -- iterate as strings directly !!!
+
+    CORRECT PARSING:
+        data = json.loads(output)
+        for item in data:
+            print(item)          # item is a string node ID
+
+    WRONG PARSING [See TRAP 2]:
+        for x in data:
+            print(x.get('name'))    # FAILS -- item is a string, not a dict
+
+    Use:    Map the internal structure of a file or class BEFORE reading code.
+            [RULE: dependencies first -> read only the method you need]
+
+------------------------------------------------------------------------
+CMD 6: IMPACT  (who depends on this node)
+------------------------------------------------------------------------
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    [MANDATORY] RUN BEFORE ANY EDIT. THIS IS NOT OPTIONAL.
+    SKIPPING IMPACT = BLIND SPOTS = BUGS INTRODUCED IN UNTOUCHED FILES.
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    python Spashta_2.0/runtime/query_spashta.py impact "path/file.py::Class" --depth 2 --json
+
+    Output: DICT keyed by node ID:
+            {
+              "File:path/other.py": { "relation": "imports", "depth": 2, "node_type": "File" },
+              ...
+            }
+
+    Note:   Returns FILE-LEVEL edges (not method-level). Tells you WHICH files
+            are affected, not which specific function inside them.
+            --> For each affected file, run dependencies + read the relevant methods.
+
+    FILTER out old_code in results:
+        for k, v in data.items():
+            if "old_code" not in k:
+                print(f"[depth {v['depth']}] {v['relation']:12s} {k}")
+
+    *** CRITICAL RULE FOR MODEL FIELD CHANGES ***
+    When you ADD or REMOVE a field from a Django model class:
+
+        WRONG approach:  impact only the services that use the model
+        RIGHT approach:  impact THE MODEL CLASS ITSELF first
+
+        impact "models.py::MyModel" --depth 2
+
+        This returns ALL consumers: views, services, serializers, management
+        commands, admin, tests -- every file that creates or reads the model.
+        Each returned file is a candidate that may need the new field.
+
+        [SKIPPING MODEL-LEVEL IMPACT = CONSUMER FILES SILENTLY BROKEN]
+        Real example: save_excel_config_view created TabularFile without
+        file_content because model-level impact was not run. Bug only caught
+        at runtime. Would have been caught pre-implementation with this step.
+
+------------------------------------------------------------------------
+CMD 7: CALL GRAPH  (Python only -- limited use)
+------------------------------------------------------------------------
+    python Spashta_2.0/runtime/query_spashta.py call-graph "path/file.py::method" --json
+
+    WARNING: Python dynamic calls are NOT tracked. Use IMPACT instead for
+             "who uses this". Call-graph only shows static call sites.
+             [Prefer impact over call-graph in almost all cases]
+
+================================================================================
+SECTION 2: OUTPUT FORMATS AT A GLANCE
+================================================================================
+
+    COMMAND         OUTPUT TYPE      KEY FIELDS
+    -------         -----------      ----------
+    stats           dict             nodes, edges, meta
+    search          list of dicts    node_type, name, id, file_path, docstring, line_start
+    locate          dict             id, file, line_start, line_end, docstring
+    read            dict             content (code string), mode, lines
+    dependencies    list of STRINGS  node ID strings  (!!! NOT dicts -- iterate directly)
+    impact          dict of dicts    keyed by node ID -> {relation, depth, node_type}
+    call-graph      list/dict        limited data -- prefer impact
+
+================================================================================
+SECTION 3: CANONICAL WORKFLOW  [MANDATORY GATE BEFORE IMPLEMENTATION]
+================================================================================
+
+    Complete ALL 7 steps before writing a single line of code.
+    Skipping a step is not a time-saver -- it is a bug factory.
+
+STEP 1 -- SESSION START  [cannot be skipped]
+    stats --json
+    Confirm node count. If < 1000 --> STOP and rebuild CKG (Section 7).
+
+STEP 2 -- DISCOVER
+    search "keyword or filename.py" --json
+    Filter results: node_type in [File, Class, Method, Function]
+    Exclude: "old_code_reference" in id  [ALWAYS]
+
+STEP 3 -- CONFIRM FILE
+    locate "File:path/to/file.py" --json
+    Gets docstring + line range. Confirms path is correct.
+    Do NOT proceed to read if locate returns empty -- path is wrong.
+
+STEP 4 -- MAP STRUCTURE
+    dependencies "File:path/to/file.py" --json    -> list of class IDs
+    dependencies "path/file.py::ClassName" --json -> list of method IDs
+    Output is list of STRINGS -- iterate directly (not .get('name'))
+
+STEP 5 -- READ CODE
+    read "path/file.py::ClassName::method_name" --json
+    Read ONLY the specific node you need. Not the full file.
+
+STEP 6 -- IMPACT  [MANDATORY -- no exceptions]
+    impact "path/file.py::ClassName" --depth 2 --json
+    Filter out old_code. Note ALL production files at depth 1 and 2.
+    Also run impact on individual methods you plan to change.
+
+    !!! IF TASK INVOLVES A MODEL FIELD CHANGE !!!
+    ALSO run:  impact "models.py::ModelClassName" --depth 2
+    This finds every view, service, serializer, admin, and management
+    command that constructs or reads the model. Each is a scope candidate.
+
+STEP 7 -- SCOPE COMPLETENESS CHECK  [NEW -- do not skip]
+    Before declaring "ready to implement", explicitly answer:
+    [ ] Have I found ALL files that create instances of every model I am changing?
+    [ ] Have I found ALL views/endpoints that handle the affected upload/edit flow?
+    [ ] Have I checked serializers for field exposure risks?
+    [ ] Have I confirmed which files do NOT need changes (and why)?
+
+    Only proceed to implementation when all 4 boxes can be checked YES.
+    Document your answers in the task README / pre-implementation notes.
+
+================================================================================
+SECTION 4: EFFICIENT TASK WORKFLOWS
+================================================================================
+
+UNDERSTAND A FEATURE  (5-10 min)
+    search "FeatureName"
+    -> read top 3 Class/Method nodes
+    -> build mental model, no full file reads needed
+
+FIND WHERE SOMETHING IS IMPLEMENTED
+    search "ClassName or function_name"
+    -> locate "File:..." to confirm path
+    -> dependencies "File:..." to see structure
+    -> read "file::Class::method" for exact code
+
+EXPLORE AN UNKNOWN FILE
+    locate "File:path/file.py"          -- get docstring/summary
+    dependencies "File:path/file.py"    -- list classes inside
+    dependencies "file.py::ClassName"   -- list methods inside
+    read "file.py::ClassName::method"   -- read only what's needed
+
+BEFORE REFACTORING / EDITING A SERVICE OR VIEW
+    impact "file.py::ClassName" --depth 2     -- blast radius at class level
+    impact "file.py::Class::method" --depth 2 -- blast radius at method level
+    Note every production file (non-test, non-old_code) that imports it
+    For each affected file: dependencies -> read the relevant method
+    Only THEN plan changes
+
+!!! ADDING A NEW FIELD TO A DJANGO MODEL !!!  [HIGH-RISK WORKFLOW]
+---------------------------------------------------------------------
+    This is the workflow most likely to produce silent consumer bugs.
+    Follow ALL steps. Do not abbreviate.
+
+    Step A -- Find all model consumers (breadth sweep):
+        impact "models.py::YourModel" --depth 2 --json
+        Filter out old_code. List every production file returned.
+        --> These are ALL files that may need to handle the new field.
+
+    Step B -- Categorise consumers:
+        For each file from Step A, determine its role:
+        - Service (upload_, process_, index_)  -> does it create/read the model?
+        - View (ui_views, api_views)           -> does it call objects.create()
+                                                  or get_or_create()?
+        - Serializer                           -> is the new field safe to expose?
+        - Admin                                -> does it need a new fieldset?
+        - Management command                   -> does it query this field?
+        - Test                                 -> does it need a new sibling test?
+
+    Step C -- Read each create/get_or_create call site:
+        For every consumer file identified in Step B, read the method that
+        calls objects.create() or get_or_create() for the model.
+        Confirm the new field is handled (passed in defaults or set after).
+
+    Step D -- Identify safe-to-skip files:
+        Explicitly confirm which consumers do NOT need changes and why.
+        Document this. Unexamined files are risk, not savings.
+
+    Step E -- Run Step 7 (Scope Completeness Check) before proceeding.
+
+    REAL EXAMPLE (Plan 110 -- file_content field on TabularFile):
+        Ran impact on tabular_service and document_service -- found services.
+        Did NOT run impact on TabularFile model class itself.
+        Result: save_excel_config_view (also creates TabularFile) was missed.
+        file_content was never copied -> runtime crash "cannot convert NoneType".
+        Would have been caught at Step A with:
+            impact "core_utils/models.py::TabularFile" --depth 2
+
+================================================================================
+SECTION 5: GOTCHAS & AGENT TRAPS
+================================================================================
+
+TRAP 1: Wrong locate syntax for files
+    WRONG: locate "core_utils/models.py"
+    RIGHT: locate "File:core_utils/models.py"
+    OR:    search "models.py"  (safer for discovery)
+
+TRAP 2: Treating dependencies output as list of dicts
+    WRONG: for x in data: print(x.get('name'))   # AttributeError
+    RIGHT: for x in data: print(x)               # x is already a string ID
+
+TRAP 3: Parsing impact output as a list
+    WRONG: for x in data: ...                    # data is a DICT not a list
+    RIGHT: for k, v in data.items(): ...
+
+TRAP 4: Unicode errors on Windows when using python -c pipe
+    Use subprocess.run(..., capture_output=True) instead of shell pipe.
+    Then: content = d.get('content','').encode('ascii','replace').decode()
+
+TRAP 5: Including old_code_reference nodes in analysis
+    Always filter: if "old_code" not in xid (or k for impact results)
+    Old code nodes represent archived code -- including them wastes effort.
+
+TRAP 6: Jumping to read before dependencies
+    Always do: dependencies first -> read only the method you need
+    NOT: read entire class when you only need one method
+
+TRAP 7: Using search results' file_path field for Method/Class nodes
+    file_path is populated for File nodes only.
+    For Method/Class nodes, parse the path from the "id" field:
+        id = "core_utils/models.py::TabularFile::upload"
+        file_path = id.split("::")[0]   -- "core_utils/models.py"
+
+TRAP 8: Running impact on SERVICES but not on the MODEL CLASS itself
+    !!! MOST DANGEROUS TRAP -- causes silent consumer bugs !!!
+
+    Scenario: You add a new field to MyModel. You run impact on the services
+    that USE MyModel. You miss all the VIEWS that also call
+    MyModel.objects.create() or get_or_create() -- because views were not
+    in your search scope, only services were.
+
+    WRONG:  impact "services/my_service.py::MyService" --depth 2
+            (only finds files that import the service)
+
+    RIGHT:  impact "models.py::MyModel" --depth 2
+            (finds EVERY file that imports the model -- views, services,
+             serializers, admin, management commands, tests -- all of them)
+
+    Rule: When you add/remove/rename a model field, the model class is the
+    anchor. Run impact on the model class, not just on one consumer.
+
+================================================================================
+SECTION 6: KNOWLEDGE GRAPH ARTIFACTS (fallback if CLI insufficient)
+================================================================================
+
+    L2 ENRICHED (Best):
+        Spashta_2.0/runtime/code_knowledge_graph_enriched_by_Agent.json
+        Contains: LLM-generated business intent, summaries, complex reasoning
+
+    L1 ENRICHED (Standard):
+        Spashta_2.0/runtime/code_knowledge_graph_enriched.json
+        Contains: deterministic structure + Adapter semantics (View, API, Model)
+
+    RAW AST (Last resort):
+        Spashta_2.0/runtime/code_knowledge_graph_ast.json
+        Contains: pure syntax tree only
+
+    Use order: L2 -> L1 -> RAW -> CLI commands -> raw file read (last)
+
+================================================================================
+SECTION 7: MAINTENANCE (after structural code changes)
+================================================================================
+
+    Run BOTH scripts after adding new files, classes, or functions:
+
+        python Spashta_2.0/runtime/build_runtime_ast.py
+        python Spashta_2.0/runtime/enrich_runtime_ast.py
+
+    Do NOT manually edit files in Spashta_2.0/runtime/.
+    If L2 graph is missing, use L1.
+
+    [IMPORTANT] After adding new model fields or classes, rebuild CKG before
+    running impact -- otherwise impact results will be stale and miss new nodes.
+
+================================================================================
+SECTION 8: AGENT RULES  [READ BEFORE EVERY SESSION]
+================================================================================
+
+1.  Run stats FIRST every session. If nodes < 1000, rebuild before proceeding.
+2.  Spashta is the Single Source of Truth for file paths and structure.
+3.  Filter old_code_reference nodes from ALL results, always.
+4.  Use search for discovery. Use locate for confirmation. Use read for code.
+5.  Always run impact BEFORE editing any class or method. No exceptions.
+6.  Use dependencies to map structure before reading code.
+7.  On Windows: use subprocess.run(capture_output=True) for unicode safety.
+8.  Never read a full file when a node snippet suffices.
+9.  [NEW] When adding/removing a model field: run impact on THE MODEL CLASS,
+    not just the services. Views, serializers, and admin are also consumers.
+10. [NEW] Complete the Scope Completeness Check (Section 3, Step 7) before
+    transitioning from analysis to implementation. Document the answers.
+
+================================================================================
+SECTION 9: PRE-IMPLEMENTATION GATE CHECKLIST
+================================================================================
+
+    Copy this checklist into your task notes. Check every box before coding.
+
+    DISCOVERY
+    [ ] stats run -- node count confirmed (>1000)
+    [ ] All relevant files found via search
+    [ ] All relevant classes/methods located and confirmed
+
+    IMPACT (breadth)
+    [ ] impact run on every CLASS I plan to modify
+    [ ] impact run on every MODEL CLASS whose fields I am adding/removing
+    [ ] impact run on every METHOD that is the primary change site
+    [ ] All consumer files from impact results have been reviewed
+
+    SCOPE
+    [ ] Found ALL files that call objects.create() / get_or_create() for each model I am changing
+    [ ] Serializer exposure checked (new fields absent from API if sensitive)
+    [ ] Files that do NOT need changes explicitly identified and documented
+    [ ] Migration numbers confirmed (no collision with existing migrations)
+
+    READINESS
+    [ ] Risks documented (circular imports, delete safety, test coverage gaps)
+    [ ] Task list created with priority order
+    [ ] Implementation can start without further Spashta queries
+
+    DO NOT PROCEED until all boxes are checked.
+
+================================================================================
+QUICK REFERENCE CARD
+================================================================================
+
+    stats                                          verify CKG is live
+    search "keyword"                               discover nodes
+    locate "File:path/file.py"                     confirm file exists + docstring
+    locate "path/file.py::ClassName"               confirm class exists
+    dependencies "File:path/file.py"               list classes  (returns STRINGS)
+    dependencies "path/file.py::ClassName"         list methods  (returns STRINGS)
+    read "path/file.py::Class::method"             get code snippet + lines
+    impact "path/file.py::Class" --depth 2         blast radius  (returns DICT)
+    impact "models.py::Model" --depth 2            ALL consumers of a model
+    call-graph "path/file.py::method"              static call sites (limited)
+
+    OUTPUT TYPES:
+        search       -> list of dicts
+        dependencies -> list of STRINGS  (NOT dicts -- iterate directly)
+        impact       -> dict  (key=node_id, value={relation, depth, node_type})
+        read         -> dict  (key=content, mode, lines)
+        locate       -> dict  (key=id, file, line_start, line_end, docstring)
+
+    CANONICAL STEP ORDER:
+        stats -> search -> locate -> dependencies -> read -> impact -> [scope check] -> implement
+
+================================================================================
+Spashta provides 90% structural understanding with 10% of code reading.
+QUERY SPASHTA FIRST. READ SOURCE CODE SECOND. IMPLEMENT ONLY AFTER SCOPE CHECK.
+================================================================================

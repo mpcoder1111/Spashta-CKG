@@ -1,0 +1,33 @@
+Spashta 2.1 — Full Integrity Check
+====================================
+
+Run these in order to validate the entire pipeline:
+
+Step 1: Build AST (runs all language builders + validates fragments)
+  python Spashta_2.1/runtime/build_runtime_ast.py
+
+Step 2: Diff (incremental change detection — optional, skippable on first run)
+  python Spashta_2.1/runtime/diff_runtime_ast.py
+
+Step 3: Enrich (applies adapter semantic roles)
+  python Spashta_2.1/runtime/enrich_runtime_ast.py
+
+Step 4: Validate structural equivalence (ensures enrichment didn't corrupt structure)
+  python Spashta_2.1/runtime/validate_ast_equivalence.py \
+    Spashta_2.1/runtime/code_knowledge_graph_ast.json \
+    Spashta_2.1/runtime/code_knowledge_graph_enriched.json
+
+Step 5: Validate builder output against Core schema
+  python Spashta_2.1/builders/validation/validate_builder_output.py \
+    Spashta_2.1/runtime/code_knowledge_graph_ast.json
+
+Step 6: Validate adapter rules governance
+  python Spashta_2.1/adapters/validation/validate_adapter_rules.py django
+  python Spashta_2.1/adapters/validation/validate_adapter_rules.py fastapi
+  python Spashta_2.1/adapters/validation/validate_adapter_rules.py htmx
+
+Step 7: Query tool smoke test
+  python Spashta_2.1/runtime/query_spashta.py stats --json
+
+All steps should complete without errors.
+Warnings are acceptable (custom semantic roles, missing core/agent_rules/).

@@ -1,0 +1,202 @@
+# Spashta-CKG JSON Configuration Reference
+
+This document defines the JSON configuration files in the Spashta Architecture - their purpose, location, and usage.
+
+*Last Updated: 2025-12-30*
+
+---
+
+## Quick Reference
+
+| Category | JSON Files | Purpose |
+|----------|-----------|---------|
+| **Core Schema** | `nodes.json`, `edges.json` | Universal vocabulary (FROZEN) |
+| **Project Config** | `profile.json` | Project root, languages, frameworks |
+| **Builder Config** | `builder_rules.json`, `*_language_mapping.json` | Builder policies and syntax mappings |
+| **Adapter Config** | `framework_mapping.json` (per framework) | Framework semantic mappings |
+| **LLM Enrichment** | `llm_enrichment_rules.json`, `llm_enrichment_prompt.json` | L2 enrichment configuration |
+| **Execution** | `execution_protocol.json` | Agent workflow definition |
+| **Output** | `code_knowledge_graph_*.json` | Generated CKG files |
+
+---
+
+## Core Schema Files
+
+### `core/software_schema/nodes.json`
+**Purpose:** Defines what CAN exist in the graph (vocabulary).
+
+| Aspect | Details |
+|--------|---------|
+| Status | 🔒 **FROZEN** - No modifications allowed |
+| Contains | Node types: File, Function, Class, Method, Variable, Template, Route, etc. |
+| Used By | All language builders emit nodes from this vocabulary |
+| Edit Rule | Only additive changes allowed (never remove/rename existing) |
+
+### `core/software_schema/edges.json`
+**Purpose:** Defines what RELATIONSHIPS can exist between nodes.
+
+| Aspect | Details |
+|--------|---------|
+| Status | 🔒 **FROZEN** - No modifications allowed |
+| Contains | Edge types: calls, imports, defines, contains, renders_template, etc. |
+| Used By | All builders emit edges from this vocabulary |
+| Edit Rule | Only additive changes allowed |
+
+---
+
+## Project Configuration
+
+### `project/profile.json`
+**Purpose:** Defines active technology stack for the current project.
+
+**Key Fields:**
+```json
+{
+  "_meta": {
+    "supported_languages": ["python", "html", "css"],
+    "supported_frameworks": ["django", "fastapi", "htmx"]
+  },
+  "project_root": "C:/path/to/your/project",
+  "languages": ["python", "html", "css"],
+  "frameworks": ["django", "htmx"]
+}
+```
+
+| Field | Effect |
+|-------|--------|
+| `project_root` | Where to scan for source code |
+| `languages` | Which builders to run |
+| `frameworks` | Which adapters to apply during enrichment |
+| `_meta.supported_*` | Reference for valid values (avoid spelling mistakes) |
+
+---
+
+## Builder Configuration
+
+### `builders/builder_rules.json`
+**Purpose:** Global policies for all builders.
+
+**Key Contents:**
+```json
+{
+  "scan_exclusions": ["Spashta_2.0", "Spashta-CKG", "venv", "__pycache__", ".git"]
+}
+```
+
+**Effect:** Directories listed are skipped during project scanning.
+
+### `builders/*/language_mapping.json`
+**Purpose:** Maps language-specific syntax to Core schema nodes/edges.
+
+| Language | File | Key Mappings |
+|----------|------|--------------|
+| Python | `python_language_mapping.json` | FunctionDef → Function, ClassDef → Class |
+| HTML | `html_language_mapping.json` | template file → Template, link → links_static |
+| CSS | `css_language_mapping.json` | .class → StyleClass, #id → StyleId |
+
+---
+
+## Adapter Configuration
+
+### `adapters/*/framework_mapping.json`
+**Purpose:** Maps framework-specific patterns to semantic roles.
+
+| Framework | Location | Example Mappings |
+|-----------|----------|------------------|
+| Django | `adapters/django/` | `models.Model` → DataModel, `render()` → View |
+| FastAPI | `adapters/fastapi/` | `@app.get` → View, `BaseModel` → APIContract |
+| HTMX | `adapters/htmx/` | `hx-get` → HTMXInteraction |
+
+**Used By:** `runtime/enrich_runtime_ast.py` during Level-1 (adapter) enrichment.
+
+---
+
+## LLM Enrichment Configuration (Level 2)
+
+### `runtime/enrichment_through_LLM/llm_enrichment_rules.json`
+**Purpose:** Rules and constraints for AI agent enrichment.
+
+**Contains:**
+- What fields the agent should add (business_intent, domain_tags)
+- What files to skip
+- Quality guidelines
+
+### `runtime/enrichment_through_LLM/llm_enrichment_prompt.json`
+**Purpose:** Format and workflow definition for L2 enrichment.
+
+**Contains:**
+- Expected output format
+- Workflow steps
+- Field descriptions
+
+---
+
+## Execution & Governance
+
+### `runtime/execution_protocol.json`
+**Purpose:** Formal step-by-step execution lifecycle with user confirmations.
+
+| Aspect | Details |
+|--------|---------|
+| Status | ✅ ACTIVE |
+| Used By | AI Agents for automated workflow execution |
+| Contains | Steps, user prompts, quick commands, file policies |
+
+**Key Sections:**
+- `steps[]` - Ordered execution steps
+- `quick_commands` - Shortcuts for common operations
+- `execution_policy` - What files agent can/cannot modify
+- `post_completion` - What to do after CKG is ready
+
+---
+
+## Output Files (Generated)
+
+These are generated by runtime scripts, not manually configured:
+
+| File | Location | Purpose | Generated By |
+|------|----------|---------|--------------|
+| `code_knowledge_graph_ast.json` | `runtime/` | Raw structural AST (no semantics) | `build_runtime_ast.py` |
+| `code_knowledge_graph_enriched.json` | `runtime/` | L1 enriched (adapter semantic roles) | `enrich_runtime_ast.py` |
+| `code_knowledge_graph_enriched_by_Agent.json` | `runtime/` | L2 enriched (LLM business intent) | AI Agent |
+| `diff_report.json` | `runtime/` | Change detection between builds | `diff_runtime_ast.py` |
+| `fragment_python.json` | `runtime/builders_generated_fragments/` | Intermediate builder output (Python) | `build_python_ast.py` |
+| `fragment_html.json` | `runtime/builders_generated_fragments/` | Intermediate builder output (HTML) | `build_html_ast.py` |
+| `fragment_css.json` | `runtime/builders_generated_fragments/` | Intermediate builder output (CSS) | `build_css_ast.py` |
+
+---
+
+## Key Principles
+
+### 1. Builders Obey Schema Vocabulary
+> Builders read `nodes.json` and `edges.json` to know WHAT to emit.
+> They do NOT interpret meaning or enforce correctness.
+
+### 2. Adapters Add Meaning, Not Structure
+> Adapters read `framework_mapping.json` to ADD semantic roles.
+> They do NOT modify node IDs or edge topology.
+
+### 3. LLM Adds Business Context
+> L2 enrichment adds business_intent, domain_tags, resolved ambiguities.
+> It does NOT modify structure — only adds metadata.
+
+### 4. Separation of Concerns
+```
+Language Builders      → Structure (what exists)
+Framework Adapters     → L1 Semantics (framework meaning)
+LLM Enrichment         → L2 Semantics (business meaning)
+Validators             → Correctness (is it valid?)
+```
+
+---
+
+## File Modification Rules
+
+| File Type | Can Agent Modify? |
+|-----------|-------------------|
+| Core schema (`nodes.json`, `edges.json`) | ❌ NEVER |
+| Builder outputs (`fragment_*.json`) | ❌ NO (regenerated) |
+| L1 CKG (`code_knowledge_graph_enriched.json`) | ❌ NO (regenerated) |
+| L2 CKG (`code_knowledge_graph_enriched_by_Agent.json`) | ✅ YES (agent writes this) |
+| Profile (`profile.json`) | ✅ YES (with user confirmation) |
+| LLM working files | ✅ YES (temporary) |

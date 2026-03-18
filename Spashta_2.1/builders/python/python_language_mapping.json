@@ -1,0 +1,52 @@
+{
+  "_meta": {
+    "version": "1.6-strict",
+    "supported_core_schema": "1.4",
+    "language": "python",
+    "ast_source": "CPython ast module",
+    "principle": "Maps syntax to core nodes only. Adapter logic (heuristics, symbols) is excluded.",
+    "changelog_1.6": "Added Field, Constant, TestCase node mappings. Added has_field, references, listens_to, defines_variable, defines_constant, defines_field, contains_field, contains_constant edge mappings. Schema 1.3 -> 1.4."
+  },
+  "node_mappings": {
+    "Module": "File",
+    "ClassDef": "Class",
+    "FunctionDef": "Function",
+    "AsyncFunctionDef": "Function",
+    "Assign": "Variable",
+    "AnnAssign": "Variable",
+    "AugAssign": "Variable",
+    "Name": "Variable",
+    "FieldAssign": "Field",
+    "ConstantAssign": "Constant",
+    "TestClassDef": "TestCase"
+  },
+  "edge_mappings": {
+    "import": "imports",
+    "import_from": "imports",
+    "import_lazy": "imports",
+    "defines_class": "defines",
+    "defines_function": "defines",
+    "defines_variable": "defines",
+    "defines_constant": "defines",
+    "defines_field": "defines",
+    "defines_testcase": "defines",
+    "contains_method": "contains_member",
+    "contains_variable": "contains_member",
+    "contains_field": "contains_member",
+    "contains_constant": "contains_member",
+    "has_field": "has_field",
+    "references_model": "references",
+    "listens_to_signal": "listens_to",
+    "inherits_from": "extends",
+    "extends": "extends",
+    "function_call": "calls",
+    "calls": "calls",
+    "method_call": "calls",
+    "reads_variable": "reads_from",
+    "writes_variable": "writes_to",
+    "writes_to": "writes_to",
+    "raises_exception": "throws_exception",
+    "decorates": "decorates",
+    "await_usage": "uses_async"
+  }
+}

@@ -1,0 +1,157 @@
+{
+    "_meta": {
+        "description": "Maps Django constructs to Core Nodes + Semantic Roles.",
+        "role": "Enrichment Mapping",
+        "version": "2.1",
+        "changelog_2.1": "Fixed View function detection (removed used_in_calls — too strict). Added ManagementCommand, URLConf, AppConfig, Migration mappings. Signal now uses decorators rule (implemented in engine). Total: 9 -> 13 mappings."
+    },
+    "mappings": [
+        {
+            "core_node": "Class",
+            "semantic_role": "DataModel",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "models.Model",
+                    "django.db.models.Model"
+                ]
+            }
+        },
+        {
+            "core_node": "Function",
+            "semantic_role": "View",
+            "notes": "Function with 'request' arg in a views file. arg_names_include + file_path_contains are both implemented in enrichment engine 2.1.",
+            "detection_rules": {
+                "arg_names_include": [
+                    "request"
+                ],
+                "file_path_contains": "*views*"
+            }
+        },
+        {
+            "core_node": "Class",
+            "semantic_role": "View",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "View",
+                    "APIView",
+                    "ViewSet",
+                    "ModelViewSet",
+                    "TemplateView",
+                    "ListView",
+                    "DetailView",
+                    "CreateView",
+                    "UpdateView",
+                    "DeleteView",
+                    "FormView",
+                    "RedirectView",
+                    "GenericAPIView",
+                    "django.views",
+                    "rest_framework.generics",
+                    "rest_framework.views"
+                ]
+            }
+        },
+        {
+            "core_node": "Call",
+            "semantic_role": "Route",
+            "detection_rules": {
+                "function_name": [
+                    "path",
+                    "re_path",
+                    "url"
+                ],
+                "context": "urlpatterns"
+            }
+        },
+        {
+            "core_node": "Class",
+            "semantic_role": "Form",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "forms.Form",
+                    "forms.ModelForm",
+                    "django.forms.Form",
+                    "django.forms.ModelForm"
+                ]
+            }
+        },
+        {
+            "core_node": "Class",
+            "semantic_role": "Serializer",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "serializers.Serializer",
+                    "serializers.ModelSerializer",
+                    "serializers.HyperlinkedModelSerializer",
+                    "rest_framework.serializers.Serializer",
+                    "rest_framework.serializers.ModelSerializer"
+                ]
+            }
+        },
+        {
+            "core_node": "Class",
+            "semantic_role": "Admin",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "admin.ModelAdmin",
+                    "admin.TabularInline",
+                    "admin.StackedInline",
+                    "django.contrib.admin.ModelAdmin"
+                ]
+            }
+        },
+        {
+            "core_node": "Class",
+            "semantic_role": "Middleware",
+            "detection_rules": {
+                "inheritance_includes": [
+                    "MiddlewareMixin",
+                    "django.utils.deprecation.MiddlewareMixin"
+                ],
+                "file_path_contains": "middleware"
+            }
+        },
+        {
+            "core_node": "Function",
+            "semantic_role": "Signal",
+            "notes": "Function decorated with @receiver. Uses decorators rule implemented in enrichment engine 2.1.",
+            "detection_rules": {
+                "decorators": [
+                    "receiver"
+                ]
+            }
+        },
+        {
+            "core_node": "Class",
+            "semantic_role": "ManagementCommand",
+            "notes": "Class in management/commands/ directory. 100% confident — universal Django convention.",
+            "detection_rules": {
+                "file_path_contains": "management/commands/"
+            }
+        },
+        {
+            "core_node": "File",
+            "semantic_role": "URLConf",
+            "notes": "File named urls.py or ui_urls.py. 100% confident — universal Django convention.",
+            "detection_rules": {
+                "file_path_contains": "*urls.py"
+            }
+        },
+        {
+            "core_node": "Class",
+            "semantic_role": "AppConfig",
+            "notes": "Class in apps.py file. 100% confident — universal Django convention.",
+            "detection_rules": {
+                "file_path_contains": "apps.py"
+            }
+        },
+        {
+            "core_node": "File",
+            "semantic_role": "Migration",
+            "notes": "File in migrations/ directory. 100% confident — universal Django convention.",
+            "detection_rules": {
+                "file_path_contains": "migrations/"
+            }
+        }
+    ]
+}

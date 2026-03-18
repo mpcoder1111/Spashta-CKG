@@ -1,0 +1,187 @@
+{
+    "_meta": {
+        "role": "LLM Enrichment Rules for IDE Agent",
+        "description": "Strict rules that IDE Agent MUST follow during Level-2 semantic enrichment",
+        "version": "1.0",
+        "last_updated": "2025-12-29"
+    },
+    "agent_role": {
+        "identity": "Semantic Enrichment Agent for Spashta-CKG",
+        "primary_task": "Add business intent and meaning to CKG nodes",
+        "secondary_task": "Attempt to resolve ambiguities"
+    },
+    "input_files": {
+        "rules": "runtime/enrichment_through_LLM/llm_enrichment_rules.json",
+        "source_graph": "runtime/code_knowledge_graph_enriched.json",
+        "project_source_files": "As referenced in CKG nodes"
+    },
+    "output_files": {
+        "enriched_graph": "runtime/code_knowledge_graph_enriched_by_Agent.json",
+        "working_folder": "runtime/enrichment_through_LLM/LLM_working_files/",
+        "working_folder_note": "Store intermediate files like progress tracking, file logs here"
+    },
+    "what_gets_enriched": {
+        "nodes": {
+            "enriched": true,
+            "output_key": "llm_enrichment",
+            "note": "ALL node types are enriched (File, Class, Function, Variable, etc.)"
+        },
+        "edges": {
+            "enriched": false,
+            "reason": "Edge types already carry semantic meaning (calls, imports, extends)"
+        },
+        "ambiguities": {
+            "enriched": true,
+            "output_key": "llm_resolution",
+            "note": "Attempt to resolve unresolved calls/imports"
+        }
+    },
+    "node_enrichment_schema": {
+        "output_key": "llm_enrichment",
+        "fields": {
+            "intent": {
+                "type": "string",
+                "description": "Business purpose of this code element",
+                "required": true
+            },
+            "summary": {
+                "type": "string",
+                "description": "One-line description",
+                "required": true
+            },
+            "complexity_score": {
+                "type": "integer",
+                "range": [
+                    1,
+                    5
+                ],
+                "description": "1=trivial, 3=moderate, 5=very complex",
+                "required": true
+            },
+            "domain_tags": {
+                "type": "array",
+                "description": "Business domain concepts (not technical)",
+                "required": true,
+                "examples": [
+                    "authentication",
+                    "payment",
+                    "user-management"
+                ]
+            },
+            "pure_logic": {
+                "type": "boolean",
+                "description": "True if no side effects (IO, state changes)",
+                "required": false,
+                "default": false
+            },
+            "side_effects": {
+                "type": "array",
+                "description": "List of side effects if any",
+                "required": false,
+                "examples": [
+                    "database_write",
+                    "api_call",
+                    "file_io",
+                    "session_update"
+                ]
+            },
+            "enriched_at_hash": {
+                "type": "string",
+                "description": "File hash at time of enrichment (for incremental tracking)",
+                "required": true,
+                "note": "Copy from node's 'hash' field to enable skipping unchanged files"
+            },
+            "enriched_at": {
+                "type": "string",
+                "description": "ISO timestamp when this node was enriched",
+                "required": true
+            }
+        }
+    },
+    "ambiguity_resolution_schema": {
+        "output_key": "llm_resolution",
+        "fields": {
+            "status": {
+                "type": "string",
+                "enum": [
+                    "resolved",
+                    "unresolved"
+                ],
+                "required": true
+            },
+            "probable_target": {
+                "type": "string",
+                "description": "EXACT node ID if resolved (must exist in CKG)",
+                "required_if": "status == resolved"
+            },
+            "confidence": {
+                "type": "float",
+                "range": [
+                    0.0,
+                    1.0
+                ],
+                "required": true
+            },
+            "reasoning": {
+                "type": "string",
+                "description": "Why this decision was made",
+                "required": true
+            }
+        },
+        "strict_rules": [
+            "Only mark 'resolved' if EXACT target node ID is identified in CKG",
+            "Confidence >= 0.9: Completely certain (import found, definition visible)",
+            "Confidence 0.7-0.9: Likely but based on naming convention or partial evidence",
+            "Confidence < 0.7: MUST mark as 'unresolved'",
+            "If target is dynamic/runtime-computed: Mark 'unresolved'",
+            "If target not found in CKG nodes: Mark 'unresolved'"
+        ]
+    },
+    "prohibited_actions": [
+        "DO NOT invent new nodes",
+        "DO NOT modify existing node IDs",
+        "DO NOT modify edge topology (no new edges, no edge removal)",
+        "DO NOT change Level-1 semantic_roles",
+        "DO NOT mark ambiguity 'resolved' if uncertain",
+        "DO NOT assume targets that are not in the provided node list"
+    ],
+    "query_tool": {
+        "path": "runtime/query_spashta.py",
+        "description": "Use this tool to query CKG for context",
+        "helpful_commands": [
+            "python runtime/query_spashta.py --help",
+            "python runtime/query_spashta.py stats --json",
+            "python runtime/query_spashta.py list-files --json",
+            "python runtime/query_spashta.py search <keyword> --json",
+            "python runtime/query_spashta.py details <node_id> --json",
+            "python runtime/query_spashta.py dependencies <node_id> --json"
+        ],
+        "when_to_use": "When you need more context about a node or its relationships"
+    },
+    "workflow": {
+        "step_1": {
+            "action": "Read this rules file",
+            "purpose": "Understand your role and constraints"
+        },
+        "step_2": {
+            "action": "Read runtime/code_knowledge_graph_enriched.json",
+            "purpose": "Load the source graph with all nodes, edges, ambiguities"
+        },
+        "step_3": {
+            "action": "For each file in the CKG, read source code",
+            "purpose": "Understand code context for enrichment"
+        },
+        "step_4": {
+            "action": "Add llm_enrichment to each node",
+            "purpose": "Capture business intent and meaning"
+        },
+        "step_5": {
+            "action": "Attempt to resolve ambiguities",
+            "purpose": "Complete the graph where possible"
+        },
+        "step_6": {
+            "action": "Write to runtime/code_knowledge_graph_enriched_by_Agent.json",
+            "purpose": "Save enriched output"
+        }
+    }
+}
