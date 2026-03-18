@@ -562,6 +562,12 @@ class StructureWalker(ast.NodeVisitor):
 
     def visit_Assign(self, node):
         parent_id, parent_type = self.scope_stack[-1]
+
+        # Skip local variables inside functions/methods — they have no architectural value
+        # and create orphan nodes. Only index File-level and Class-level assignments.
+        if parent_type in ("Function", "Method", "TestCase"):
+            return
+
         for target in node.targets:
             if isinstance(target, ast.Name) and isinstance(target.ctx, ast.Store):
                 var_name = target.id
@@ -599,6 +605,8 @@ class StructureWalker(ast.NodeVisitor):
 
     def visit_AnnAssign(self, node):
         parent_id, parent_type = self.scope_stack[-1]
+        if parent_type in ("Function", "Method", "TestCase"):
+            return
         if isinstance(node.target, ast.Name) and isinstance(node.target.ctx, ast.Store):
              var_name = node.target.id
              var_id = get_symbol_id(parent_id, var_name)
