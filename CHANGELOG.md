@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [3.2.0] - 2026-08-30
+
+**Spashta-CKG 3.2 — Official Model Context Protocol (MCP) SDK Upgrade & Cross-Platform Transport**
+
+Enterprise-grade MCP server upgrade integrating Anthropic's official `mcp` Python SDK for robust, non-blocking asynchronous stdio communication across all major AI coding environments.
+
+### Added
+- **Official Model Context Protocol (MCP) SDK Upgrade**: Migrated `spashta_ckg_mcp` to the official Python `mcp` SDK (`MCPServer` / `FastMCP`) with asynchronous stdio transport, eliminating Windows pipe buffer blocks and stream deadlocks across Antigravity, Cursor, Claude Desktop, and VS Code.
+- **Cross-Version MCP Compatibility**: Seamless dual-support for both `mcp>=2.0.0` (`MCPServer`) and `mcp<2.0.0` (`FastMCP`).
+- **Comprehensive Native MCP Tool Suite**: Native IDE execution for `spashta_impact`, `spashta_routes`, `spashta_search`, `spashta_dead_code`, and `spashta_scan` with zero-click silent execution.
+- **Enhanced MCP Configuration Guides**: Clear setup documentation for global environments and project-level `.venv` paths on Windows, Linux, and macOS.
+
+---
+
 ## [3.1.0] - 2026-08-30
 
 **Spashta-CKG 3.1 — Zero-Config Multi-Language Engine & Streamlined Directory Exclusions**

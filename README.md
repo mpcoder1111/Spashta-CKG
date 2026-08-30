@@ -2,7 +2,7 @@
 
 > **Spashta** (स्पष्ट) = *Clarity* in Sanskrit. Deterministic Code Knowledge Graph & Impact Engine for Python, JavaScript, HTML, and CSS.
 
-[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.2.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
 
@@ -89,8 +89,9 @@ Connect Spashta directly to **Antigravity, Cursor, Claude Desktop, or VS Code** 
   }
 }
 ```
+*(If installed inside a project `.venv`, specify the direct path: e.g. `"command": ".venv/Scripts/spashta_ckg_mcp.exe"` on Windows or `".venv/bin/spashta_ckg_mcp"` on Linux/macOS).*
 
-*Your AI agent now has native, zero-click IDE tools (`spashta_impact`, `spashta_dead_code`, `spashta_routes`, `spashta_search`)!*
+*Your AI agent now has native, zero-click IDE tools (`spashta_impact`, `spashta_dead_code`, `spashta_routes`, `spashta_search`, `spashta_scan`)!*
 
 ---
 
@@ -134,17 +135,18 @@ This repository uses **Spashta-CKG** (https://github.com/mpcoder1111/Spashta-CKG
 
 **Mandatory Rules for AI Coding Agents:**
 1. **Query First (Pre-Flight Impact)**:
-   - Before modifying, renaming, or deleting any function, class, model, route, or CSS class, run:
-     `spashta_ckg impact <SymbolName> --depth 2 --json`
+   - Before modifying, renaming, or deleting any function, class, model, route, or CSS class:
+     - **If MCP is active**: Call `spashta_impact(symbol="<SymbolName>")`.
+     - **If CLI only**: Run `spashta_ckg impact <SymbolName> --depth 2 --json`.
    - Inspect all returned callers across Python, JavaScript, HTML templates, and CSS stylesheets.
 2. **Pinpoint, Don't Guess**:
-   - Use `spashta_ckg locate <SymbolName>` to find exact file paths and line ranges instead of speculative reading.
+   - Use `spashta_ckg locate <SymbolName>` (or `spashta_search`) to find exact file paths and line ranges instead of speculative reading.
    - For database models, use `spashta_ckg consumers <ModelName>` to verify all query and update sites.
 3. **Verify Routing & Couplings**:
-   - When altering URLs or views, run `spashta_ckg routes` to ensure template `{% url %}` tags and HTMX event listeners remain intact.
+   - When altering URLs or views, call `spashta_routes()` (or run `spashta_ckg routes`) to ensure template `{% url %}` tags and HTMX event listeners remain intact.
 4. **Rescan Before Commit & Periodically**:
-   - **Always run `spashta_ckg scan` before creating a git commit** to ensure `.spashta/` graph memory is synchronized with active changes.
-   - Audit with `spashta_ckg dead-code <lang>` to ensure no broken or orphaned code is committed.
+   - **Always run `spashta_ckg scan` (or call `spashta_scan()`) before creating a git commit** to ensure `.spashta/` graph memory is synchronized with active changes.
+   - Audit with `spashta_dead_code()` to ensure no broken or orphaned code is committed.
 ```
 
 ---

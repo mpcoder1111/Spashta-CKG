@@ -22,7 +22,8 @@ To maintain architectural integrity and eliminate hallucinations/breakages, foll
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
 │ 1. PRE-FLIGHT (Impact & Blast Radius)                                  │
-│    • Query: spashta_ckg impact <TargetSymbol> --depth 2 --json         │
+│    • CLI: spashta_ckg impact <TargetSymbol> --depth 2 --json           │
+│    • Or Native MCP Tool: spashta_impact(symbol="TargetSymbol")         │
 │    • Find all callers across Python, JS, HTML templates, and CSS       │
 │    • Check dependencies: spashta_ckg dependencies <TargetSymbol>      │
 └───────────────────────────────────┬────────────────────────────────────┘
@@ -127,6 +128,33 @@ spashta_ckg stats
 
 ---
 
+## 🤖 Native MCP Server Tools Reference (Zero-Click Execution)
+
+When `spashta_ckg_mcp` is registered in your IDE's `mcp_config.json`, use these native tools directly with **zero permission clicks**:
+
+| Native MCP Tool | Parameters | Purpose / Returned Subgraph |
+| :--- | :--- | :--- |
+| `spashta_impact` | `symbol: str`, `depth: int = 3`, `project_dir: str = "."` | Upstream blast radius: who calls or depends on this symbol before editing |
+| `spashta_routes` | `project_dir: str = "."` | Full-stack routes connecting backend views, templates, and HTMX triggers |
+| `spashta_search` | `query: str`, `node_type: str = None`, `project_dir: str = "."` | Searches CKG for symbols, classes, styles, or endpoints |
+| `spashta_dead_code` | `language: str = "css"|"js"|"py"`, `project_dir: str = "."` | Dynamic-safe dead code detection with zero false-positives |
+| `spashta_scan` | `project_dir: str = "."` | Scans codebase and rebuilds `.spashta/` CKG cache |
+
+### MCP IDE Configuration (`mcp_config.json`):
+```json
+{
+  "mcpServers": {
+    "spashta_ckg": {
+      "command": "spashta_ckg_mcp",
+      "args": []
+    }
+  }
+}
+```
+*(If installed in project virtualenv, set `"command": ".venv/Scripts/spashta_ckg_mcp.exe"` on Windows or `".venv/bin/spashta_ckg_mcp"` on Linux/macOS).*
+
+---
+
 ## 📌 CRITICAL: Add to Your `AGENTS.md` / `CLAUDE.md`
 
 Because AI agents start every conversation with zero memory of previous sessions, **you must include Spashta rules in your project's `AGENTS.md` or `CLAUDE.md`** (or `.cursorrules` / `.windsurfrules`).
@@ -141,17 +169,18 @@ This project uses **Spashta-CKG** (https://github.com/mpcoder1111/Spashta-CKG) f
 
 **Mandatory Rules for AI Coding Agents:**
 1. **Query First (Closed-Loop Pre-Flight)**:
-   - Before modifying, renaming, or deleting any function, class, model, route, or CSS class, run:
-     `spashta_ckg impact <SymbolName> --depth 2 --json`
+   - Before modifying, renaming, or deleting any function, class, model, route, or CSS class:
+     - **If MCP tools are active**: Call `spashta_impact(symbol="<SymbolName>")`.
+     - **If CLI only**: Run `spashta_ckg impact <SymbolName> --depth 2 --json`.
    - Inspect all returned callers across Python, JavaScript, HTML templates, and CSS stylesheets.
 2. **Pinpoint, Don't Guess**:
-   - Use `spashta_ckg locate <SymbolName>` to find exact file paths and line ranges instead of reading entire directories.
+   - Use `spashta_ckg locate <SymbolName>` (or `spashta_search`) to find exact file paths and line ranges instead of reading entire directories.
    - For database models, use `spashta_ckg consumers <ModelName>` to verify all query and update sites.
 3. **Verify Routing & Couplings**:
-   - When altering URLs or views, run `spashta_ckg routes` to ensure template `{% url %}` tags and HTMX event listeners remain intact.
+   - When altering URLs or views, call `spashta_routes()` (or run `spashta_ckg routes`) to ensure template `{% url %}` tags and HTMX event listeners remain intact.
 4. **Rescan Before Commit & Periodically**:
-   - **Always run `spashta_ckg scan` before creating a git commit** to ensure `.spashta/` graph memory is synchronized with active changes.
-   - Audit with `spashta_ckg dead-code <lang>` to ensure no broken or orphaned code is committed.
+   - **Always run `spashta_ckg scan` (or call `spashta_scan()`) before creating a git commit** to ensure `.spashta/` graph memory is synchronized with active changes.
+   - Audit with `spashta_dead_code()` to ensure no broken or orphaned code is committed.
 ```
 
 ---
