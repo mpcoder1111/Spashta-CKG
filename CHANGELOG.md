@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [3.2.1] - 2026-08-30
+
+**Spashta-CKG 3.2.1 — FastMCP Asynchronous Performance & Fail-Fast Reliability Patch**
+
+Maintenance patch resolving background MCP daemon hangs, eliminating runaway full-disk scan fallbacks, and adding instant CLI `--help` handling.
+
+### Fixed
+- **CLI `-h` / `--help` Daemon Interception**: Added command-line argument handling in `spashta_ckg_mcp` so `--help` prints usage instructions and exits immediately in 0.05s instead of hanging on stdin.
+- **Eliminated Runaway Disk Scan Fallbacks**: Removed the automatic `CKG.build()` fallback inside query MCP tools (`spashta_impact`, `spashta_routes`, `spashta_search`, `spashta_dead_code`). If no graph exists in the target directory, it now fails fast in 0.001s with an explicit prompt to run `spashta_scan`, preventing background processes from scanning the entire filesystem.
+- **Asynchronous Tool Handlers (`async def`)**: Defined all FastMCP tools asynchronously to ensure the stdio transport event loop is never blocked by disk I/O.
+
+---
+
 ## [3.2.0] - 2026-08-30
 
 **Spashta-CKG 3.2 — Official Model Context Protocol (MCP) SDK Upgrade & Cross-Platform Transport**
