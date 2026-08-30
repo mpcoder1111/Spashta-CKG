@@ -1,11 +1,15 @@
 /**
- * style_demo.css - Demo Stylesheet for Spashta-CKG
+ * style_demo.css - Demo Stylesheet for Spashta-CKG 3.0
  * 
- * This is a DEMO file used to test Spashta-CKG's CSS extraction.
- * Demonstrates how Spashta extracts CSS selectors and relationships.
+ * Demonstrates CSS selectors, compound rules, and @keyframes animation modeling.
  * 
  * Part of: Spashta-CKG Demo Project (_demo/)
  */
+
+@keyframes fadeInDemo {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
 /* Demo container class */
 .container-demo {
@@ -14,17 +18,28 @@
     padding: 20px;
 }
 
+.container-demo > h1 {
+    font-size: 2rem;
+    color: #333;
+}
+
 /* Demo list styling */
 #list-demo {
     background: #f5f5f5;
     border-radius: 8px;
     padding: 16px;
+    animation: fadeInDemo 0.4s ease-in-out;
 }
 
 /* Demo item styling */
 .item-demo {
     padding: 8px;
     border-bottom: 1px solid #ddd;
+}
+
+.item-active {
+    background: #e3f2fd;
+    font-weight: bold;
 }
 
 /* Demo hover state */

@@ -1,0 +1,22 @@
+{
+    "_meta": {
+        "framework": "Vanilla JS",
+        "description": "Maps Vanilla-JavaScript conventions (no SPA framework — addEventListener / dispatchEvent, window.* namespaces) to Spashta CKG Semantic Roles. The JS sibling of the HTMX adapter: rule-based, deterministic, additive; it annotates roles on nodes the JS builder already emits, it never mutates structure.",
+        "version": "0.1-mvp",
+        "applies_to": "Projects using plain browser JavaScript (the Forms Portal stack: HTMX + vanilla JS + a window.fp public API). Activate by adding \"vanilla\" to project/profile.json frameworks.",
+        "requires_builder": "builders/js/build_js_ast.py (>= the event-coupling slice — emits registers_event_handler / dispatches_event edges)."
+    },
+    "mappings": [
+        {
+            "core_node": "Function",
+            "semantic_role": "Signal",
+            "notes": "A function that registers an event handler (addEventListener) or dispatches an event (dispatchEvent) IS an event handler/producer — the CKG `Signal` role. Detected purely from the edges the JS builder emits, exactly like the HTMX adapter detects Component via calls_api/triggers_event/submits_form.",
+            "detection_rules": {
+                "has_outgoing_edge": [
+                    "registers_event_handler",
+                    "dispatches_event"
+                ]
+            }
+        }
+    ]
+}

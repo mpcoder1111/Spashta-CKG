@@ -1,25 +1,33 @@
 /**
- * main_demo.js - Demo JavaScript for Spashta-CKG
+ * main_demo.js - Demo JavaScript for Spashta-CKG 3.0
  * 
- * This is a DEMO file used to test Spashta-CKG's Code Knowledge Graph generation.
- * Note: JavaScript builder is planned for future versions.
+ * Demonstrates Tree-Sitter AST extraction, DOM queries, classList mutations,
+ * and event listener callback resolutions.
  * 
  * Part of: Spashta-CKG Demo Project (_demo/)
  */
+
+/**
+ * Handle item click and apply dynamic style.
+ */
+function handleItemClick(event) {
+    const target = event.currentTarget;
+    target.classList.add("item-active");
+    console.log("Item clicked:", target);
+}
 
 /**
  * Initialize the demo application.
  * Called when DOM is fully loaded.
  */
 function initDemo() {
-    console.log("Spashta-CKG Demo Ready");
-}
-
-/**
- * Demo function to show JS function extraction (future feature).
- */
-function loadItemsDemo() {
-    console.log("Loading demo items...");
+    console.log("Spashta-CKG 3.0 Demo Ready");
+    
+    // DOM query extraction
+    const listElement = document.querySelector("#list-demo");
+    if (listElement) {
+        listElement.addEventListener("click", handleItemClick);
+    }
 }
 
 document.addEventListener("DOMContentLoaded", initDemo);

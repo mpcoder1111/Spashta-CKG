@@ -35,3 +35,9 @@ desktop.ini
 venv/
 env/
 .venv/
+
+# Agent Workspace
+agent_work/
+
+# Spashta Local Cache & Artifacts
+.spashta/

@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "version": "0.1-mvp",
+    "supported_core_schema": "1.4",
+    "language": "js",
+    "ast_source": "tree-sitter (tree-sitter-javascript)",
+    "principle": "Maps syntax to core nodes only. Deterministic edges when the target is statically resolvable; anything dynamic becomes an unresolved ambiguity (never a guessed edge).",
+    "scope_note": "MVP vertical slice (spec/js-support.md US-1): File + Function nodes + the `calls` edge. DOM/route/event edges are Phase 2."
+  },
+  "node_mappings": {
+    "program": "File",
+    "function_declaration": "Function",
+    "function_expression": "Function",
+    "arrow_function": "Function",
+    "method_definition": "Function",
+    "event": "Event",
+    "style_class": "StyleClass",
+    "style_id": "StyleID"
+  },
+  "edge_mappings": {
+    "defines_function": "defines",
+    "calls": "calls",
+    "function_call": "calls",
+    "registers_event_handler": "registers_event_handler",
+    "dispatches_event": "dispatches_event",
+    "queries_dom": "queries_dom"
+  }
+}

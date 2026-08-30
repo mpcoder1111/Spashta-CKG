@@ -1,0 +1,196 @@
+{
+  "_meta": {
+    "builder": "build_html_ast.py",
+    "builder_version": "2.0-strict",
+    "generated_at": "2026-08-01T16:04:24.184176"
+  },
+  "nodes": [
+    {
+      "node_type": "Template",
+      "name": "htmx_trigger_dummy.html",
+      "id": "htmx_trigger_dummy.html",
+      "analysis_confidence": "structural",
+      "line_start": null,
+      "line_end": null,
+      "attributes": null,
+      "hash": "09d5e925e80864aa279602cd7da2cdad"
+    },
+    {
+      "node_type": "Route",
+      "name": "/reload",
+      "id": "htmx_trigger_dummy.html::Route::/reload",
+      "analysis_confidence": "heuristic",
+      "line_start": 8,
+      "line_end": null,
+      "attributes": {
+        "tag": "div"
+      }
+    },
+    {
+      "node_type": "Event",
+      "name": "app:reload from:body",
+      "id": "htmx_trigger_dummy.html::Event::app:reload from:body",
+      "analysis_confidence": "heuristic",
+      "line_start": 8,
+      "line_end": null,
+      "attributes": {
+        "tag": "div"
+      }
+    },
+    {
+      "node_type": "Event",
+      "name": "app:reload",
+      "id": "htmx_trigger_dummy.html::Event::app:reload",
+      "analysis_confidence": "heuristic",
+      "line_start": 8,
+      "line_end": null,
+      "attributes": {
+        "tag": "div"
+      }
+    },
+    {
+      "node_type": "Route",
+      "name": "/sync",
+      "id": "htmx_trigger_dummy.html::Route::/sync",
+      "analysis_confidence": "heuristic",
+      "line_start": 9,
+      "line_end": null,
+      "attributes": {
+        "tag": "div"
+      }
+    },
+    {
+      "node_type": "Event",
+      "name": "app:sync[!event.detail] from:document",
+      "id": "htmx_trigger_dummy.html::Event::app:sync[!event.detail] from:document",
+      "analysis_confidence": "heuristic",
+      "line_start": 9,
+      "line_end": null,
+      "attributes": {
+        "tag": "div"
+      }
+    },
+    {
+      "node_type": "Event",
+      "name": "app:sync",
+      "id": "htmx_trigger_dummy.html::Event::app:sync",
+      "analysis_confidence": "heuristic",
+      "line_start": 9,
+      "line_end": null,
+      "attributes": {
+        "tag": "div"
+      }
+    },
+    {
+      "node_type": "Route",
+      "name": "/save",
+      "id": "htmx_trigger_dummy.html::Route::/save",
+      "analysis_confidence": "heuristic",
+      "line_start": 10,
+      "line_end": null,
+      "attributes": {
+        "tag": "button",
+        "method": "POST"
+      }
+    },
+    {
+      "node_type": "Event",
+      "name": "click",
+      "id": "htmx_trigger_dummy.html::Event::click",
+      "analysis_confidence": "heuristic",
+      "line_start": 10,
+      "line_end": null,
+      "attributes": {
+        "tag": "button",
+        "method": "POST"
+      }
+    },
+    {
+      "node_type": "Route",
+      "name": "/dyn",
+      "id": "htmx_trigger_dummy.html::Route::/dyn",
+      "analysis_confidence": "heuristic",
+      "line_start": 11,
+      "line_end": null,
+      "attributes": {
+        "tag": "div"
+      }
+    },
+    {
+      "node_type": "Event",
+      "name": "{{ live_event }} from:body",
+      "id": "htmx_trigger_dummy.html::Event::{{ live_event }} from:body",
+      "analysis_confidence": "heuristic",
+      "line_start": 11,
+      "line_end": null,
+      "attributes": {
+        "tag": "div"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "edge": "calls_api",
+      "from": "htmx_trigger_dummy.html",
+      "to": "htmx_trigger_dummy.html::Route::/reload"
+    },
+    {
+      "edge": "triggers_event",
+      "from": "htmx_trigger_dummy.html",
+      "to": "htmx_trigger_dummy.html::Event::app:reload from:body"
+    },
+    {
+      "edge": "listens_to",
+      "from": "htmx_trigger_dummy.html",
+      "to": "htmx_trigger_dummy.html::Event::app:reload"
+    },
+    {
+      "edge": "calls_api",
+      "from": "htmx_trigger_dummy.html",
+      "to": "htmx_trigger_dummy.html::Route::/sync"
+    },
+    {
+      "edge": "triggers_event",
+      "from": "htmx_trigger_dummy.html",
+      "to": "htmx_trigger_dummy.html::Event::app:sync[!event.detail] from:document"
+    },
+    {
+      "edge": "listens_to",
+      "from": "htmx_trigger_dummy.html",
+      "to": "htmx_trigger_dummy.html::Event::app:sync"
+    },
+    {
+      "edge": "calls_api",
+      "from": "htmx_trigger_dummy.html",
+      "to": "htmx_trigger_dummy.html::Route::/save"
+    },
+    {
+      "edge": "triggers_event",
+      "from": "htmx_trigger_dummy.html",
+      "to": "htmx_trigger_dummy.html::Event::click"
+    },
+    {
+      "edge": "calls_api",
+      "from": "htmx_trigger_dummy.html",
+      "to": "htmx_trigger_dummy.html::Route::/dyn"
+    },
+    {
+      "edge": "triggers_event",
+      "from": "htmx_trigger_dummy.html",
+      "to": "htmx_trigger_dummy.html::Event::{{ live_event }} from:body"
+    }
+  ],
+  "ambiguities": [
+    {
+      "id": "bf35e7fe-85cf-484d-a3ef-72e3ea9cf593",
+      "kind": "unresolved_event",
+      "source_file": "htmx_trigger_dummy.html",
+      "source_scope": "htmx_trigger_dummy.html",
+      "expression": "{{ live_event }} from:body",
+      "reason": "Dynamic / templated hx-trigger event name",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    }
+  ],
+  "logs": []
+}

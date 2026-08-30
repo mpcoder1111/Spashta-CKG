@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spashta_ckg"
+version = "3.0.0"
+description = "Full-stack Code Knowledge Graph (CKG) for Python, JavaScript, HTML, and CSS"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "Praveen", email = "mpcoder1111@users.noreply.github.com" }
+]
+keywords = [
+    "code-knowledge-graph",
+    "ast",
+    "impact-analysis",
+    "dead-code",
+    "mcp",
+    "django",
+    "htmx",
+    "javascript",
+    "css"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Quality Assurance",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "tree-sitter>=0.22.0",
+    "tree-sitter-javascript>=0.21.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "black>=23.0"
+]
+
+[project.scripts]
+spashta_ckg = "spashta_ckg.cli:main"
+spashta_ckg_mcp = "spashta_ckg.mcp_server:main"
+
+[tool.setuptools.packages.find]
+include = ["spashta_ckg*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.md", "*.txt"]

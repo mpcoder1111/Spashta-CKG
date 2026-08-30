@@ -1,0 +1,11 @@
+<!-- Fixture — spec/htmx-event-coupling.md US-1. The HTML builder must:
+     (a) emit listens_to onto a BARE-named Event node for an hx-trigger with a `from:` clause
+         (the element listens for an event fired on ANOTHER element — the JS dispatchEvent coupling);
+     (b) strip a trailing [filter] from the event name (bare name only);
+     (c) NOT emit listens_to for a plain self-trigger (no `from:`);
+     (d) leave the existing triggers_event edge untouched;
+     (e) treat a templated/dynamic hx-trigger as an ambiguity, never a guessed edge. -->
+<div hx-get="/reload" hx-trigger="app:reload from:body">listens for a JS-dispatched event</div>
+<div hx-get="/sync" hx-trigger="app:sync[!event.detail] from:document">filtered event, from another element</div>
+<button hx-post="/save" hx-trigger="click">native self-trigger — no listens_to</button>
+<div hx-get="/dyn" hx-trigger="{{ live_event }} from:body">dynamic event name — an ambiguity</div>

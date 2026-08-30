@@ -1,0 +1,16 @@
+{
+    "name": "HTMX Adapter Verification",
+    "paths": {
+        "mapping_file": "../../htmx/framework_mapping.json",
+        "dummy_dir": "../data/htmx",
+        "dummy_files": [
+            "dummy_htmx.html"
+        ],
+        "builder_script": "builders/html/build_html_ast.py"
+    },
+    "expectations": {
+        "roles_present": [
+            "Component"
+        ]
+    }
+}

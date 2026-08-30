@@ -1,0 +1,5 @@
+# build_js_ast.py dependencies (the first Spashta builder needing a 3rd-party parser).
+# Tree-sitter is a C library with Python bindings: NO Node.js runtime, error-tolerant, MIT.
+# Install into the Spashta venv:  pip install -r builders/js/requirements.txt
+tree-sitter>=0.23,<1.0
+tree-sitter-javascript>=0.23

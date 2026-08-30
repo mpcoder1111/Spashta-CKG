@@ -1,0 +1,16 @@
+{
+  "builder_identity": {
+    "name": "build_js_ast.py",
+    "version": "0.1-mvp",
+    "output_format": "fragment_js.json",
+    "scope": "JavaScript structure — MVP vertical slice: File + Function nodes + the `calls` edge (spec/js-support.md US-1)."
+  },
+  "builder_principles": {
+    "structure_only": "Emit facts observed in the syntax tree. No framework interpretation (that is an adapter's job).",
+    "no_best_guessing": "A `calls` edge is emitted ONLY when the callee resolves to exactly one known function definition. A dynamic/unknown callee becomes an unresolved ambiguity, never a guessed edge.",
+    "determinism": "Same input -> same fragment. Literal-resolvable target -> deterministic edge; otherwise emit_ambiguity(confidence='unresolved') for Level-2 (LLM) resolution."
+  },
+  "ambiguity_policy": {
+    "default_resolver": "agent"
+  }
+}

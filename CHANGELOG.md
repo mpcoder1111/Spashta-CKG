@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [3.0.0] - 2026-08-30
+
+**Spashta-CKG 3.0 — Full-Stack Code Knowledge Graph & MCP Server**
+
+Major update packaging Spashta into an installable Python library (`spashta_ckg`), a 17-command interactive CLI, and a native Model Context Protocol (MCP) server (`spashta_ckg_mcp`).
+
+### Added
+- **Installable Package & CLI (`spashta_ckg`)**: Installable via `pip install git+https://github.com/mpcoder1111/Spashta-CKG.git` with 17 unified CLI commands (`scan`, `impact`, `dead-code`, `dead-css`, `routes`, `call-graph`, `search`, `locate`, `read`, `details`, `consumers`, `scope-check`, `class-usage`, `dup-styles`, `list-files`, `stats`).
+- **Native MCP Server (`spashta_ckg_mcp`)**: Fast JSON-RPC stdio MCP server giving AI Agents in Cursor, Antigravity, Claude Desktop, and VS Code native zero-click tool execution (`spashta_impact`, `spashta_dead_code`, `spashta_routes`, `spashta_search`, `spashta_scan`).
+- **Full JavaScript Support (Tree-Sitter)**: New `build_js_ast.py` builder with tree-sitter AST parser, Vanilla JS framework adapter, DOM queries (`queries_dom`), `classList` mutations (`uses_style`), event listeners (`listens_to`, `dispatches_event`), and callback reference resolution (`calls`).
+- **Full-Stack Django Route Couplings**: Resolves URLconf `path()` / `include()` hierarchies (`includes_urlconf`), links template `{% url %}` tags to Route nodes (`resolves_to`), and maps view API calls (`calls_api`).
+- **HTMX Cross-Language Couplings**: Maps Python `HX-Trigger` response headers (`dispatches_event`), HTMX `hx-trigger="... from:body"` listeners (`listens_to`), Out-of-Band swaps (`oob_swaps`), and Form/Signal model extraction (`uses_model`).
+- **Template Hierarchy Modeling**: Captures Django template tags `{% include %}` (`includes_template`) and `{% extends %}` (`extends_template`).
+- **CSS Coverage & Keyframes**: New `Keyframes` node type, `@keyframes` extraction with `uses_animation` / `defines` edges, and fixed compound selector lookaheads (`.a.b`, `.parent > .child`).
+- **Dead-Code Accuracy Engine**: Eliminates ~35% false positives in dead-CSS / dead-JS auditing by tracking dynamic class usages across HTML attributes, inline scripts, and template contexts.
+- **Programmatic Python API**: `from spashta_ckg import CKG` for direct programmatic graph queries and pipeline integrations.
+
+---
+
 ## [2.1.0] - 2026-03-18
 
 **Spashta-CKG 2.1 — Deeper Awareness, Fewer Blind Spots**

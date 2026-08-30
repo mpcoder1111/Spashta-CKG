@@ -1,0 +1,19 @@
+.foo.bar {
+  margin: 1.5em;
+}
+
+.baz > .qux {
+  padding: 0;
+}
+
+.attr[data-state="on"] {
+  color: red;
+}
+
+.pseudo:hover {
+  color: blue;
+}
+
+.plain {
+  transition: all 0.3s ease;
+}

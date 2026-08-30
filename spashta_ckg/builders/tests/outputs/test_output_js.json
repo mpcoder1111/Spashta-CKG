@@ -1,0 +1,210 @@
+{
+  "_meta": {
+    "builder": "build_js_ast.py",
+    "builder_version": "0.1-mvp",
+    "schema_version": "1.4",
+    "generated_at": "2026-08-30T15:16:01.675797"
+  },
+  "nodes": [
+    {
+      "id": "File:js_dummy.js",
+      "node_type": "File",
+      "name": "js_dummy.js",
+      "lang": "js",
+      "file": "js_dummy.js",
+      "hash": "4c2f5cee909c7fc62e2a5b34d8e62033318c9263"
+    },
+    {
+      "id": "js::sym::window.app.greet",
+      "node_type": "Function",
+      "name": "window.app.greet",
+      "lang": "js",
+      "file": "js_dummy.js",
+      "line": 8
+    },
+    {
+      "id": "js::sym::window.app.warn",
+      "node_type": "Function",
+      "name": "window.app.warn",
+      "lang": "js",
+      "file": "js_dummy.js",
+      "line": 11
+    },
+    {
+      "id": "js_dummy.js::helper",
+      "node_type": "Function",
+      "name": "helper",
+      "lang": "js",
+      "file": "js_dummy.js",
+      "line": 16
+    },
+    {
+      "id": "js_dummy.js::run",
+      "node_type": "Function",
+      "name": "run",
+      "lang": "js",
+      "file": "js_dummy.js",
+      "line": 20
+    },
+    {
+      "id": "js_dummy.js::init",
+      "node_type": "Function",
+      "name": "init",
+      "lang": "js",
+      "file": "js_dummy.js",
+      "line": 29
+    },
+    {
+      "id": "js_dummy.js::fireRefresh",
+      "node_type": "Function",
+      "name": "fireRefresh",
+      "lang": "js",
+      "file": "js_dummy.js",
+      "line": 35
+    },
+    {
+      "id": "js_dummy.js::paint",
+      "node_type": "Function",
+      "name": "paint",
+      "lang": "js",
+      "file": "js_dummy.js",
+      "line": 41
+    },
+    {
+      "id": "js::event::app:refresh",
+      "node_type": "Event",
+      "name": "app:refresh",
+      "lang": "js"
+    },
+    {
+      "id": "StyleID:main-panel",
+      "node_type": "StyleID",
+      "name": "main-panel",
+      "lang": "css",
+      "provisional": true
+    },
+    {
+      "id": "StyleClass:widget",
+      "node_type": "StyleClass",
+      "name": "widget",
+      "lang": "css",
+      "provisional": true
+    }
+  ],
+  "edges": [
+    {
+      "edge": "defines",
+      "from": "File:js_dummy.js",
+      "to": "js::sym::window.app.greet"
+    },
+    {
+      "edge": "defines",
+      "from": "File:js_dummy.js",
+      "to": "js::sym::window.app.warn"
+    },
+    {
+      "edge": "defines",
+      "from": "File:js_dummy.js",
+      "to": "js_dummy.js::helper"
+    },
+    {
+      "edge": "defines",
+      "from": "File:js_dummy.js",
+      "to": "js_dummy.js::run"
+    },
+    {
+      "edge": "defines",
+      "from": "File:js_dummy.js",
+      "to": "js_dummy.js::init"
+    },
+    {
+      "edge": "defines",
+      "from": "File:js_dummy.js",
+      "to": "js_dummy.js::fireRefresh"
+    },
+    {
+      "edge": "defines",
+      "from": "File:js_dummy.js",
+      "to": "js_dummy.js::paint"
+    },
+    {
+      "edge": "calls",
+      "from": "js::sym::window.app.warn",
+      "to": "js::sym::window.app.greet",
+      "call_line": 12,
+      "callee": "window.app.greet"
+    },
+    {
+      "edge": "calls",
+      "from": "js_dummy.js::run",
+      "to": "js_dummy.js::helper",
+      "call_line": 21,
+      "callee": "helper"
+    },
+    {
+      "edge": "calls",
+      "from": "js_dummy.js::run",
+      "to": "js::sym::window.app.greet",
+      "call_line": 22,
+      "callee": "window.app.greet"
+    },
+    {
+      "edge": "registers_event_handler",
+      "from": "js_dummy.js::init",
+      "to": "js::event::app:refresh",
+      "event_line": 30,
+      "event": "app:refresh"
+    },
+    {
+      "edge": "calls",
+      "from": "js_dummy.js::init",
+      "to": "js_dummy.js::helper",
+      "call_line": 31,
+      "callee": "helper"
+    },
+    {
+      "edge": "dispatches_event",
+      "from": "js_dummy.js::fireRefresh",
+      "to": "js::event::app:refresh",
+      "event_line": 36,
+      "event": "app:refresh"
+    },
+    {
+      "edge": "queries_dom",
+      "from": "js_dummy.js::paint",
+      "to": "StyleID:main-panel",
+      "dom_line": 42,
+      "selector": "main-panel"
+    },
+    {
+      "edge": "queries_dom",
+      "from": "js_dummy.js::paint",
+      "to": "StyleClass:widget",
+      "dom_line": 43,
+      "selector": ".widget"
+    }
+  ],
+  "ambiguities": [
+    {
+      "id": "99704912-7f6e-42da-a778-b48705b14f32",
+      "kind": "unresolved_call",
+      "source_file": "js_dummy.js",
+      "source_scope": "js_dummy.js::L23",
+      "expression": "console.log",
+      "reason": "callee not found in the JS def registry (external/cross-language/dynamic)",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    },
+    {
+      "id": "e9ae0f4b-6ca5-4e8d-a73c-afa4acfa6810",
+      "kind": "unresolved_selector",
+      "source_file": "js_dummy.js",
+      "source_scope": "js_dummy.js::L44",
+      "expression": ".a .b",
+      "reason": "querySelector with a non-simple selector",
+      "confidence": "unresolved",
+      "resolver": "agent"
+    }
+  ],
+  "logs": []
+}

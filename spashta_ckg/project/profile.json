@@ -1,0 +1,55 @@
+{
+    "_meta": {
+        "description": "Defines the active technology stack and scan scope for this project.",
+        "role": "Project Activation Context",
+        "version": "2.2",
+        "core_schema_version": "1.4",
+        "IMPORTANT": "Use exact spellings from supported lists below. Spelling mistakes will cause errors.",
+        "supported_languages": [
+            "python",
+            "html",
+            "css",
+            "js"
+        ],
+        "supported_frameworks": [
+            "django",
+            "fastapi",
+            "htmx",
+            "vanilla"
+        ]
+    },
+    "project_root": "..",
+    "_project_root_note": "Relative to Spashta-CKG folder. '..' means parent directory (the project root). Use absolute path if Spashta-CKG is not inside the project.",
+    "project_type": "web_app",
+    "languages": [
+        "python",
+        "html",
+        "css",
+        "js"
+    ],
+    "frameworks": [
+        "django",
+        "htmx",
+        "vanilla"
+    ],
+    "excluded": {
+        "frameworks": [
+            "fastapi"
+        ],
+        "languages": [],
+        "directories": [
+            "node_modules",
+            ".git",
+            "venv",
+            ".venv",
+            "__pycache__",
+            "dist",
+            "build",
+            "misc",
+            "reference",
+            "_archive",
+            "agent_work"
+        ],
+        "_directories_note": "Project-specific folders to exclude from scanning. Added to builder_rules.json universal exclusions (node_modules, .git, __pycache__, etc.)"
+    }
+}

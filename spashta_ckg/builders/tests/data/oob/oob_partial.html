@@ -1,0 +1,9 @@
+<div id="form-messages" hx-swap-oob="true" aria-live="assertive">
+  <p>Saved.</p>
+</div>
+
+<span id="rv-count" class="fp-count" hx-swap-oob="outerHTML">42 matches</span>
+
+<div id="dyn-{{ field.id }}" hx-swap-oob="true">dynamic id — must be an ambiguity, no edge</div>
+
+<button hx-get="/refresh" hx-target="#form-messages">Refresh</button>

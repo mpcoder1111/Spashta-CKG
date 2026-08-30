@@ -1,0 +1,20 @@
+@keyframes spin-a {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-b {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes wobble {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(4px); }
+}
+
+.thing {
+  animation: spin-a 0.6s linear infinite;
+}
+
+.other {
+  animation-name: spin-b;
+}

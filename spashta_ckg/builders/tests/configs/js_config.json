@@ -1,0 +1,28 @@
+{
+    "__meta": {
+        "config_role": "JavaScript Test Configuration (MVP — spec/js-support.md US-1)",
+        "runner": "../run_tests.py",
+        "note": "Fixture + config follow the css/python convention. Wiring into run_tests.py's assertion protocol is a maintainer follow-up; builders/js/verify_js_mvp.py is a self-contained runnable proof in the meantime."
+    },
+    "paths": {
+        "project_root_relative": "../data/js_dummy.js",
+        "real_project_root_note": "Point at the dummy as the scan root to isolate the test.",
+        "builder_script": "../../js/build_js_ast.py",
+        "mapping_file": "../../js/js_language_mapping.json"
+    },
+    "output": {
+        "filename": "../outputs/test_output_js.json",
+        "clean_before_run": true,
+        "format": "json"
+    },
+    "contract_equivalences": {
+        "__guide": "Valid fallback behaviour: an external/dynamic callee is an ambiguity, not a missing edge.",
+        "rules": [
+            {
+                "required_edge": "calls",
+                "accepted_ambiguity": "unresolved_call",
+                "reason": "Builder emits `calls` only when the callee resolves to exactly one known definition; an external (document.getElementById), cross-language, or dynamic callee becomes an unresolved_call ambiguity instead of a guessed edge."
+            }
+        ]
+    }
+}

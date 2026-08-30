@@ -1,0 +1,154 @@
+{
+  "_meta": {
+    "version": "1.6-strict",
+    "supported_core_schema": "1.4",
+    "language": "python",
+    "ast_source": "CPython ast module",
+    "principle": "Maps syntax to core nodes only. Adapter logic (heuristics, symbols) is excluded.",
+    "changelog_1.6": "Added Field, Constant, TestCase node mappings. Added has_field, references, listens_to, defines_variable, defines_constant, defines_field, contains_field, contains_constant edge mappings. Schema 1.3 -> 1.4."
+  },
+  "node_mappings": {
+    "Module": "File",
+    "ClassDef": "Class",
+    "FunctionDef": "Function",
+    "AsyncFunctionDef": "Function",
+    "Assign": "Variable",
+    "AnnAssign": "Variable",
+    "AugAssign": "Variable",
+    "Name": "Variable",
+    "FieldAssign": "Field",
+    "ConstantAssign": "Constant",
+    "TestClassDef": "TestCase"
+  },
+  "edge_mappings": {
+    "import": "imports",
+    "import_from": "imports",
+    "import_lazy": "imports",
+    "defines_class": "defines",
+    "defines_function": "defines",
+    "defines_variable": "defines",
+    "defines_constant": "defines",
+    "defines_field": "defines",
+    "defines_testcase": "defines",
+    "contains_method": "contains_member",
+    "contains_variable": "contains_member",
+    "contains_field": "contains_member",
+    "contains_constant": "contains_member",
+    "has_field": "has_field",
+    "references_model": "references",
+    "listens_to_signal": "listens_to",
+    "inherits_from": "extends",
+    "extends": "extends",
+    "function_call": "calls",
+    "calls": "calls",
+    "method_call": "calls",
+    "reads_variable": "reads_from",
+    "writes_variable": "writes_to",
+    "writes_to": "writes_to",
+    "raises_exception": "throws_exception",
+    "decorates": "decorates",
+    "await_usage": "uses_async",
+    "resolves_to": "resolves_to",
+    "renders_template": "renders_template",
+    "calls_api": "calls_api",
+    "dispatches_event": "dispatches_event",
+    "includes_urlconf": "includes_urlconf",
+    "uses_model": "uses_model",
+    "receives_signal": "listens_to"
+  },
+  "route_registrations": {
+    "_doc": "Config-driven URL route extraction. Each framework declares how it registers a route so the builder stays generic. Django: path/re_path/url(pattern, view, name=NAME) with a module-level app_name namespace.",
+    "django": {
+      "call_names": [
+        "path",
+        "re_path",
+        "url"
+      ],
+      "name_kwarg": "name",
+      "view_arg_index": 1,
+      "namespace_var": "app_name"
+    }
+  },
+  "include_registrations": {
+    "_doc": "Config-driven URLconf include-tree extraction (framework-agnostic). Each framework declares how it includes a sub-URLconf so the builder stays generic. Django: path(prefix, include('module.path'), namespace='ns'?). A LITERAL module string -> an includes_urlconf edge (File->File) to the resolved module; a literal namespace= is carried as edge metadata. A non-literal module arg (variable / inline include([...]) list) -> an unresolved_include ambiguity, never a guess. Empty {} = off, graph unchanged.",
+    "django": {
+      "call_names": [
+        "include"
+      ],
+      "module_arg_index": 0,
+      "namespace_kwarg": "namespace",
+      "edge": "includes_urlconf"
+    }
+  },
+  "model_form_binding": {
+    "_doc": "Config-driven form/serializer -> model binding (framework-agnostic). A class extending a configured base (Django forms.ModelForm / DRF ModelSerializer) with a nested Meta class whose model attr names a Model -> a uses_model edge (Form Class -> Model Class), resolved by name (heuristic). A non-literal model attr -> an unresolved_model_binding ambiguity. Structural detection (a base class + a nested attr), like the TestCase/Field policy. Empty {} = off.",
+    "django": {
+      "base_classes": [
+        "ModelForm",
+        "ModelSerializer"
+      ],
+      "meta_class": "Meta",
+      "model_attr": "model",
+      "target": "Class",
+      "edge": "uses_model"
+    }
+  },
+  "signal_receivers": {
+    "_doc": "Config-driven signal receiver detection (framework-agnostic). A function decorated @receiver(SIGNAL, ...) -> a listens_to edge (Function -> Signal), the Signal named by the decorator's signal arg (a Name/Attribute; joined to a Signal node by name at merge). A non-name signal arg -> an unresolved_signal ambiguity. Structural detection (a decorator), like the route/testcase policy. Empty {} = off.",
+    "django": {
+      "decorators": [
+        "receiver"
+      ],
+      "signal_arg_index": 0,
+      "target": "Signal",
+      "edge": "receives_signal"
+    }
+  },
+  "header_event_dispatch": {
+    "_doc": "Config-driven GENERIC inline HTMX event dispatch (no project helper needed). A direct response-header assignment response[HEADER] = <literal> dispatches a client-side event: a bare string literal (optionally comma-separated) -> one event per name; json.dumps({'evt': ...}) with a DICT LITERAL -> one event per literal key. Emits dispatches_event (enclosing Function/Method -> Event, joined to the JS listener by name at merge). A computed value (a variable / a non-literal dict) -> an unresolved_hx_trigger ambiguity, never a guess. A framework fact (the HX-Trigger header names), not a project helper -> shippable by default. Empty {} = off.",
+    "htmx": {
+      "headers": [
+        "HX-Trigger",
+        "HX-Trigger-After-Settle",
+        "HX-Trigger-After-Swap"
+      ],
+      "json_dumps_calls": [
+        "dumps"
+      ],
+      "target": "Event",
+      "edge": "dispatches_event"
+    }
+  },
+  "call_couplings": {
+    "_doc": "From a Python call: {func: literal_arg_index}, a target node type + match strategy + edge. match: node_name (an existing/placeholder node by exact name), template_suffix (a Template by path suffix).",
+    "render_template": {
+      "calls": {
+        "render": 1,
+        "get_template": 0,
+        "render_to_string": 0,
+        "select_template": 0
+      },
+      "target": "Template",
+      "match": "template_suffix",
+      "edge": "renders_template"
+    },
+    "url_reference": {
+      "calls": {
+        "reverse": 0,
+        "reverse_lazy": 0,
+        "redirect": 0
+      },
+      "target": "Route",
+      "match": "node_name",
+      "edge": "calls_api"
+    },
+    "hx_trigger": {
+      "calls": {
+        "_append_hx_trigger": 1
+      },
+      "target": "Event",
+      "match": "node_name",
+      "edge": "dispatches_event"
+    }
+  }
+}

@@ -1,0 +1,359 @@
+{
+    "_meta": {
+        "logic": "Separates syntax-level facts from framework-level assumptions.",
+        "version": "2.2",
+        "changelog_1.4": "Added has_field, references, listens_to edges. Expanded defines.to to include Variable, Field, Constant. Expanded imports.from to include Function, Method (enables function-scoped/lazy import tracking \u2014 universal in Python, JS, PHP). All additions are universal."
+    },
+    "direct_structural": {
+        "imports": {
+            "from": [
+                "File",
+                "Module",
+                "Stylesheet",
+                "Function",
+                "Method"
+            ],
+            "to": [
+                "Module",
+                "Package",
+                "Stylesheet",
+                "Class",
+                "Function",
+                "Variable",
+                "File"
+            ]
+        },
+        "defines": {
+            "from": [
+                "File",
+                "Stylesheet"
+            ],
+            "to": [
+                "Class",
+                "Function",
+                "Interface",
+                "Enum",
+                "Route",
+                "Trait",
+                "Component",
+                "Hook",
+                "Variable",
+                "Constant",
+                "Field",
+                "TestCase",
+                "StyleClass",
+                "StyleID",
+                "StyleElement",
+                "Keyframes"
+            ]
+        },
+        "contains_member": {
+            "from": [
+                "Class",
+                "Trait"
+            ],
+            "to": [
+                "Method",
+                "Variable",
+                "Field",
+                "Constant"
+            ],
+            "meaning": "Defines internal object structure"
+        },
+        "has_field": {
+            "from": [
+                "Class"
+            ],
+            "to": [
+                "Field"
+            ],
+            "meaning": "Data model declares a typed, persistent field (ORM column, schema attribute)"
+        },
+        "extends": {
+            "from": [
+                "Class"
+            ],
+            "to": [
+                "Class"
+            ]
+        },
+        "implements_interface": {
+            "from": [
+                "Class"
+            ],
+            "to": [
+                "Interface"
+            ]
+        },
+        "uses_trait": {
+            "from": [
+                "Class"
+            ],
+            "to": [
+                "Trait"
+            ]
+        },
+        "calls": {
+            "from": [
+                "Function",
+                "Method",
+                "Hook",
+                "File"
+            ],
+            "to": [
+                "Function",
+                "Method"
+            ]
+        },
+        "registers_event_handler": {
+            "from": [
+                "Function",
+                "Method",
+                "Hook",
+                "File"
+            ],
+            "to": [
+                "Event"
+            ]
+        },
+        "throws_exception": {
+            "from": [
+                "Function",
+                "Method"
+            ],
+            "to": [
+                "Class"
+            ],
+            "meaning": "Declares or raises an exception type"
+        },
+        "reads_from": {
+            "from": [
+                "Function",
+                "Method"
+            ],
+            "to": [
+                "Variable",
+                "DataModel",
+                "File"
+            ],
+            "meaning": "Reads state or data"
+        },
+        "writes_to": {
+            "from": [
+                "Function",
+                "Method"
+            ],
+            "to": [
+                "Variable",
+                "DataModel"
+            ],
+            "meaning": "Mutates state or data"
+        }
+    },
+    "reference_symbolic": {
+        "decorates": {
+            "from": [
+                "Function",
+                "Class"
+            ],
+            "to": [
+                "Function",
+                "Class"
+            ]
+        },
+        "renders_template": {
+            "from": [
+                "Route",
+                "Function"
+            ],
+            "to": [
+                "Template",
+                "Fragment"
+            ]
+        },
+        "calls_api": {
+            "from": [
+                "Function",
+                "Template",
+                "Component",
+                "Method"
+            ],
+            "to": [
+                "Route"
+            ]
+        },
+        "submits_form": {
+            "from": [
+                "Template"
+            ],
+            "to": [
+                "Route"
+            ]
+        },
+        "links_static_asset": {
+            "from": [
+                "Template"
+            ],
+            "to": [
+                "StaticAsset"
+            ]
+        },
+        "targets_element": {
+            "from": [
+                "StaticAsset",
+                "Template"
+            ],
+            "to": [
+                "Template",
+                "StyleID",
+                "StyleClass"
+            ],
+            "meaning": "CSS selector targets HTML elements"
+        },
+        "triggers_event": {
+            "from": [
+                "Template",
+                "Fragment"
+            ],
+            "to": [
+                "Event"
+            ]
+        },
+        "dispatches_event": {
+            "from": [
+                "Function",
+                "Method",
+                "Hook",
+                "File"
+            ],
+            "to": [
+                "Event"
+            ],
+            "meaning": "Code emits/dispatches a custom or DOM event (JS element.dispatchEvent(new CustomEvent('x')), Node EventEmitter.emit). The JS-side sibling of triggers_event (Template->Event)."
+        },
+        "queries_dom": {
+            "from": [
+                "Function",
+                "Method",
+                "Hook",
+                "File"
+            ],
+            "to": [
+                "StyleClass",
+                "StyleID"
+            ],
+            "meaning": "Code selects a DOM element by class or id (JS document.querySelector('.x') / getElementById('y')). The target unifies at merge with the CSS StyleClass/StyleID of the same name \u2014 a JS<->CSS cross-language edge. Only a single literal .class / #id selector is resolved; a complex/dynamic selector becomes an ambiguity."
+        },
+        "expects_contract": {
+            "from": [
+                "Route",
+                "Function"
+            ],
+            "to": [
+                "APIContract"
+            ]
+        },
+        "references": {
+            "from": [
+                "Class",
+                "Field"
+            ],
+            "to": [
+                "Class"
+            ],
+            "meaning": "Relational reference between data models (ForeignKey, OneToOne, ManyToMany, @ManyToOne, belongsTo)"
+        },
+        "listens_to": {
+            "from": [
+                "Function",
+                "Method",
+                "Template",
+                "Fragment"
+            ],
+            "to": [
+                "Event",
+                "Signal"
+            ],
+            "meaning": "Subscribes to or handles an event or signal (Django @receiver, Node EventEmitter.on, Java @EventListener)"
+        },
+        "resolves_to": {
+            "from": [
+                "Route"
+            ],
+            "to": [
+                "Function",
+                "Method",
+                "Class"
+            ],
+            "meaning": "A URL route (url-name) resolves to the view that serves it (Django path(...,view,name=x) -> view). Joined by url-name to a template's calls_api Route placeholder."
+        },
+        "extends_template": {
+            "from": [
+                "Template",
+                "Fragment"
+            ],
+            "to": [
+                "Template"
+            ],
+            "meaning": "A template extends a parent template (Django/Jinja {% extends %})."
+        },
+        "includes_template": {
+            "from": [
+                "Template",
+                "Fragment"
+            ],
+            "to": [
+                "Template"
+            ],
+            "meaning": "A template includes a partial template (Django/Jinja {% include %})."
+        },
+        "includes_urlconf": {
+            "from": [
+                "File"
+            ],
+            "to": [
+                "File"
+            ],
+            "meaning": "A URLconf includes another URLconf module (Django path(prefix, include('app.urls'))). Models the URL-include tree; an explicit literal namespace= is carried as edge metadata."
+        },
+        "uses_model": {
+            "from": [
+                "Class"
+            ],
+            "to": [
+                "Class"
+            ],
+            "meaning": "A form/serializer is bound to a data model (Django forms.ModelForm / DRF ModelSerializer with class Meta: model = X). Distinct from references (a relational FK/O2O/M2M between two data models)."
+        },
+        "oob_swaps": {
+            "from": [
+                "Template",
+                "Fragment"
+            ],
+            "to": [
+                "StyleID"
+            ],
+            "meaning": "An HTMX out-of-band fragment refreshes a DOM element by id (hx-swap-oob on an element with id=X -> the element #X it replaces wherever it lives). The StyleID target unifies by name with the same #X that other templates hx-target and with the CSS StyleID \u2014 answers 'which fragments OOB-refresh #X?'. Distinct from targets_element (a request's hx-target)."
+        },
+        "uses_style": {
+            "from": [
+                "Template",
+                "Fragment"
+            ],
+            "to": [
+                "StyleClass"
+            ],
+            "meaning": "Markup applies a CSS class (class=\"x\" -> StyleClass x). The target unifies by name with the CSS StyleClass (defines) and JS queries_dom of the same name \u2014 completes the CSS triangle (define / use / query). Answers 'which templates use .x?' and, by absence, 'is .x dead?'. Only literal class tokens resolve; a templated token (class=\"fp-{{ v }}\") is a dynamic ambiguity."
+        },
+        "uses_animation": {
+            "from": [
+                "Stylesheet",
+                "StyleClass"
+            ],
+            "to": [
+                "Keyframes"
+            ],
+            "meaning": "A CSS rule references an @keyframes animation (animation:/animation-name: name -> Keyframes name), joined by name to the Keyframes definition (defines). Answers 'what uses platform-spin?' and, by absence, 'is this @keyframes dead?'; combined with the Keyframes body_hash, 'which animations are identical duplicates?'."
+        }
+    }
+}

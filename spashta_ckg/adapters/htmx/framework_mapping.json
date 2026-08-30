@@ -1,0 +1,30 @@
+{
+    "_meta": {
+        "framework": "HTMX",
+        "description": "Maps HTMX attributes (hx-*) to Spashta CKG Semantic Roles.",
+        "version": "2.1",
+        "changelog_2.1": "Replaced dead contains_attributes rule with has_outgoing_edge (implemented in engine 2.1). Templates with calls_api/triggers_event/submits_form edges are now detected as Component. Added Fragment partial detection via file_path_contains."
+    },
+    "mappings": [
+        {
+            "core_node": "Template",
+            "semantic_role": "Component",
+            "notes": "Templates with HTMX interactions (hx-get, hx-post, etc.) are interactive UI Components. The HTML builder already emits calls_api edges for hx-* attributes — this rule detects Templates that have those edges.",
+            "detection_rules": {
+                "has_outgoing_edge": [
+                    "calls_api",
+                    "triggers_event",
+                    "submits_form"
+                ]
+            }
+        },
+        {
+            "core_node": "Template",
+            "semantic_role": "Fragment",
+            "notes": "Partial templates in partials/ directories are HTMX swap targets. 100% confident — standard Django+HTMX convention.",
+            "detection_rules": {
+                "file_path_contains": "partials/"
+            }
+        }
+    ]
+}

@@ -1,0 +1,46 @@
+{
+    "_meta": {
+        "parser": "regex_v1",
+        "description": "Regex-based mapping for CSS selectors and imports (Structural Heuristics)."
+    },
+    "file_node_type": "Stylesheet",
+    "patterns": {
+        "class_selector": {
+            "_doc": "The lookahead accepts every selector-terminator so a class is captured regardless of what follows it: whitespace/comma/brace/pseudo (:) PLUS a compound (.a.b -> a AND b), child (>), sibling (+ ~), and attribute ([) — the first class of a compound selector was previously missed. The name still requires a letter/_/- start, so a numeric value (.5em) never matches.",
+            "regex": "\\.([a-zA-Z_-][a-zA-Z0-9_-]*)(?=[\\s,\\{:.>+~\\[])",
+            "emit_node": "StyleClass",
+            "name_group": 1,
+            "defines_edge": "defines"
+        },
+        "id_selector": {
+            "regex": "#(?!(?:[a-fA-F0-9]{3}|[a-fA-F0-9]{6})\\b)([a-zA-Z][a-zA-Z0-9_-]*)",
+            "emit_node": "StyleID",
+            "name_group": 1,
+            "defines_edge": "defines"
+        },
+        "element_selector": {
+            "regex": "(?<![\\.#-])\\b([a-zA-Z][a-zA-Z0-9_-]*)(?=[\\s:\\{])",
+            "emit_node": "StyleElement",
+            "name_group": 1,
+            "defines_edge": "defines"
+        },
+        "import_rule": {
+            "regex": "@import\\s+['\"](.*?)['\"]",
+            "emit_edge": "imports",
+            "target_group": 1,
+            "target_node_type": "Stylesheet"
+        }
+    },
+    "animations": {
+        "_doc": "CSS coverage P2. @keyframes NAME { body } -> a Keyframes node (with a normalized body_hash for identical-duplicate detection) + a defines edge; an animation:/animation-name: NAME declaration -> a uses_animation edge (Stylesheet -> Keyframes NAME, joined by name). The @keyframes blocks are stripped before selector matching so their to/from/percent stops don't leak into StyleElement. Empty/absent = off (the old 'Animations unmodeled' ambiguity is kept).",
+        "node": "Keyframes",
+        "defines_edge": "defines",
+        "uses_edge": "uses_animation",
+        "keyword_stopwords": [
+            "linear", "ease", "ease-in", "ease-out", "ease-in-out", "infinite",
+            "alternate", "alternate-reverse", "normal", "reverse", "both", "forwards",
+            "backwards", "none", "running", "paused", "step-start", "step-end",
+            "initial", "inherit", "unset"
+        ]
+    }
+}

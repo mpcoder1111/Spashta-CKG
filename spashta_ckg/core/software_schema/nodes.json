@@ -1,0 +1,300 @@
+{
+    "_meta": {
+        "version": "2.2",
+        "principle": "Superset ontology defining potential nodes; absence is not an error.",
+        "changelog_1.4": "Added Field, TestCase, Constant nodes. Added js to Enum, Decorator. All additions are universal across Python/Java/JS/PHP."
+    },
+    "Call": {
+        "description": "Invocation of a function or method",
+        "languages": [
+            "any"
+        ]
+    },
+    "File": {
+        "description": "Physical source file on disk",
+        "languages": [
+            "python",
+            "html",
+            "css",
+            "js",
+            "java",
+            "php"
+        ]
+    },
+    "Module": {
+        "description": "Logical grouping inside a runtime",
+        "languages": [
+            "python",
+            "js"
+        ]
+    },
+    "Package": {
+        "description": "Namespace-level grouping",
+        "languages": [
+            "java",
+            "php"
+        ]
+    },
+    "Class": {
+        "description": "Object-oriented type",
+        "languages": [
+            "python",
+            "java",
+            "php",
+            "js"
+        ]
+    },
+    "Interface": {
+        "description": "Behavioral contract",
+        "languages": [
+            "java",
+            "php"
+        ]
+    },
+    "Trait": {
+        "description": "Horizontal code reuse unit",
+        "languages": [
+            "php"
+        ]
+    },
+    "Enum": {
+        "description": "Fixed value set",
+        "languages": [
+            "python",
+            "java",
+            "js",
+            "php"
+        ]
+    },
+    "Decorator": {
+        "description": "Behavior-modifying annotation on functions or classes",
+        "languages": [
+            "python",
+            "java",
+            "js"
+        ],
+        "note": "Python decorators, Java annotations (@Override), JS/TS decorators (@Component)"
+    },
+    "Function": {
+        "description": "Callable unit of logic",
+        "languages": [
+            "python",
+            "js",
+            "php"
+        ]
+    },
+    "Method": {
+        "description": "Class-bound function",
+        "languages": [
+            "python",
+            "java",
+            "php",
+            "js"
+        ]
+    },
+    "Variable": {
+        "description": "Named state or configuration",
+        "languages": [
+            "python",
+            "js",
+            "php",
+            "java"
+        ]
+    },
+    "Constant": {
+        "description": "Immutable named value (module-level, class-level, or global)",
+        "languages": [
+            "python",
+            "js",
+            "java",
+            "php"
+        ]
+    },
+    "Field": {
+        "description": "Typed attribute in a data model (ORM field, schema field, column definition)",
+        "languages": [
+            "python",
+            "java",
+            "php",
+            "js"
+        ],
+        "note": "Distinguished from Variable by its declarative nature and type metadata (e.g. CharField, Integer, VARCHAR)"
+    },
+    "Route": {
+        "description": "HTTP endpoint",
+        "languages": [
+            "python",
+            "java",
+            "php",
+            "js"
+        ],
+        "framework_bound": true
+    },
+    "Template": {
+        "description": "Renderable UI document",
+        "languages": [
+            "html"
+        ]
+    },
+    "Fragment": {
+        "description": "Partial template (AJAX / HTMX swap)",
+        "languages": [
+            "html"
+        ]
+    },
+    "Component": {
+        "description": "UI-bound logical unit",
+        "languages": [
+            "js"
+        ]
+    },
+    "Hook": {
+        "description": "Lifecycle or state hook",
+        "languages": [
+            "js"
+        ]
+    },
+    "Stylesheet": {
+        "description": "CSS or Style file",
+        "languages": [
+            "css"
+        ]
+    },
+    "StyleClass": {
+        "description": "CSS Class selector definition",
+        "languages": [
+            "css"
+        ]
+    },
+    "StyleID": {
+        "description": "CSS ID selector definition",
+        "languages": [
+            "css"
+        ]
+    },
+    "Keyframes": {
+        "description": "CSS @keyframes animation definition (carries a normalized body_hash so identical animations are detectable). Referenced by an animation:/animation-name: declaration via uses_animation.",
+        "languages": [
+            "css"
+        ]
+    },
+    "StyleElement": {
+        "description": "CSS Element selector definition",
+        "languages": [
+            "css"
+        ]
+    },
+    "StaticAsset": {
+        "description": "Non-executable resource",
+        "types": [
+            "css",
+            "image",
+            "font",
+            "js"
+        ]
+    },
+    "Event": {
+        "description": "UI or runtime event",
+        "languages": [
+            "js",
+            "html"
+        ]
+    },
+    "DataModel": {
+        "description": "Persistent data representation",
+        "languages": [
+            "python",
+            "java",
+            "php"
+        ]
+    },
+    "Config": {
+        "description": "Configuration or environment definition",
+        "languages": [
+            "any"
+        ]
+    },
+    "APIContract": {
+        "description": "Request/response interface contract",
+        "languages": [
+            "any"
+        ]
+    },
+    "Assign": {
+        "description": "Variable assignment or binding",
+        "languages": [
+            "any"
+        ]
+    },
+    "View": {
+        "description": "Logic handling a user interface or API request",
+        "languages": [
+            "python",
+            "js",
+            "php",
+            "java"
+        ]
+    },
+    "Router": {
+        "description": "Routing configuration or logic",
+        "languages": [
+            "python",
+            "js",
+            "php"
+        ]
+    },
+    "Form": {
+        "description": "User input validation contract",
+        "languages": [
+            "python",
+            "php",
+            "js"
+        ]
+    },
+    "Serializer": {
+        "description": "Data transformation contract",
+        "languages": [
+            "python",
+            "js"
+        ]
+    },
+    "Admin": {
+        "description": "Administrative interface logic",
+        "languages": [
+            "python",
+            "php"
+        ]
+    },
+    "Middleware": {
+        "description": "Request/Response reference pipeline",
+        "languages": [
+            "python",
+            "js",
+            "php"
+        ]
+    },
+    "Signal": {
+        "description": "Event handler or producer",
+        "languages": [
+            "python",
+            "js"
+        ]
+    },
+    "Dependency": {
+        "description": "Injected dependency or service",
+        "languages": [
+            "python",
+            "java"
+        ]
+    },
+    "TestCase": {
+        "description": "Test container \u2014 a class or function that validates behavior",
+        "languages": [
+            "python",
+            "java",
+            "js",
+            "php"
+        ],
+        "note": "Covers unittest.TestCase, pytest functions, JUnit, Jest, PHPUnit"
+    }
+}

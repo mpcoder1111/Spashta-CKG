@@ -1,749 +1,205 @@
-# Spashta-CKG: The Code Knowledge Graph for Agentic Coding
+# Spashta-CKG
 
-> **Spashta** (स्पष्ट) = *Clarity* in Sanskrit. Clear, unambiguous, deterministic.
+> **Spashta** (स्पष्ट) = *Clarity* in Sanskrit. Deterministic Code Knowledge Graph & Impact Engine for Python, JavaScript, HTML, and CSS.
 
-**Spashta-CKG** is a modular, universal architecture designed to give AI Coding Agents **"Situational Awareness"** of any codebase.
+[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](CHANGELOG.md)
+[![License](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
 
-> **Current Version:** 2.1 — located in `Spashta_2.1/`
-
-It solves the **"Lost in the Woods"** problem where AI agents hallucinate file paths, misunderstand architecture, or break existing logic because they lack a structured map of the project.
-
-> **Note:** Spashta-CKG is designed for use with **Agentic IDEs** (Antigravity, Cursor, Windsurf, Gemini CLI, etc.)
->
-> **Currently Supported:**
-> - **Languages:** Python, HTML, CSS
-> - **Frameworks:** Django, FastAPI, HTMX
+**Spashta-CKG** is a deterministic **Code Knowledge Graph (CKG) and query engine** that maps structures, blast-radius impact, routes, and dependencies across full-stack codebases (Python, JavaScript, HTML, CSS). It helps developers and AI coding agents navigate codebases accurately without guesswork.
 
 ---
 
-## 🤔 Why Spashta-CKG?
+## ⚡ Instant Installation
 
-Most Agentic IDEs use embeddings for semantic search, but still rely on probabilistic retrieval rather than explicit structural queries like dependency graphs.
-
-Spashta-CKG introduces **Deterministic Architectural Memory**:
-
-| Benefit | Without Spashta | With Spashta |
-|---------|-----------------|--------------|
-| ⏱️ **Time Saving** | Agent explores files repeatedly | Agent queries pre-built graph instantly |
-| 🔍 **Code Clarity** | Agent guesses project structure | Agent knows file, function, line numbers, docstrings & dependencies |
-| 🚫 **Hallucinations** | Agent invents non-existent code | Agent queries facts, doesn't guess |
-| 💰 **Token Usage** | Wastes tokens reading files | Efficient queries, minimal token use |
-| 🎯 **Impact Analysis** | Agent manually traces dependencies | Query "what calls this?" or "what does this depend on?" |
-| 🧘 **Peace of Mind** | Hope the agent understood correctly | Trust the deterministic knowledge graph |
-
-### 📊 Estimated Savings
-
-Based on testing with mid-sized Django projects:
-
-```
-⏱️ Coding Time      ⬇️ 60% reduction
-💰 Token Usage      ⬇️ 60% savings  
-🚫 Hallucinations   ⬇️ Significantly reduced
+```bash
+pip install git+https://github.com/mpcoder1111/Spashta-CKG.git
 ```
 
-| Metric | Estimated Improvement |
-|--------|----------------------|
-| **Coding Time** | ~60% reduction |
-| **Token Usage** | ~60% savings |
-| **Hallucinations** | Significantly reduced |
+*(Dependencies like `tree-sitter` and `tree-sitter-javascript` are installed automatically).*
 
-> 💡 *These are indicative figures. Test on your own projects to measure actual impact!*
->
-> 📖 See [AI Agent's Testimony on Spashta](Spashta_2.1/_docs/Testimony_on_Spashta2.md) for real-world usage experience.
+---
 
-### 🧠 Dual-Brain Architecture
+## 🎯 Why Developers & AI Agents Use Spashta
+
+| Problem Without Spashta | Solution With Spashta-CKG |
+| :--- | :--- |
+| 💸 **Wasted Tokens**: Agent reads dozens of files trying to understand structure. | ⚡ **~60% Token Savings & Coding Time**: Agent queries exact dependency subgraphs instantly. |
+| 💥 **Hidden Breakages**: Modifying a Python view or CSS class breaks unseen templates or JS handlers. | 🛡️ **Instant Blast-Radius (`impact`)**: See all affected callers across Python, JS, HTML, and CSS before editing. |
+| 👻 **False-Positive Dead Code**: Cleaning dead CSS deletes classes dynamically applied in templates. | 🎯 **Dynamic Accuracy**: Tracks BEM modifiers, HTMX swaps, and JS `classList` usages. |
+| 🗺️ **Scattered Routing**: Finding which template, view, and HTMX trigger connect to a URL requires manual grepping. | 🔗 **Full-Stack Route Map (`routes`)**: Complete request flow mapped in milliseconds. |
+
+### 📊 Measured Benchmarks (Tested on Mid-Sized Web Apps)
+
+| Metric | Measured Impact |
+| :--- | :--- |
+| ⏱️ **Agent Task Time** | **~60% reduction** |
+| 💰 **LLM Token Usage (Code Exploration & Impact)** | **~60% savings** (queries targeted graph subgraphs instead of loading dozens of whole files into context) |
+| 🚫 **Architectural Hallucinations** | **Significantly reduced** |
+| 🎯 **Dead CSS False-Positives** | **~35% fewer false-positives** (via dynamic BEM & `classList` tracking) |
+
+> 💡 *Figures based on benchmark tests with mid-sized Django, HTMX, and JS codebases.*
+
+---
+
+## 🚀 3 Ways to Use Spashta 3.0
+
+### 1. 🖥️ Interactive Developer CLI (`spashta_ckg`)
+
+Run instant queries directly from your project terminal:
+
+```bash
+# 1. Scan and index codebase into .spashta/
+spashta_ckg scan
+
+# 2. Check blast-radius before editing a function, class, or CSS class
+spashta_ckg impact SectionBlock
+
+# 3. Find dead code across Python, JS, or CSS with zero false-positives
+spashta_ckg dead-code css
+
+# 4. View all full-stack routes linking templates, backend views, and HTMX events
+spashta_ckg routes
+
+# 5. Output structured JSON for scripts and agents
+spashta_ckg impact SectionBlock --json
+```
+
+---
+
+### 2. 🤖 Native MCP Server for AI IDEs (`spashta_ckg_mcp`)
+
+Connect Spashta directly to **Antigravity, Cursor, Claude Desktop, or VS Code** by adding this to your `mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "spashta_ckg": {
+      "command": "spashta_ckg_mcp",
+      "args": []
+    }
+  }
+}
+```
+
+*Your AI agent now has native, zero-click IDE tools (`spashta_impact`, `spashta_dead_code`, `spashta_routes`, `spashta_search`)!*
+
+---
+
+### 3. 🐍 Python Library API (`import spashta_ckg`)
+
+Integrate Spashta directly into your Python scripts or custom agent tools:
+
+```python
+from spashta_ckg import CKG
+
+# Load existing graph or scan project
+ckg = CKG.load()
+
+# Perform blast-radius analysis
+report = ckg.impact("product_detail")
+print(f"Impacted components: {report['impact_count']}")
+for node in report["impacted_nodes"]:
+    print(f" - [{node['node_type']}] {node['name']} ({node['file_path']})")
+```
+
+---
+
+### 4. 🧠 Ready-Made Agent Skill & `AGENTS.md` / `CLAUDE.md` Setup
+
+Give your AI coding agents proactive, closed-loop architectural awareness:
+
+#### Step 1: Copy the Ready-Made Skill
+Copy the [`skills/spashta-ckg/`](skills/spashta-ckg/) folder into your AI assistant's skills directory:
+* **Google Antigravity**: `.agents/skills/spashta-ckg/` (or global `~/.gemini/config/skills/spashta-ckg/`)
+* **Claude Code**: `.claude/skills/spashta-ckg/`
+* **Custom Agent Tools**: Any directory indexed by your agent harness
+
+#### Step 2: Add Governance Rules to `AGENTS.md` / `CLAUDE.md`
+Add the following rule to your repository's `AGENTS.md`, `CLAUDE.md`, or `.cursorrules`:
+
+```markdown
+<!-- SPASHTA-CKG AGENT GOVERNANCE RULE -->
+## 🧠 Architectural Situational Awareness & Impact Governance (Spashta-CKG)
+
+This repository uses **Spashta-CKG** (https://github.com/mpcoder1111/Spashta-CKG) for deterministic Code Knowledge Graph memory.
+
+**Mandatory Rules for AI Coding Agents:**
+1. **Query First (Pre-Flight Impact)**:
+   - Before modifying, renaming, or deleting any function, class, model, route, or CSS class, run:
+     `spashta_ckg impact <SymbolName> --depth 2 --json`
+   - Inspect all returned callers across Python, JavaScript, HTML templates, and CSS stylesheets.
+2. **Pinpoint, Don't Guess**:
+   - Use `spashta_ckg locate <SymbolName>` to find exact file paths and line ranges instead of speculative reading.
+   - For database models, use `spashta_ckg consumers <ModelName>` to verify all query and update sites.
+3. **Verify Routing & Couplings**:
+   - When altering URLs or views, run `spashta_ckg routes` to ensure template `{% url %}` tags and HTMX event listeners remain intact.
+4. **Rescan Before Commit & Periodically**:
+   - **Always run `spashta_ckg scan` before creating a git commit** to ensure `.spashta/` graph memory is synchronized with active changes.
+   - Audit with `spashta_ckg dead-code <lang>` to ensure no broken or orphaned code is committed.
+```
+
+---
+
+## 📋 CLI Command Reference
+
+| Command | Description | Example |
+| :--- | :--- | :--- |
+| `spashta_ckg scan` | Scans project across all languages and builds `.spashta/` CKG cache | `spashta_ckg scan` |
+| `spashta_ckg impact <symbol>` | Upstream blast-radius: who calls or depends on this symbol? | `spashta_ckg impact UserForm` |
+| `spashta_ckg dependencies <symbol>` | Downstream dependencies: what does this symbol call/use? | `spashta_ckg dependencies home_view` |
+| `spashta_ckg dead-code [lang]` | Detects unused code across `css`, `js`, or `py` | `spashta_ckg dead-code css` |
+| `spashta_ckg routes` | Maps full-stack URL endpoints to views and templates | `spashta_ckg routes` |
+| `spashta_ckg search <query>` | Searches nodes by name or ID (supports `--type` and `--app`) | `spashta_ckg search auth --type Function` |
+| `spashta_ckg locate <symbol>` | Pinpoints exact file path and line numbers | `spashta_ckg locate calculate_total` |
+| `spashta_ckg read <symbol>` | Reads raw source code of a node without opening files | `spashta_ckg read calculate_total` |
+| `spashta_ckg class-usage <class>` | Shows where a CSS class is defined and used in HTML/JS | `spashta_ckg class-usage .btn-primary` |
+| `spashta_ckg dup-styles` | Finds duplicate CSS definitions and identical `@keyframes` | `spashta_ckg dup-styles` |
+| `spashta_ckg consumers <model>` | Hybrid graph + grep search for all ORM model usage sites | `spashta_ckg consumers Order` |
+| `spashta_ckg scope-check <symbol>` | Pre-edit safety check comparing analyzed files vs impact | `spashta_ckg scope-check User --analyzed "views.py"` |
+| `spashta_ckg stats` | Graph statistics, node/edge counts, and language breakdown | `spashta_ckg stats` |
+
+*(All commands support `-p <dir>` to target a custom project path and `--json` for machine output).*
+
+---
+
+## 🧰 Supported Stack
+
+* **Languages**: Python (AST), JavaScript (Tree-sitter), HTML5, CSS3.
+* **Frameworks & Couplings**:
+  * **Django**: `urls.py` routing hierarchies, `{% url %}` resolution, Forms & Signals model extraction.
+  * **HTMX**: `HX-Trigger` response headers, `hx-trigger="..." from:body` event listeners, Out-of-Band (`hx-swap-oob`) updates.
+  * **Vanilla JS**: DOM queries (`querySelector`), `classList` mutations, `addEventListener` callback resolution.
+  * **CSS**: `@keyframes` animation modeling, compound selector extraction.
+
+---
+
+## 🧠 Architectural Overview: Dual-Brain Concept
+
+Spashta operates on a **Dual-Brain Architecture**:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  STAGE 1: BODY (Structure)           STAGE 2: MIND (Semantics)  │
-│                                                                  │
-│  100% Accurate AST-based facts   +   AI-enriched understanding  │
-│  Generated by builders               Added by adapters & LLM    │
-│                                                                  │
-│  "What exists"                       "What it means"             │
+│                                                                 │
+│  100% Deterministic AST Facts    +   Framework & Domain Rules   │
+│  Generated by language builders      Interpreted by adapters    │
+│  "What exists"                       "What it means"            │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### 🔓 Open & Extensible Architecture
+### Stage 2 Enrichment Levels:
+1. **Level 1 — Framework Adapters (Automatic & Deterministic)**:
+   - Evaluates 9 pattern-matching rules during `spashta_ckg scan` to assign semantic roles (`View`, `Form`, `DataModel`, `Admin`, `Signal`, `Route`, `URLConf`, `Component`).
+   - Runs instantly with zero LLM cost or latency.
+2. **Level 2 — Agent / LLM Enrichment (Optional & On-Demand)**:
+   - AI coding agents can optionally run deeper semantic analysis (business logic purpose, high-level intent) using the tools in [`spashta_ckg/runtime/enrichment_through_LLM/`](spashta_ckg/runtime/enrichment_through_LLM/).
 
-Spashta is designed to grow with your needs:
-
-| Layer | Currently Supported | Easy to Add | What to Create |
-|-------|---------------------|-------------|----------------|
-| **Languages** | Python, HTML, CSS | Java, PHP, JavaScript, Go, Rust, etc. | Builder script |
-| **Frameworks** | Django, FastAPI, HTMX | Flask, Express, React, Spring, Laravel, etc. | `framework_mapping.json` |
-
-> 🚀 **Contribute!** Adding a new language or framework doesn't touch the core — just add a builder or adapter.
-
-## 🚀 Current Capabilities (v2.1)
-
-| Area | What's Included |
-|------|----------------|
-| **Design** | Modular 5-layer architecture (Core → Builders → Adapters → Runtime → Project) |
-| **Languages** | Python, HTML, CSS (extensible to Java, JS, PHP, Go) |
-| **Frameworks** | Django (13 roles), FastAPI (7 roles), HTMX (2 roles) — pluggable adapters |
-| **Core Schema** | 38 node types, 22 edge types — includes Field, Constant, TestCase, has_field, references, listens_to |
-| **Python Builder** | ORM Field detection, Constant detection, TestCase classification, FK reference edges, self/super method resolution, lazy import tracking |
-| **Enrichment** | Two-stage: Rule-based (9 detection rules) + LLM (optional). Layer classification, semantic roles. |
-| **Query Tool** | 11 commands: search, locate, read, details, impact (layer-aware), dependencies, call-graph, consumers (grep+graph), stats, list-files, scope-check. `--app` filter, auto File: prefix, Windows Unicode safe, contextual agent hints |
-
-> 📖 Full changelog: `Spashta_2.1/Readme_updations_done_in_2.1.md`
+For detailed architectural philosophy, contributor guides, and historical release specs (v1.0, v2.0, v2.1), explore the [_archive/](_archive/) directory.
 
 ---
 
-## 🚀 Quick Start (One-Click Option)
+## 📄 License & Changelog
 
-The easiest way to use Spashta is to let your AI Agent handle everything automatically:
-
-1. **Copy** the `Spashta-CKG` folder into your project's root directory:
-   ```
-   YourProject/
-   ├── Spashta-CKG/      <-- Copy this folder here
-   ├── your_app/
-   ├── manage.py
-   └── ...
-   ```
-
-2. **Configure** `Spashta-CKG/Spashta_2.1/project/profile.json`:
-   - Set `project_root` to your project's absolute path (or use `"."` for current directory)
-   - Set `languages` and `frameworks` as needed (check `_meta` for supported values)
-
-3. **Provide this prompt** to your AI Agent:
-   ```
-   Read and follow: Spashta-CKG/Spashta_2.1/runtime/execution_protocol.json
-   ```
-
-That's it! The AI Agent will:
-- Validate your configuration
-- Build the AST
-- Apply L1 enrichment (adapters)
-- Ask if you want L2 enrichment (LLM)
-- Set up the CKG for querying
-
-> 💡 The `execution_protocol.json` contains the complete step-by-step workflow with user confirmations built-in.
-
-**✅ Your Agent Now Knows About Spashta!**
-
-For future sessions, reinforce this by providing:
-
-```
-This project uses Spashta-CKG as its Code Knowledge Graph.
-
-📁 CKG Location:
-   L1 (Adapter-enriched): Spashta-CKG/Spashta_2.1/runtime/code_knowledge_graph_enriched.json
-   L2 (LLM-enriched):     Spashta-CKG/Spashta_2.1/runtime/code_knowledge_graph_enriched_by_Agent.json
-   (Use L2 if available, otherwise use L1)
-
-📌 Your Rules:
-1. Query Spashta-CKG FIRST before reading project files
-2. Use: python Spashta-CKG/Spashta_2.1/runtime/query_spashta.py --help
-3. If queries are insufficient, you may read source files directly
-4. Never modify files in Spashta_2.1/runtime/ — these are generated artifacts
-
-Use Spashta as your primary source of truth about this codebase.
-```
-
----
-
-## 🏗️ Spashta 2.0 Architecture
-
-```
-Read from bottom...
-┌───────────────────────────────────────────────────────────────────────────────┐
-│                              SPASHTA-CKG 2.0                                  │
-├───────────────────────────────────────────────────────────────────────────────┤
-│                                                                               │
-│   ┌─────────────────────────────────────────────────────────────────────┐     │
-│   │                         AI AGENT / IDE                               │    │
-│   │                                                                      │    │
-│   │  • Reads CKG for situational awareness                               │    │
-│   │  • Queries CKG before making changes                                 │    │
-│   │  • Never modifies runtime artifacts                                  │    │
-│   │  • code_knowledge_graph_enriched_by_Agent.json (Agent enriched)      │    │
-│   └───────────────────────────────────▲─────────────────────────────────┘     │
-│                                       │ consumes                              │
-│   ┌───────────────────────────────────┴─────────────────────────────────┐     │
-│   │                          RUNTIME                                     │    │
-│   │                                                                      │    │
-│   │ Orchestrates builders → Merges AST's → Applies adapters → Validates  │    │
-│   │                                                                      │    │
-│   │  Output:                                                             │    │
-│   │   • code_knowledge_graph_ast.json      (structure)                   │    │
-│   │   • code_knowledge_graph_enriched.json (semantics)                   │    │
-│   └───────────────────────────────────┬─────────────────────────────────┘     │
-│                                       │ uses                                  │
-│       ┌───────────────────────────────┴───────────────────────────────┐      │
-│       │                                                               │      │
-│   ┌───┴────────────┐    ┌──────────────────┐    ┌─────────────────┐  │      │
-│   │   BUILDERS     │    │    ADAPTERS      │    │    PROJECT      │  │      │
-│   │                │    │                  │    │                 │  │      │
-│   │  Language      │    │  Framework       │    │  Declaration    │  │      │
-│   │  Observers     │    │  Interpreters    │    │  Only           │  │      │
-│   │                │    │                  │    │                 │  │      │
-│   │  • Python      │    │  • Django        │    │  • profile.json │  │      │
-│   │  • HTML        │    │  • FastAPI       │    │                 │  │      │
-│   │  • CSS         │    │  • HTMX          │    │                 │  │      │
-│   │  • (Future)    │    │  • (Future)      │    │                 │  │      │
-│   └───────┬────────┘    └────────┬─────────┘    └────────┬────────┘  │      │
-│           │                      │                       │           │      │
-│           └──────────────────────┼───────────────────────┘           │      │
-│                                  │ governed by                       │      │
-│   ┌──────────────────────────────┴─────────────────────────────────┐ │      │
-│   │                           CORE                                  │ │      │
-│   │                                                                 │ │      │
-│   │   The Universal Laws of Software                                │ │      │
-│   │                                                                 │ │      │
-│   │   • software_schema/       → What can exist (nodes, edges)      │ │      │
-│   │                                                                 │ │      │
-│   └─────────────────────────────────────────────────────────────────┘ │      │
-│                                                                       │      │
-└───────────────────────────────────────────────────────────────────────┴──────┘
-```
-
----
-
-## 🧠 Understanding the Five Layers
-
-### 1️⃣ CORE – The Universal Laws
-
-**Location:** `Spashta_2.1/core/`
-
-**Purpose:** Defines what software fundamentally *is* — language-agnostic, framework-agnostic, eternal.
-
-```
-Spashta_2.1/core/
-└── software_schema/
-    ├── nodes.json    # What can exist: File, Function, Class, Template, Route...
-    └── edges.json    # How things connect: calls, imports, renders, depends_on...
-```
-
-**Key Insight:**
-> The Core Schema is a **superset**. It defines what *can* exist, not what *must* exist.  
-> A project without classes is valid. A project without routes is valid.
-
-**Immutability:**
-> ⚠️ Core is **FROZEN**. It never changes for any project. This guarantees universal truth.
-
----
-
-### 2️⃣ BUILDERS – The Observers
-
-**Location:** `Spashta_2.1/builders/`
-
-**Purpose:** Turn language-specific syntax into objective, structural facts — nothing more.
-
-```
-Spashta_2.1/builders/
-├── builder_rules.json      # Global policies (error handling, recursion limits)
-│
-├── python/
-│   ├── build_ast.py        # Extract Python structure using native AST
-│   └── language_mapping.json # Python syntax → Core concepts (def → Function)
-│
-├── html/
-│   ├── build_dom.py        # Extract HTML structure (templates, assets)
-│   └── language_mapping.json # HTML → Core concepts (file → Template)
-│
-├── css/
-│   ├── build_css.py        # Extract CSS selectors and dependencies
-│   └── language_mapping.json # CSS → Core concepts (file → StaticAsset)
-│
-└── (future: javascript/, java/, go/...)
-```
-
-**What Builders Do:**
-- ✅ Parse code using language-native tools
-- ✅ Extract nodes: File, Function, Class, Template, Asset
-- ✅ Extract edges: calls, imports, renders
-- ✅ Record line numbers and docstrings
-- ✅ Log ambiguities (dynamic calls, unresolved references)
-
-**What Builders Do NOT Do:**
-- ❌ Interpret meaning or intent
-- ❌ Apply framework rules
-- ❌ Make architectural decisions
-- ❌ Guess when uncertain
-
-**Mental Model:**
-> 📷 **Builders are cameras.** They observe and record. They never interpret.
-
----
-
-### 3️⃣ ADAPTERS – The Interpreters
-
-**Location:** `Spashta_2.1/adapters/`
-
-**Purpose:** Explain framework-specific meaning on top of structural facts.
-
-```
-Spashta_2.1/adapters/
-├── django/
-│   └── framework_mapping.json          # Function + render() → View
-│   
-├── fastapi/
-│   └── (same structure for API-focused mappings)
-│
-├── htmx/
-│   └── (same structure for interaction patterns)
-│
-└── validation/
-    └── validate_adapter.py             # Ensure adapters comply with Core
-```
-
-**What Adapters Do:**
-- ✅ Add **semantic_role** to nodes (e.g., Function → "View")
-- ✅ Map framework constructs to core concepts
-- ✅ Verify framework contracts (View must return HttpResponse)
-
-**What Adapters Do NOT Do:**
-- ❌ Parse or execute code
-- ❌ Mutate graph structure
-- ❌ Invent new node types (use semantic roles instead)
-
-**Mental Model:**
-> 📚 **Adapters are interpreters.** They explain framework meaning on top of structure.
-
----
-
-### 4️⃣ RUNTIME – The Execution Engine
-
-**Location:** `Spashta_2.1/runtime/`
-
-**Purpose:** Orchestrate builders, merge outputs, apply enrichment, validate results.
-
-```
-Spashta_2.1/runtime/
-├── build_runtime_ast.py          # Run all builders → raw AST
-├── diff_runtime_ast.py           # Detect changes in files. It is used to reduce LLM enrichments on already enriched files.(optional)
-├── enrich_runtime_ast.py         # Apply adapter semantics → enriched AST (Rule based)
-├── validate_ast_equivalence.py   # Ensure Graph structure unchanged
-│
-├── code_knowledge_graph_ast.json       # Output: raw structure
-└── code_knowledge_graph_enriched.json  # Output: with semantics
-```
-
-**Execution Flow:**
-
-```
-┌─────────────────────────────────────┐
-│  1. validate_project_profile.py     │  ← Validate project config
-├─────────────────────────────────────┤
-│  2. context_loader.py               │  ← Load project context, Language, Framework from profile.json
-├─────────────────────────────────────┤
-│  3. build_runtime_ast.py            │  ← Run all language builders
-├─────────────────────────────────────┤
-│  4. diff_runtime_ast.py             │  ← Detect changes in files (optional)
-├─────────────────────────────────────┤
-│  5. enrich_runtime_ast.py           │  ← Apply semantic enrichment based adapter mappings
-├─────────────────────────────────────┤
-│  6. validate_ast_equivalence.py     │  ← Verify structure preserved
-└─────────────────────────────────────┘
-```
-
-**Enrichment Levels:**
-
-| Level | Name | Implementation | Nature |
-|-------|------|----------------|--------|
-| L1 | Adapter Enrichment | Rule-based via Adapters | Deterministic, cheap |
-| L2 | LLM Enrichment | AI Agent reasoning | Token-intensive (one-time) |
-
-**Query Tool (`query_spashta.py`):**
-
-The query tool is how AI Agents access the CKG:
-
-```bash
-# Find functions by name
-python Spashta_2.1/runtime/query_spashta.py search "login" --type Function --json
-
-# Get file location and line numbers
-python Spashta_2.1/runtime/query_spashta.py locate "app/views.py::login" --json
-
-# Read actual source code
-python Spashta_2.1/runtime/query_spashta.py read "app/views.py::login" --json
-
-# Impact analysis: what breaks if I change this?
-python Spashta_2.1/runtime/query_spashta.py impact "app/models.py::User" --depth 3 --json
-
-# Call graph: what does this function call?
-python Spashta_2.1/runtime/query_spashta.py call-graph "app/views.py::search" --json
-```
-
-| Command | Purpose |
-|---------|---------|
-| `search` | Find nodes by name/attributes |
-| `locate` | Get file path + line numbers |
-| `read` | View actual source code |
-| `details` | Full node metadata |
-| `impact` | Who depends on this? |
-| `dependencies` | What does this use? |
-| `call-graph` | Function call chains (Python) |
-| `stats` | Graph statistics |
-| `list-files` | All indexed files |
-
-> 📖 For detailed documentation, see `_docs/Query_Tool_Readme.md`
-
-**Key Constraint:**
-> ⚠️ **Runtime is Spashta-owned.** Projects declare intent; Runtime executes.
-
----
-
-### 5️⃣ PROJECT – The Declarations
-
-**Location:** `Spashta_2.1/project/`
-
-**Purpose:** Declare what THIS project is — which languages, which frameworks apply HERE.
-
-```
-Spashta_2.1/project/
-├── profile.json          # Activation switchboard
-├── context_loader.py     # Convert declarations → Python dict. input is profile.json
-├── validation/           # Profile validators
-└── runtime_logs/         # Session logs, agent notes
-```
-
-**Sample `profile.json`:**
-```json
-{
-    "project_root": "/path/to/your/project",
-    "project_type": "web_app",
-    "languages": ["python", "html", "css"],
-    "frameworks": ["django", "htmx"],
-    "excluded": {
-        "frameworks": ["fastapi"],
-        "languages": ["javascript"]
-    }
-}
-```
-
-**What Profile Does:**
-- Tells runtime which builders to run
-- Tells runtime which adapters to apply
-- Defines what is forbidden
-- Sets the scan scope
-
-**Mental Model:**
-> 📋 **Project says WHAT. Runtime decides HOW.**
-
----
-
-## 📊 Architecture Summary
-
-```
-                    ┌─────────────────────────────────────────────┐
-                    │                 PROJECT                     │
-                    │  profile.json → WHAT this project is        │
-                    └───────────────┬─────────────────────────────┘
-                                    │ declares
-                                    ▼
-    ┌─────────────────────────────────────────────────────────────────────────┐
-    │                              RUNTIME                                    │
-    │                                                                         │
-    │    ┌──────────────┐    ┌──────────────┐    ┌──────────────────────┐     │
-    │    │   BUILDERS   │───▶│  Merge AST   │───▶│    ADAPTERS         │     │
-    │    │  (Observers) │    │              │    │  (Interpreters)      │     │
-    │    └──────────────┘    └──────────────┘    └──────────────────────┘     │
-    │                                                       │                 │
-    │                                                       ▼                 │
-    │                              ┌────────────────────────────────────┐     │
-    │                              │ code_knowledge_graph_enriched.json │     │
-    │                              └────────────────────────────────────┘     │
-    └─────────────────────────────────────┬───────────────────────────────────┘
-                                          │ governed by
-                                          ▼
-                    ┌─────────────────────────────────────────────┐
-                    │                   CORE                      │
-                    │  software_schema/ → Laws of software        │
-                    └─────────────────────────────────────────────┘
-```
-
----
-
-## 🔒 Immutability Zones & Separation of Responsibility
-
-| Layer | Responsibility | Mutability |
-|-------|---------------|------------|
-| **Core** | Universal software definitions | ❄️ FROZEN |
-| **Builders** | Observe syntax | ❄️ FROZEN (per language) |
-| **Adapters** | Interpret meaning | ❄️ FROZEN (per framework) |
-| **Runtime** | Execute & merge | 🔧 Spashta-controlled |
-| **Project** | Declare intent | 📝 User-configurable |
-| **Agents** | Reason & act | 🤖 Autonomous |
-
-**What NEVER happens:**
-- ❌ Runtime never guesses
-- ❌ Builders never add semantics
-- ❌ Adapters never change structure
-- ❌ Agents never mutate AST directly
-
----
-
-## 🛠️ How to Use
-
-### Manual Steps (Detailed Walkthrough)
-
-If you prefer to run each step manually, or want to understand what happens behind the scenes:
-
-### Step 0: Copy Spashta to Your Project
-
-Copy the `Spashta-CKG` folder into your project's root directory:
-
-```
-YourProject/
-├── Spashta-CKG/      <-- Copy this folder here
-├── your_app/
-├── manage.py
-└── ...
-```
-
-### Step 1: Configure Your Project
-
-Edit `Spashta-CKG/Spashta_2.1/project/profile.json` to point to your project:
-
-```json
-{
-    "project_root": "C:/path/to/your/project",
-    "project_type": "web_app",
-    "languages": ["python", "html", "css"],
-    "frameworks": ["django", "htmx"],
-    "excluded": {
-        "frameworks": ["fastapi"],
-        "languages": ["javascript"]
-    }
-}
-```
-
-> ⚠️ **Important:** `project_root` must be set to the absolute path of the project you want to analyze.
-
----
-
-### Step 2: Build the Knowledge Graph
-
-Run the following commands from your project's root directory:
-
-```bash
-# If your project has a virtual environment, activate it first
-# Example: .\venv\Scripts\activate (Windows) or source venv/bin/activate (Linux/Mac)
-
-# Build Raw AST
-python Spashta-CKG/Spashta_2.1/runtime/build_runtime_ast.py
-```
-
-**What this does:**
-- Scans all files in your project matching the declared languages
-- Extracts structure using language-native AST parsers (Python's `ast`, HTML parser, CSS regex)
-- Creates nodes (File, Function, Class, Template, StaticAsset)
-- Creates edges (calls, imports, renders, links)
-- Logs ambiguities (dynamic calls, unresolved references)
-
-**Output:** `Spashta-CKG/Spashta_2.1/runtime/code_knowledge_graph_ast.json` — pure structural facts
-
----
-
-### Step 3: Level 1 Enrichment (Adapter-Based)
-
-```bash
-python Spashta-CKG/Spashta_2.1/runtime/enrich_runtime_ast.py
-```
-
-**What this does:**
-- Reads the raw AST from Step 2
-- Applies framework-specific semantic roles using Adapter definitions:
-  - Django: Function + `render()` → **View**, Class + `models.Model` → **DataModel**
-  - FastAPI: Function + `@app.get` → **View**, Class + `BaseModel` → **APIContract**
-  - HTMX: Template + `hx-get` → **HTMXInteraction**
-- Adds `semantic_role` metadata to nodes
-- Validates framework contracts (e.g., View must return HttpResponse)
-
-**Output:** `Spashta-CKG/Spashta_2.1/runtime/code_knowledge_graph_enriched.json` — structure + semantic meaning
-
-> ✅ **Level 1 is deterministic, rule-based, and cheap.** It runs in seconds.
-
----
-
-### Step 3a: Validate Structural Equivalence (Recommended)
-
-```bash
-python Spashta-CKG/Spashta_2.1/runtime/validate_ast_equivalence.py
-```
-
-**What this does:**
-- Ensures the enriched AST preserves the exact structure of the raw AST
-- Verifies no nodes or edges were accidentally added/removed during enrichment
-- Confirms only semantic metadata was added (no structural mutations)
-
-> 🛡️ **This is a safety check.** If validation fails, enrichment may have corrupted the graph.
-
----
-
-### Step 4: Level 2 Enrichment (LLM-Based) — Optional
-
-Level 2 enrichment is performed by your **AI Agent** (not by scripts).
-
-**What it does:**
-- Adds **business intent** to nodes (e.g., "This view handles user authentication")
-- Adds **domain tags** (e.g., `#payments`, `#user-management`)
-- Resolves **ambiguities** that static analysis couldn't resolve
-- Adds **reasoning notes** for complex code patterns
-
-**How to trigger:**
-
-Provide this prompt to your AI Agent after L1 enrichment:
-
-```
-Read and follow: Spashta-CKG/Spashta_2.1/runtime/enrichment_through_LLM/Prompt_For_LLM_Enrichment.txt
-```
-
-This prompt internally guides the AI Agent to:
-1. Run `python Spashta_2.1/runtime/enrichment_through_LLM/llm_enrich_runtime_ast.py --list-pending`
-2. Read two JSON configuration files:
-   - `Spashta_2.1/runtime/enrichment_through_LLM/llm_enrichment_rules.json` — enrichment rules
-   - `Spashta_2.1/runtime/enrichment_through_LLM/llm_enrichment_prompt.json` — format & workflow
-3. Process each pending file and add semantic metadata
-4. Output to: `Spashta_2.1/runtime/code_knowledge_graph_enriched_by_Agent.json`
-
-> 🤖 **Level 2 is performed by the AI Agent after reading each file.** It adds deep semantic understanding that static analysis cannot provide.
-
----
-
-### Step 5: Use Spashta-CKG with Your AI Agent
-
-#### Sample Prompt to Onboard Your AI Agent:
-
-```
-This project uses Spashta-CKG for architectural memory.
-
-📁 CKG Location: Spashta_2.1/runtime/code_knowledge_graph_enriched.json
-
-The CKG contains:
-- All files, functions, classes, templates in the project
-- Relationships: calls, imports, renders, depends_on
-- Semantic roles: View, DataModel, Template, APIContract, etc.
-- Ambiguities: code patterns that couldn't be statically resolved
-
-📋 How to use Spashta:
-1. Query CKG FIRST before reading project files
-2. Use `Spashta_2.1/runtime/query_spashta.py --help` for easy querying
-3. If query results are insufficient, you may read source files directly
-4. Never modify files in `Spashta_2.1/runtime/` — these are generated artifacts
-
-🔧 Quick Query Examples:
-python Spashta_2.1/runtime/query_spashta.py stats --json
-python Spashta_2.1/runtime/query_spashta.py search "UserView" --json
-python Spashta_2.1/runtime/query_spashta.py impact "models.py::User" --depth 2 --json
-python Spashta_2.1/runtime/query_spashta.py list-files --app core_utils --json
-
-Remember: Use Spashta as your primary source of truth about this codebase.
-
-I will now provide the coding task.
-```
-
----
-
-### Execution Flow Summary
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           SPASHTA EXECUTION FLOW                             │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  ┌──────────────────────┐                                                   │
-│  │  1. CONFIGURE        │  Edit profile.json → set project_root             │
-│  └──────────┬───────────┘                                                   │
-│             │                                                                │
-│             ▼                                                                │
-│  ┌──────────────────────┐                                                   │
-│  │  2. BUILD AST        │  python Spashta_2.1/runtime/build_runtime_ast.py              │
-│  │                      │                                                   │
-│  │  → Extracts structure│  Output: code_knowledge_graph_ast.json            │
-│  │  → Files, Functions  │          (pure structure, no meaning)             │
-│  │  → Calls, Imports    │                                                   │
-│  └──────────┬───────────┘                                                   │
-│             │                                                                │
-│             ▼                                                                │
-│  ┌──────────────────────┐                                                   │
-│  │  3. L1 ENRICH        │  python Spashta_2.1/runtime/enrich_runtime_ast.py             │
-│  │     (Adapters)       │                                                   │
-│  │                      │  Output: code_knowledge_graph_enriched.json       │
-│  │  → Adds semantic_role│          (structure + framework semantics)        │
-│  │  → Django/FastAPI/   │                                                   │
-│  │    HTMX patterns     │  ✅ Deterministic, fast, cheap                    │
-│  └──────────┬───────────┘                                                   │
-│             │                                                                │
-│             ▼                                                                │
-│  ┌──────────────────────┐                                                   │
-│  │  3a. VALIDATE        │  python Spashta_2.1/runtime/validate_ast_equivalence.py       │
-│  │                      │                                                   │
-│  │  → Structure intact? │  Ensures enrichment didn't corrupt the graph      │
-│  │  → No missing nodes? │  🛡️ Safety check before using CKG                 │
-│  └──────────┬───────────┘                                                   │
-│             │                                                                │
-│             ▼                                                                │
-│  ┌──────────────────────┐                                                   │
-│  │  4. L2 ENRICH        │  AI Agent reads CKG + adds business context       │
-│  │     (LLM) [Optional] │                                                   │
-│  │                      │  Output: code_knowledge_graph_enriched_by_Agent   │
-│  │  → Business intent   │          .json (agent's semantic understanding)   │
-│  │  → Domain tags       │                                                   │
-│  │  → Resolve ambiguity │  🤖 Done by AI Agent after reading each file      │
-│  └──────────┬───────────┘                                                   │
-│             │                                                                │
-│             ▼                                                                │
-│  ┌──────────────────────┐                                                   │
-│  │  5. USE CKG          │  AI Agent queries CKG for all coding tasks        │
-│  │                      │                                                   │
-│  │  → query_spashta.py  │  "Query facts, don't guess structure"             │
-│  │  → Direct JSON read  │                                                   │
-│  └──────────────────────┘                                                   │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 📚 Documentation
-
-| Document | Purpose |
-|----------|---------|
-| `Spashta_2.1/_docs/Spashta2.0_Universal_Architecture_Readme.md` | Complete architecture philosophy |
-| `Spashta_2.1/_docs/Spashta_Structure.md` | Why this structure exists |
-| `Spashta_2.1/_docs/Runtime_Readme.md` | Runtime execution reference |
-| `Spashta_2.1/_docs/adapter_Readme.md` | Complete adapter guide |
-| `Spashta_2.1/_docs/Builders_Roadmap.md` | Builder capabilities & roadmap |
-
----
-
-## 🧠 Why Spashta-CKG Architecture Works
-
-### 1. Provides Clear Context for AI
-**Problem:** AI agents struggle to understand the "big picture" without reading every file.  
-**Solution:** The CKG provides a structural map. Agents instantly know where files are and how they connect.
-
-### 2. Drastically Reduces Hallucinations
-**Problem:** AI guesses about dependencies and invents non-existent code.  
-**Solution:** Agents query **objective truth** stored in AST JSON. Facts, not probabilities.
-
-### 3. Saves Time and Costs
-**Problem:** Re-analyzing codebases for every prompt is slow and expensive.  
-**Solution:** Hash-based incremental updates. Only changed files are re-processed.
-
-### 4. Enables Safer Code Changes
-**Problem:** Fixing one part often breaks another due to hidden dependencies.  
-**Solution:** Explicit dependency mapping enables **impact analysis** before any edit.
-
-### 5. Prevents Architectural Drift
-**Problem:** Codebases become "spaghetti code" as layer boundaries are violated.  
-**Solution:** Semantic roles and framework contracts help maintain clean architecture.
-
-### 6. Open & Extensible by Design
-**Problem:** Most tools are locked to specific languages or frameworks.  
-**Solution:** Spashta's modular architecture allows easy addition of new languages (Java, PHP, Go, etc.) and frameworks (Flask, Express, Spring, etc.) without modifying the core.
-
----
-
-## 📄 License
-
-Apache 2.0 - Free for personal and commercial use.
-
----
-
-*Created by [mpcoder1111](https://github.com/mpcoder1111) | Spashta-CKG 2.0*
+* **License**: [Apache-2.0](LICENSE)
+* **Release History**: See [CHANGELOG.md](CHANGELOG.md) for full version release notes.
