@@ -83,9 +83,15 @@ TEST_BASE_CLASSES = {"TestCase", "TransactionTestCase", "SimpleTestCase",
                      "APITestCase", "APITransactionTestCase"}
 
 
-def load_scan_exclusions():
-    """Loads exclusion rules from builder_rules.json + project/profile.json."""
-    exclude_dirs = set([".venv", "__pycache__"])  # Defaults
+def load_scan_exclusions(source_root=None, cli_exclude=None):
+    """Loads exclusion rules from builder_rules.json + profile.json (in source_root or package) + CLI overrides."""
+    exclude_dirs = set([".venv", "venv", "env", "__pycache__", ".git", "node_modules"])  # Defaults
+
+    if cli_exclude:
+        for d in str(cli_exclude).split(","):
+            d_clean = d.strip()
+            if d_clean:
+                exclude_dirs.add(d_clean)
 
     # 1. Universal exclusions from builder_rules.json
     exclude_patterns = []
@@ -98,17 +104,25 @@ def load_scan_exclusions():
         except Exception:
             pass
 
-    # 2. Project-specific exclusions from profile.json
-    profile_path = PROJECT_ROOT / "project" / "profile.json"
-    if profile_path.exists():
-        try:
-            profile = json.loads(profile_path.read_text("utf-8"))
-            project_excluded = profile.get("excluded", {}).get("directories", [])
-            exclude_dirs.update(project_excluded)
-        except Exception:
-            pass
+    # 2. Project-specific exclusions from profile.json (check source_root first, then package default)
+    candidates = []
+    if source_root:
+        sr = Path(source_root).resolve()
+        candidates.extend([sr / "profile.json", sr / ".spashta" / "profile.json"])
+    candidates.append(PROJECT_ROOT / "project" / "profile.json")
+
+    for profile_path in candidates:
+        if profile_path.exists():
+            try:
+                profile = json.loads(profile_path.read_text("utf-8"))
+                project_excluded = profile.get("excluded", {}).get("directories", [])
+                exclude_dirs.update(project_excluded)
+                break
+            except Exception:
+                pass
 
     return exclude_dirs, exclude_patterns
+
 
 # ---------------------------------------------------------
 # SCHEMA ENFORCER
@@ -1200,8 +1214,9 @@ class RelationWalker(ast.NodeVisitor):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--source-root", default=".")
-    parser.add_argument("--out", default="runtime/output.json")
+    parser.add_argument("--source-root", required=True, help="Root directory or file to parse")
+    parser.add_argument("--out", required=True, help="Path to write output AST JSON")
+    parser.add_argument("--exclude", default=None, help="Comma-separated directories to exclude")
     args = parser.parse_args()
     
     root = Path(args.source_root).resolve()
@@ -1224,7 +1239,7 @@ def main():
     else:
         # Case: Project Scan
         root_dir = root
-        exclude_dirs, exclude_patterns = load_scan_exclusions()
+        exclude_dirs, exclude_patterns = load_scan_exclusions(source_root=root_dir, cli_exclude=args.exclude)
         
         def should_include(p):
             # Check directory exclusions relative to root

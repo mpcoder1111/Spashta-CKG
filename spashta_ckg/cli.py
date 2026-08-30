@@ -11,9 +11,37 @@ from spashta_ckg.engine import CKG
 import spashta_ckg.runtime.query_spashta as qs
 
 def main():
+    help_epilog = """
+Supported Languages & Couplings (Auto-Detected):
+  Languages:   Python (AST), JavaScript (Tree-sitter), HTML5, CSS3
+  Frameworks:  Django, FastAPI, HTMX, Vanilla JS
+
+Quickstart Workflow:
+  1. (Optional) Initialize project directory exclusions:
+     spashta_ckg init
+     spashta_ckg init --exclude "misc,reference,legacy"
+
+  2. View or edit excluded directories:
+     spashta_ckg config
+     spashta_ckg config --add-exclude "docs,fixtures"
+
+  3. Scan & build CKG graph:
+     spashta_ckg scan
+     spashta_ckg scan --exclude "misc,legacy"
+
+  4. Blast-radius impact analysis (pre-refactoring):
+     spashta_ckg impact "MyFunctionOrClass" --depth 2 --json
+
+  5. Inspect full-stack routes & dead code:
+     spashta_ckg routes
+     spashta_ckg dead-code css
+"""
+
     parser = argparse.ArgumentParser(
         prog="spashta_ckg",
-        description="Spashta CKG v3.0 - Universal Full-Stack Code Knowledge Graph & Impact Engine"
+        description="Spashta CKG v3.0 - Full-Stack Code Knowledge Graph & Impact Engine",
+        epilog=help_epilog,
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
     
     # Common arguments
@@ -23,75 +51,86 @@ def main():
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
-    # 1. Lifecycle & Scanning (3.0)
-    p_scan = subparsers.add_parser("scan", aliases=["build"], parents=[common], help="Scan project and build/refresh CKG graph")
-    p_scan.add_argument("--out", "-o", default=None, help="Output directory for CKG artifacts")
+    # 1. Project Initialization (3.0)
+    p_init = subparsers.add_parser("init", parents=[common], help="Initialize a project profile.json with directory exclusions")
+    p_init.add_argument("--exclude", "-e", help="Comma-separated directories to exclude (e.g. misc,tests,legacy)")
+    p_init.add_argument("--force", action="store_true", help="Overwrite existing profile.json if present")
 
-    # 2. Impact Analysis (2.1, 2.2, 3.0)
+    # 2. Configuration Management (3.0)
+    p_cfg = subparsers.add_parser("config", parents=[common], help="View or update excluded directories")
+    p_cfg.add_argument("--set-exclude", help="Set excluded directories (replaces current list)")
+    p_cfg.add_argument("--add-exclude", help="Append directories to exclusion list (e.g. misc,docs)")
+
+    # 3. Lifecycle & Scanning (3.0)
+    p_scan = subparsers.add_parser("scan", aliases=["build"], parents=[common], help="Scan project across all languages and build/refresh CKG graph")
+    p_scan.add_argument("--out", "-o", default=None, help="Output directory for CKG artifacts (default: <project_dir>/.spashta)")
+    p_scan.add_argument("--exclude", "-e", default=None, help="Comma-separated directories to exclude during this scan")
+
+    # 4. Impact Analysis (2.1, 2.2, 3.0)
     p_impact = subparsers.add_parser("impact", parents=[common], help="Calculate blast-radius: who depends on/calls this symbol?")
     p_impact.add_argument("node_id", help="Target symbol name or node ID")
     p_impact.add_argument("--depth", "-d", type=int, default=3, help="Max traversal depth (default: 3)")
 
-    # 3. Dependencies (2.1, 2.2)
+    # 5. Dependencies (2.1, 2.2)
     p_deps = subparsers.add_parser("dependencies", aliases=["deps"], parents=[common], help="What does this symbol depend on? (Outgoing edges)")
     p_deps.add_argument("node_id", help="Target symbol name or node ID")
     p_deps.add_argument("--depth", "-d", type=int, default=3, help="Max traversal depth")
 
-    # 4. Dead Code Audit (2.1, 2.2, 3.0)
+    # 6. Dead Code Audit (2.1, 2.2, 3.0)
     p_dead = subparsers.add_parser("dead-code", aliases=["dead"], parents=[common], help="Find unreferenced dead code across Python, JS, and CSS")
     p_dead.add_argument("language", nargs="?", choices=["css", "js", "py"], default=None, help="Optional language filter")
 
-    # 5. Dead CSS & Keyframes (2.1, 2.2)
+    # 7. Dead CSS & Keyframes (2.1, 2.2)
     p_dead_css = subparsers.add_parser("dead-css", parents=[common], help="Audit dead CSS classes and keyframes with dynamic usage safety")
     p_dead_css.add_argument("--kind", choices=["class", "keyframes", "all"], default="all", help="Target CSS item kind")
 
-    # 6. Full-Stack Routes (2.2, 3.0)
+    # 8. Full-Stack Routes (2.2, 3.0)
     subparsers.add_parser("routes", parents=[common], help="List all full-stack routes with connected templates, views, and events")
 
-    # 7. Call Graph (2.1)
+    # 9. Call Graph (2.1)
     p_cg = subparsers.add_parser("call-graph", parents=[common], help="View function call relationships (callers and callees)")
     p_cg.add_argument("node_id", help="Target function or method name/ID")
 
-    # 8. Search (2.1, 2.2)
+    # 10. Search (2.1, 2.2)
     p_search = subparsers.add_parser("search", parents=[common], help="Search nodes by name, ID, or attributes")
     p_search.add_argument("query", help="Search query string")
     p_search.add_argument("--type", "-t", default=None, help="Filter by node type (e.g. Function, Route, StyleClass)")
     p_search.add_argument("--app", help="Filter by Django/sub-app directory prefix")
 
-    # 9. Locate (2.1, 2.2)
+    # 11. Locate (2.1, 2.2)
     p_locate = subparsers.add_parser("locate", parents=[common], help="Locate exact file path, start line, and end line of a symbol")
     p_locate.add_argument("node_id", help="Target symbol or node ID")
 
-    # 10. Read Source (2.1)
+    # 12. Read Source (2.1)
     p_read = subparsers.add_parser("read", parents=[common], help="Read the actual source code of a node from disk")
     p_read.add_argument("node_id", help="Target symbol or node ID")
 
-    # 11. Details (2.1)
+    # 13. Details (2.1)
     p_details = subparsers.add_parser("details", parents=[common], help="Get complete JSON metadata for a node")
     p_details.add_argument("node_id", help="Target symbol or node ID")
 
-    # 12. Consumers (2.1)
+    # 14. Consumers (2.1)
     p_consumers = subparsers.add_parser("consumers", parents=[common], help="Find all ORM usage sites for a model (graph + grep hybrid)")
     p_consumers.add_argument("model_name", help="Django model class name")
 
-    # 13. Scope Check (2.1)
+    # 15. Scope Check (2.1)
     p_scope = subparsers.add_parser("scope-check", parents=[common], help="Verify analysis coverage before modifying code")
     p_scope.add_argument("node_id", help="Target node to check impact against")
     p_scope.add_argument("--analyzed", required=True, help="Comma-separated list of files already inspected")
     p_scope.add_argument("--depth", "-d", type=int, default=3, help="Impact depth")
 
-    # 14. Class Usage (2.1, 2.2)
+    # 16. Class Usage (2.1, 2.2)
     p_cu = subparsers.add_parser("class-usage", parents=[common], help="Check where a specific CSS class is defined and used")
     p_cu.add_argument("name", help="CSS class name (e.g. .btn-primary or btn-primary)")
 
-    # 15. Duplicate Styles (2.1, 2.2)
+    # 17. Duplicate Styles (2.1, 2.2)
     subparsers.add_parser("dup-styles", parents=[common], help="Find classes defined across multiple files and identical keyframe blocks")
 
-    # 16. List Files (2.1)
+    # 18. List Files (2.1)
     p_lf = subparsers.add_parser("list-files", parents=[common], help="List all indexed source files in the project")
     p_lf.add_argument("--app", help="Filter by app folder")
 
-    # 17. Stats (2.1, 2.2, 3.0)
+    # 19. Stats (2.1, 2.2, 3.0)
     subparsers.add_parser("stats", parents=[common], help="Display comprehensive graph statistics and node breakdowns")
 
     # Global flags
@@ -106,11 +145,65 @@ def main():
 
     project_root = Path(args.project_dir).resolve()
 
-    # 1. Handle scan / build
+    # Handle init
+    if args.command == "init":
+        excl = [x.strip() for x in args.exclude.split(",")] if args.exclude else None
+        try:
+            p_file = CKG.init_profile(
+                project_root=project_root,
+                excluded_dirs=excl,
+                force=args.force
+            )
+            if args.json:
+                print(json.dumps({"status": "created", "path": str(p_file)}, indent=2))
+            else:
+                print(f"Initialized project profile at: {p_file}")
+                cfg = CKG.get_profile_info(project_root=project_root)
+                print(f"Excluded Dirs: {', '.join(cfg['excluded_directories'])}")
+                print("\nRun 'spashta_ckg scan' to build your Code Knowledge Graph.")
+        except FileExistsError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
+        sys.exit(0)
+
+    # Handle config
+    if args.command == "config":
+        set_excl = [x.strip() for x in args.set_exclude.split(",")] if args.set_exclude else None
+        add_excl = [x.strip() for x in args.add_exclude.split(",")] if args.add_exclude else None
+
+        if set_excl or add_excl:
+            cfg = CKG.update_profile(
+                project_root=project_root,
+                set_exclude=set_excl,
+                add_exclude=add_excl
+            )
+            if args.json:
+                print(json.dumps(cfg, indent=2))
+            else:
+                print(f"Updated configuration in: {cfg['path']}")
+                print(f"Excluded Dirs: {', '.join(cfg['excluded_directories'])}")
+        else:
+            cfg = CKG.get_profile_info(project_root=project_root)
+            if args.json:
+                print(json.dumps(cfg, indent=2))
+            else:
+                print(f"\nActive Profile:    {cfg['path']} {'(Custom)' if cfg['is_custom'] else '(Package Default)'}")
+                print(f"Project Root:      {cfg['project_root']}")
+                print(f"Excluded Dirs:      {', '.join(cfg['excluded_directories'])}")
+                print("\nSupported Languages (Auto-Detected): Python, JavaScript, HTML, CSS")
+                print("Supported Frameworks (Auto-Detected): Django, FastAPI, HTMX, Vanilla JS\n")
+        sys.exit(0)
+
+    # Handle scan / build
     if args.command in ("scan", "build"):
+        excl = [x.strip() for x in args.exclude.split(",")] if getattr(args, "exclude", None) else None
         if not args.json:
             print(f"Scanning codebase at: {project_root}...")
-        ckg = CKG.build(project_root=project_root, output_dir=args.out)
+        ckg = CKG.build(
+            project_root=project_root,
+            output_dir=args.out,
+            excluded_dirs=excl
+        )
         stats = ckg.stats()
         if args.json:
             print(json.dumps(stats, indent=2))

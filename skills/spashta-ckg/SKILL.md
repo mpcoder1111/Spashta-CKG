@@ -56,7 +56,24 @@ To maintain architectural integrity and eliminate hallucinations/breakages, foll
 
 All commands run from the project root (or with `-p <project_root>`):
 
-### 1. Pre-Refactoring & Impact Analysis
+### 1. Project Setup & Directory Exclusions
+```bash
+# (Optional) Initialize a profile.json with custom directory exclusions
+spashta_ckg init --exclude "misc,reference,legacy"
+
+# View active configuration and excluded directories
+spashta_ckg config
+spashta_ckg config --json
+
+# Append or update directory exclusions
+spashta_ckg config --add-exclude "misc,docs,reference"
+
+# Scan project and build CKG cache (all languages/frameworks auto-detected)
+spashta_ckg scan
+spashta_ckg scan --exclude "misc,legacy"
+```
+
+### 2. Pre-Refactoring & Impact Analysis
 ```bash
 # Calculate blast-radius: who calls or depends on this symbol?
 spashta_ckg impact "MyFunctionOrClass"

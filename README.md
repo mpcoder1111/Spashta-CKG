@@ -2,7 +2,7 @@
 
 > **Spashta** (स्पष्ट) = *Clarity* in Sanskrit. Deterministic Code Knowledge Graph & Impact Engine for Python, JavaScript, HTML, and CSS.
 
-[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
 
@@ -46,24 +46,32 @@ pip install git+https://github.com/mpcoder1111/Spashta-CKG.git
 
 ### 1. 🖥️ Interactive Developer CLI (`spashta_ckg`)
 
-Run instant queries directly from your project terminal:
+Spashta auto-detects all supported languages (**Python, JavaScript, HTML, CSS**) and framework patterns (**Django, FastAPI, HTMX, Vanilla JS**) out of the box with zero manual configuration.
 
+#### Quickstart Workflow:
 ```bash
-# 1. Scan and index codebase into .spashta/
+# 1. (Optional) Initialize project exclusions in profile.json
+spashta_ckg init --exclude "misc,reference,legacy,docs"
+
+# 2. View or update directory exclusions anytime
+spashta_ckg config
+spashta_ckg config --add-exclude "fixtures,snapshots"
+
+# 3. Scan & build CKG graph (auto-detects all files and frameworks)
 spashta_ckg scan
 
-# 2. Check blast-radius before editing a function, class, or CSS class
-spashta_ckg impact SectionBlock
+# 4. Check blast-radius before editing a function, class, or CSS class
+spashta_ckg impact SectionBlock --depth 2 --json
 
-# 3. Find dead code across Python, JS, or CSS with zero false-positives
+# 5. Find dead code across Python, JS, or CSS with zero false-positives
 spashta_ckg dead-code css
 
-# 4. View all full-stack routes linking templates, backend views, and HTMX events
+# 6. View all full-stack routes linking templates, backend views, and HTMX events
 spashta_ckg routes
-
-# 5. Output structured JSON for scripts and agents
-spashta_ckg impact SectionBlock --json
 ```
+
+> 💡 **Why Directory Exclusions Matter**:  
+> Spashta automatically ignores standard folders (`.git`, `venv`, `node_modules`, `__pycache__`, `build`, `dist`). If your repository has non-production or duplicate code (`misc/`, `_archive/`, `legacy_backup/`, `fixtures/`), excluding them via `spashta_ckg init --exclude "..."` or `profile.json` ensures you get 100% accurate symbol references without false duplicate definitions.
 
 ---
 
@@ -145,7 +153,9 @@ This repository uses **Spashta-CKG** (https://github.com/mpcoder1111/Spashta-CKG
 
 | Command | Description | Example |
 | :--- | :--- | :--- |
-| `spashta_ckg scan` | Scans project across all languages and builds `.spashta/` CKG cache | `spashta_ckg scan` |
+| `spashta_ckg init` | Initializes project `profile.json` with detected languages and exclusions | `spashta_ckg init --exclude misc,docs` |
+| `spashta_ckg config` | Views or updates active profile configuration and exclusion list | `spashta_ckg config --add-exclude legacy` |
+| `spashta_ckg scan` | Scans project across all languages and builds `.spashta/` CKG cache | `spashta_ckg scan --exclude misc` |
 | `spashta_ckg impact <symbol>` | Upstream blast-radius: who calls or depends on this symbol? | `spashta_ckg impact UserForm` |
 | `spashta_ckg dependencies <symbol>` | Downstream dependencies: what does this symbol call/use? | `spashta_ckg dependencies home_view` |
 | `spashta_ckg dead-code [lang]` | Detects unused code across `css`, `js`, or `py` | `spashta_ckg dead-code css` |

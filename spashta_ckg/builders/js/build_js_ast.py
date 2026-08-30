@@ -50,24 +50,38 @@ CORE_EDGES_PATH = PROJECT_ROOT / "core/software_schema/edges.json"
 _EXCLUDE_DIR_PARTS = {"node_modules", ".venv", "venv", "env", "Spashta-CKG", ".git", "staticfiles"}
 
 
-def _excluded_dir_parts() -> set:
+def _excluded_dir_parts(source_root=None, cli_exclude=None) -> set:
     """The default JS exclusions UNION the project's declared exclusions — project/profile.json
-    (`excluded.directories`) + builder_rules.json (`scan_policy.exclude_dirs`) — so a folder the project
-    excludes (e.g. `misc`) is skipped by every builder consistently. Missing/invalid config → defaults only."""
+    (`excluded.directories`) + builder_rules.json (`scan_policy.exclude_dirs`) + CLI overrides."""
     dirs = set(_EXCLUDE_DIR_PARTS)
+    if cli_exclude:
+        for d in str(cli_exclude).split(","):
+            d_clean = d.strip()
+            if d_clean:
+                dirs.add(d_clean)
+
     rules_path = PROJECT_ROOT / "core" / "builder_rules.json"
     if rules_path.exists():
         try:
             dirs.update(json.loads(rules_path.read_text("utf-8")).get("scan_policy", {}).get("exclude_dirs", []))
         except Exception:
             pass
-    profile_path = PROJECT_ROOT / "project" / "profile.json"
-    if profile_path.exists():
-        try:
-            dirs.update(json.loads(profile_path.read_text("utf-8")).get("excluded", {}).get("directories", []))
-        except Exception:
-            pass
+
+    candidates = []
+    if source_root:
+        sr = Path(source_root).resolve()
+        candidates.extend([sr / "profile.json", sr / ".spashta" / "profile.json"])
+    candidates.append(PROJECT_ROOT / "project" / "profile.json")
+
+    for profile_path in candidates:
+        if profile_path.exists():
+            try:
+                dirs.update(json.loads(profile_path.read_text("utf-8")).get("excluded", {}).get("directories", []))
+                break
+            except Exception:
+                pass
     return dirs
+
 
 
 # ── schema enforcement (same contract as the Python builder) ──────────────
@@ -429,11 +443,12 @@ class CallCollector:
 
 
 # ── discovery + main ───────────────────────────────────────────────────────
-def _iter_js_files(root: Path) -> List[Path]:
-    excluded = _excluded_dir_parts()
+def _iter_js_files(root: Path, cli_exclude=None) -> List[Path]:
+    """Recurse root collecting .js files, skipping excluded directories."""
+    excluded = _excluded_dir_parts(source_root=root, cli_exclude=cli_exclude)
     out: List[Path] = []
     for p in root.rglob("*.js"):
-        if p.name.endswith(".min.js"):
+        if not p.is_file():
             continue
         try:
             rel_parts = p.relative_to(root).parts[:-1]
@@ -446,9 +461,10 @@ def _iter_js_files(root: Path) -> List[Path]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Spashta JS builder (MVP)")
+    parser = argparse.ArgumentParser(description="Spashta JS builder")
     parser.add_argument("--source-root", default=".")
     parser.add_argument("--out", default="runtime/fragment_js.json")
+    parser.add_argument("--exclude", default=None, help="Comma-separated directories to exclude")
     args = parser.parse_args()
 
     instructions = json.loads(INSTRUCTIONS_PATH.read_text("utf-8"))

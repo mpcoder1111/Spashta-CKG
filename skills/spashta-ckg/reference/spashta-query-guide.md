@@ -15,7 +15,26 @@ How to get the most out of the Spashta Code Knowledge Graph, including every cap
 
 ---
 
-## Key Query Commands
+## Project Setup & Directory Exclusions
+
+Spashta auto-detects all languages (**Python, JS, HTML, CSS**) and framework adapters (**Django, FastAPI, HTMX, Vanilla JS**). The only configuration needed is directory exclusions.
+
+```bash
+# 1. Initialize project exclusions
+spashta_ckg init --exclude "misc,reference,legacy,fixtures"
+
+# 2. View or edit excluded directories
+spashta_ckg config
+spashta_ckg config --add-exclude "snapshots,vendor"
+
+# 3. Rebuild CKG cache
+spashta_ckg scan
+```
+
+> **Why Exclude Directories?**  
+> Built-in exclusions (`.git`, `venv`, `node_modules`, `build`, `dist`, `__pycache__`) are always skipped. Excluding extra non-production directories (`_archive/`, `misc/`, `fixtures/`) prevents duplicate symbol definitions from creating false ambiguities in your graph.
+
+---
 
 ```bash
 spashta_ckg impact "Name" --depth 2

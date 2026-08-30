@@ -43,9 +43,15 @@ INSTRUCTIONS_PATH = SCRIPT_DIR / "builder_css_instructions_for_builder_code_deve
 CORE_EDGES_PATH = PROJECT_ROOT / "core" / "software_schema" / "edges.json"
 BUILDER_RULES_PATH = SCRIPT_DIR.parent / "builder_rules.json"
 
-def load_scan_exclusions():
-    """Loads exclusion rules from builder_rules.json + project/profile.json."""
-    exclude_dirs = set([".venv", "__pycache__"])  # Defaults
+def load_scan_exclusions(source_root=None, cli_exclude=None):
+    """Loads exclusion rules from builder_rules.json + profile.json (in source_root or package) + CLI overrides."""
+    exclude_dirs = set([".venv", "venv", "env", "__pycache__", ".git", "node_modules"])  # Defaults
+    if cli_exclude:
+        for d in str(cli_exclude).split(","):
+            d_clean = d.strip()
+            if d_clean:
+                exclude_dirs.add(d_clean)
+
     exclude_patterns = []
     if BUILDER_RULES_PATH.exists():
         try:
@@ -55,15 +61,24 @@ def load_scan_exclusions():
             exclude_patterns = policy.get("exclude_file_patterns", [])
         except Exception:
             pass
-    # Project-specific exclusions from profile.json
-    profile_path = SCRIPT_DIR.parent.parent / "project" / "profile.json"
-    if profile_path.exists():
-        try:
-            profile = json.loads(profile_path.read_text("utf-8"))
-            exclude_dirs.update(profile.get("excluded", {}).get("directories", []))
-        except Exception:
-            pass
+
+    # Project-specific exclusions from profile.json (check source_root first, then package default)
+    candidates = []
+    if source_root:
+        sr = Path(source_root).resolve()
+        candidates.extend([sr / "profile.json", sr / ".spashta" / "profile.json"])
+    candidates.append(PROJECT_ROOT / "project" / "profile.json")
+
+    for profile_path in candidates:
+        if profile_path.exists():
+            try:
+                profile = json.loads(profile_path.read_text("utf-8"))
+                exclude_dirs.update(profile.get("excluded", {}).get("directories", []))
+                break
+            except Exception:
+                pass
     return exclude_dirs, exclude_patterns
+
 
 # ---------------------------------------------------------
 # SCHEMA ENFORCER
@@ -317,9 +332,10 @@ def _model_animations(ctx, clean_content: str, cfg: dict) -> str:
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Spashta CSS AST Builder")
     parser.add_argument("--source-root", default=".")
-    parser.add_argument("--out", default="runtime/code_knowledge_graph_css.json")
+    parser.add_argument("--out", default="runtime/output.json")
+    parser.add_argument("--exclude", default=None, help="Comma-separated directories to exclude")
     args = parser.parse_args()
 
     root = Path(args.source_root).resolve()
@@ -348,7 +364,7 @@ def main():
              ctx.root_path = root.parent 
              css_files = [root]
     elif root.is_dir():
-        exclude_dirs, exclude_patterns = load_scan_exclusions()
+        exclude_dirs, exclude_patterns = load_scan_exclusions(source_root=root, cli_exclude=args.exclude)
         
         def should_include(p):
             try:

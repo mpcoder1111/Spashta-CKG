@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [3.1.0] - 2026-08-30
+
+**Spashta-CKG 3.1 — Zero-Config Multi-Language Engine & Streamlined Directory Exclusions**
+
+Streamlined developer and agent experience with zero-config auto-discovery for all languages and frameworks, plus interactive directory exclusion management via `init` and `config`.
+
+### Added
+- **Interactive Project Initialization (`spashta_ckg init`)**: One-step project setup generating a clean `profile.json` with tailored directory exclusions (`--exclude`).
+- **Configuration Management (`spashta_ckg config`)**: View active project settings (`spashta_ckg config`) or append exclusions (`spashta_ckg config --add-exclude "misc,legacy"`) directly from CLI.
+- **Zero-Config Language & Framework Auto-Detection**: Removed redundant manual language and framework declarations. Spashta automatically indexes all present files across Python, JavaScript, HTML, and CSS, and dynamically applies Django, FastAPI, HTMX, and Vanilla JS semantic rules.
+- **Simplified `profile.json` Schema**: Focused strictly on directory exclusions (`"exclude": ["..."]`), with full backwards-compatibility for legacy profiles.
+- **Ad-Hoc Scan Exclusions**: Added `--exclude` flag to `spashta_ckg scan` for one-shot folder exclusions.
+
+---
+
 ## [3.0.0] - 2026-08-30
 
 **Spashta-CKG 3.0 — Full-Stack Code Knowledge Graph & MCP Server**
@@ -13,7 +28,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 Major update packaging Spashta into an installable Python library (`spashta_ckg`), a 17-command interactive CLI, and a native Model Context Protocol (MCP) server (`spashta_ckg_mcp`).
 
 ### Added
-- **Installable Package & CLI (`spashta_ckg`)**: Installable via `pip install git+https://github.com/mpcoder1111/Spashta-CKG.git` with 17 unified CLI commands (`scan`, `impact`, `dead-code`, `dead-css`, `routes`, `call-graph`, `search`, `locate`, `read`, `details`, `consumers`, `scope-check`, `class-usage`, `dup-styles`, `list-files`, `stats`).
+- **Installable Package & CLI (`spashta_ckg`)**: Installable via `pip install git+https://github.com/mpcoder1111/Spashta-CKG.git` with 19 unified CLI commands (`init`, `config`, `scan`, `impact`, `dependencies`, `dead-code`, `dead-css`, `routes`, `call-graph`, `search`, `locate`, `read`, `details`, `consumers`, `scope-check`, `class-usage`, `dup-styles`, `list-files`, `stats`).
+- **Project Configuration & Initialization (`init` / `config`)**: Automated project setup detecting languages and sensible exclusions, plus runtime scan overrides via `--exclude`, `--languages`, and `--frameworks`.
 - **Native MCP Server (`spashta_ckg_mcp`)**: Fast JSON-RPC stdio MCP server giving AI Agents in Cursor, Antigravity, Claude Desktop, and VS Code native zero-click tool execution (`spashta_impact`, `spashta_dead_code`, `spashta_routes`, `spashta_search`, `spashta_scan`).
 - **Full JavaScript Support (Tree-Sitter)**: New `build_js_ast.py` builder with tree-sitter AST parser, Vanilla JS framework adapter, DOM queries (`queries_dom`), `classList` mutations (`uses_style`), event listeners (`listens_to`, `dispatches_event`), and callback reference resolution (`calls`).
 - **Full-Stack Django Route Couplings**: Resolves URLconf `path()` / `include()` hierarchies (`includes_urlconf`), links template `{% url %}` tags to Route nodes (`resolves_to`), and maps view API calls (`calls_api`).

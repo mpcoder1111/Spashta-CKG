@@ -155,29 +155,130 @@ class CKG:
         return cls(data, project_root=root)
 
     @classmethod
-    def build(cls, project_root: Optional[Union[str, Path]] = None, output_dir: Optional[Union[str, Path]] = None, languages: Optional[List[str]] = None, frameworks: Optional[List[str]] = None) -> "CKG":
-        """Scans project, executes builders, merges AST, runs Stage 2 semantic enrichment, and returns a CKG instance."""
+    def get_profile_info(cls, project_root: Optional[Union[str, Path]] = None) -> dict:
+        """Retrieves active project exclusions and config location."""
+        root = Path(project_root).resolve() if project_root else Path.cwd()
+        candidates = [
+            root / "profile.json",
+            root / ".spashta" / "profile.json",
+            PACKAGE_ROOT / "project" / "profile.json"
+        ]
+        profile_path = next((p for p in candidates if p.exists()), PACKAGE_ROOT / "project" / "profile.json")
+            
+        with open(profile_path, "r", encoding="utf-8") as f:
+            profile = json.load(f)
+
+        # Extract exclusions (supports both new "exclude": [] and legacy "excluded": {"directories": []})
+        excluded_dirs = profile.get("exclude")
+        if excluded_dirs is None:
+            excluded_dirs = profile.get("excluded", {}).get("directories", [])
+
+        return {
+            "path": str(profile_path),
+            "is_custom": (profile_path.parent == root or profile_path.parent == (root / ".spashta")),
+            "project_root": str(root),
+            "excluded_directories": list(excluded_dirs),
+            "profile": profile
+        }
+
+    @classmethod
+    def init_profile(cls, project_root: Optional[Union[str, Path]] = None,
+                     excluded_dirs: Optional[List[str]] = None,
+                     force: bool = False) -> Path:
+        """Generates a clean, directory-exclusion profile.json in the target project root."""
+        root = Path(project_root).resolve() if project_root else Path.cwd()
+        target_path = root / "profile.json"
+        if target_path.exists() and not force:
+            raise FileExistsError(f"profile.json already exists at {target_path}. Use force=True to overwrite.")
+
+        default_excludes = ["venv", ".venv", "env", "node_modules", ".git", "build", "dist", "Spashta-CKG", "_archive"]
+        if excluded_dirs:
+            for d in excluded_dirs:
+                if d not in default_excludes:
+                    default_excludes.append(d)
+
+        # Auto-detect other common development scratch folders
+        for d_name in [".idea", ".vscode", "coverage", ".pytest_cache", "site-packages", "misc", "reference", "fixtures"]:
+            if (root / d_name).exists() and d_name not in default_excludes:
+                default_excludes.append(d_name)
+
+        profile_content = {
+          "exclude": default_excludes
+        }
+
+        with open(target_path, "w", encoding="utf-8") as f:
+            json.dump(profile_content, f, indent=2)
+
+        return target_path
+
+    @classmethod
+    def update_profile(cls, project_root: Optional[Union[str, Path]] = None,
+                       set_exclude: Optional[List[str]] = None,
+                       add_exclude: Optional[List[str]] = None) -> dict:
+        """Updates or creates profile.json with modified directory exclusions."""
+        root = Path(project_root).resolve() if project_root else Path.cwd()
+        target_path = root / "profile.json"
+        if not target_path.exists():
+            cls.init_profile(project_root=root)
+        
+        with open(target_path, "r", encoding="utf-8") as f:
+            profile = json.load(f)
+
+        if set_exclude is not None:
+            profile["exclude"] = set_exclude
+            if "excluded" in profile and "directories" in profile["excluded"]:
+                profile["excluded"]["directories"] = set_exclude
+        elif add_exclude:
+            current = profile.get("exclude")
+            if current is None:
+                current = profile.setdefault("excluded", {}).setdefault("directories", [])
+            for item in add_exclude:
+                if item not in current:
+                    current.append(item)
+            profile["exclude"] = current
+
+        with open(target_path, "w", encoding="utf-8") as f:
+            json.dump(profile, f, indent=2)
+
+        return cls.get_profile_info(project_root=root)
+
+    @classmethod
+    def build(cls, project_root: Optional[Union[str, Path]] = None,
+              output_dir: Optional[Union[str, Path]] = None,
+              excluded_dirs: Optional[List[str]] = None) -> "CKG":
+        """Scans project across all supported languages (Python, JS, HTML, CSS), merges AST, and runs framework semantic enrichment."""
         root = Path(project_root).resolve() if project_root else Path.cwd()
         out = Path(output_dir).resolve() if output_dir else (root / ".spashta")
         out.mkdir(parents=True, exist_ok=True)
 
-        # Profile detection
-        profile_path = root / "profile.json"
-        if not profile_path.exists():
-            profile_path = PACKAGE_ROOT / "project" / "profile.json"
-        
+        # Profile detection for exclusions
+        candidates = [
+            root / "profile.json",
+            root / ".spashta" / "profile.json",
+            PACKAGE_ROOT / "project" / "profile.json"
+        ]
+        profile_path = next((p for p in candidates if p.exists()), PACKAGE_ROOT / "project" / "profile.json")
+
         with open(profile_path, "r", encoding="utf-8") as f:
             profile = json.load(f)
 
-        active_languages = languages or profile.get("languages", ["python", "html", "css", "js"])
-        active_frameworks = frameworks or profile.get("frameworks", ["django", "fastapi", "htmx", "vanilla"])
+        # Exclusions (supports "exclude": [] and legacy "excluded.directories")
+        configured_excludes = profile.get("exclude")
+        if configured_excludes is None:
+            configured_excludes = profile.get("excluded", {}).get("directories", [])
+
+        all_excluded = set(configured_excludes)
+        if excluded_dirs:
+            all_excluded.update(excluded_dirs)
+        exclude_arg = ",".join(sorted(all_excluded))
 
         # ── STAGE 1: BODY (Structure) - Run Language Builders ──────────
         frag_dir = out / "fragments"
         frag_dir.mkdir(parents=True, exist_ok=True)
         fragments = []
 
-        for lang in active_languages:
+        all_languages = ["python", "html", "css", "js"]
+        for lang in all_languages:
             builder_file = PACKAGE_ROOT / "builders" / lang / f"build_{lang}_ast.py"
             if not builder_file.exists():
                 continue
@@ -185,7 +286,8 @@ class CKG:
             cmd = [
                 sys.executable, str(builder_file),
                 "--source-root", str(root),
-                "--out", str(frag_path)
+                "--out", str(frag_path),
+                "--exclude", exclude_arg
             ]
             res = subprocess.run(cmd, capture_output=True, text=True)
             if res.returncode == 0 and frag_path.exists():
@@ -222,7 +324,7 @@ class CKG:
                 "schema_version": "2.2",
                 "generator": "Spashta-CKG 3.0",
                 "project_root": str(root),
-                "languages": active_languages
+                "languages": all_languages
             },
             "nodes": list(merged_nodes.values()),
             "edges": merged_edges,
@@ -246,8 +348,9 @@ class CKG:
                 edges_from.setdefault(src, []).append((typ, tgt))
                 edges_to.setdefault(tgt, []).append((typ, src))
 
-        # Apply each active framework adapter's semantic rules
-        for fw in active_frameworks:
+        # Apply all available framework adapters (Django, FastAPI, HTMX, Vanilla)
+        all_frameworks = ["django", "fastapi", "htmx", "vanilla"]
+        for fw in all_frameworks:
             mapping_path = PACKAGE_ROOT / "adapters" / fw / "framework_mapping.json"
             if not mapping_path.exists():
                 continue
@@ -272,7 +375,7 @@ class CKG:
         enriched_data = dict(ast_data)
         enriched_data["nodes"] = list(node_map.values())
         enriched_data["_meta"]["enriched"] = True
-        enriched_data["_meta"]["frameworks"] = active_frameworks
+        enriched_data["_meta"]["frameworks"] = all_frameworks
 
         enriched_path = out / "code_knowledge_graph_enriched.json"
         with open(enriched_path, "w", encoding="utf-8") as f:
