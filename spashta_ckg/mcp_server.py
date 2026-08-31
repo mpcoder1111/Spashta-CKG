@@ -62,6 +62,13 @@ async def spashta_scan(project_dir: str = ".") -> str:
     ckg = CKG.build(project_root=root)
     return json.dumps(ckg.stats(), indent=2)
 
+@mcp.tool()
+async def spashta_refresh(files: Optional[str] = None, project_dir: str = ".") -> str:
+    """Fast incremental refresh: re-parse only changed or specified files (e.g. after code edits) in milliseconds."""
+    root = Path(project_dir).resolve() if project_dir and project_dir != "." else Path.cwd()
+    ckg = CKG.refresh(project_root=root, files=files)
+    return json.dumps(ckg.stats(), indent=2)
+
 def main():
     """Starts the official MCP server on stdio transport or displays help if invoked from CLI."""
     if len(sys.argv) > 1 and sys.argv[1] in ("-h", "--help", "help"):

@@ -61,10 +61,16 @@ Quickstart Workflow:
     p_cfg.add_argument("--set-exclude", help="Set excluded directories (replaces current list)")
     p_cfg.add_argument("--add-exclude", help="Append directories to exclusion list (e.g. misc,docs)")
 
-    # 3. Lifecycle & Scanning (3.0)
+    # 3. Lifecycle & Scanning (3.0, 3.2.2)
     p_scan = subparsers.add_parser("scan", aliases=["build"], parents=[common], help="Scan project across all languages and build/refresh CKG graph")
     p_scan.add_argument("--out", "-o", default=None, help="Output directory for CKG artifacts (default: <project_dir>/.spashta)")
     p_scan.add_argument("--exclude", "-e", default=None, help="Comma-separated directories to exclude during this scan")
+    p_scan.add_argument("--incremental", "-i", action="store_true", help="Perform fast incremental update of changed files only")
+
+    # 3b. Fast Incremental Refresh (3.2.2)
+    p_ref = subparsers.add_parser("refresh", parents=[common], help="Fast incremental refresh: re-parse only modified or specified files")
+    p_ref.add_argument("--file", "-f", help="Specific file path(s) to refresh (comma-separated, e.g. app/views.py)")
+    p_ref.add_argument("--out", "-o", default=None, help="Output directory for CKG artifacts (default: <project_dir>/.spashta)")
 
     # 4. Impact Analysis (2.1, 2.2, 3.0)
     p_impact = subparsers.add_parser("impact", parents=[common], help="Calculate blast-radius: who depends on/calls this symbol?")
@@ -192,6 +198,27 @@ Quickstart Workflow:
                 print(f"Excluded Dirs:      {', '.join(cfg['excluded_directories'])}")
                 print("\nSupported Languages (Auto-Detected): Python, JavaScript, HTML, CSS")
                 print("Supported Frameworks (Auto-Detected): Django, FastAPI, HTMX, Vanilla JS\n")
+        sys.exit(0)
+
+    # Handle refresh / incremental update (3.2.2)
+    if args.command == "refresh" or (args.command in ("scan", "build") and getattr(args, "incremental", False)):
+        target_files = getattr(args, "file", None)
+        if not args.json:
+            if target_files:
+                print(f"Incrementally refreshing [{target_files}] in: {project_root}...")
+            else:
+                print(f"Incrementally refreshing changed files in: {project_root}...")
+        ckg = CKG.refresh(
+            project_root=project_root,
+            output_dir=getattr(args, "out", None),
+            files=target_files
+        )
+        stats = ckg.stats()
+        if args.json:
+            print(json.dumps(stats, indent=2))
+        else:
+            print(f"Refresh complete! Graph active with {stats['total_nodes']} nodes and {stats['total_edges']} edges.")
+            print(f"Artifacts updated in: {project_root / '.spashta'}")
         sys.exit(0)
 
     # Handle scan / build

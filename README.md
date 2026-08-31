@@ -2,7 +2,7 @@
 
 > **Spashta** (स्पष्ट) = *Clarity* in Sanskrit. Deterministic Code Knowledge Graph & Impact Engine for Python, JavaScript, HTML, and CSS.
 
-[![Version](https://img.shields.io/badge/version-3.2.1-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.2.2-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
 
@@ -65,11 +65,6 @@ spashta_ckg impact SectionBlock --depth 2 --json
 
 # 5. Find dead code across Python, JS, or CSS with zero false-positives
 spashta_ckg dead-code css
-
-# 6. View all full-stack routes linking templates, backend views, and HTMX events
-spashta_ckg routes
-```
-
 > 💡 **Why Directory Exclusions Matter**:  
 > Spashta automatically ignores standard folders (`.git`, `venv`, `node_modules`, `__pycache__`, `build`, `dist`). If your repository has non-production or duplicate code (`misc/`, `_archive/`, `legacy_backup/`, `fixtures/`), excluding them via `spashta_ckg init --exclude "..."` or `profile.json` ensures you get 100% accurate symbol references without false duplicate definitions.
 
@@ -91,7 +86,7 @@ Connect Spashta directly to **Antigravity, Cursor, Claude Desktop, or VS Code** 
 ```
 *(If installed inside a project `.venv`, specify the direct path: e.g. `"command": ".venv/Scripts/spashta_ckg_mcp.exe"` on Windows or `".venv/bin/spashta_ckg_mcp"` on Linux/macOS).*
 
-*Your AI agent now has native, zero-click IDE tools (`spashta_impact`, `spashta_dead_code`, `spashta_routes`, `spashta_search`, `spashta_scan`)!*
+*Your AI agent now has native, zero-click IDE tools (`spashta_impact`, `spashta_routes`, `spashta_search`, `spashta_dead_code`, `spashta_refresh`, `spashta_scan`)!*
 
 ---
 
@@ -102,8 +97,9 @@ Integrate Spashta directly into your Python scripts or custom agent tools:
 ```python
 from spashta_ckg import CKG
 
-# Load existing graph or scan project
+# Load existing graph, run full build, or incremental refresh
 ckg = CKG.load()
+ckg_updated = CKG.refresh(files=["app/views.py"])
 
 # Perform blast-radius analysis
 report = ckg.impact("product_detail")
@@ -144,8 +140,9 @@ This repository uses **Spashta-CKG** (https://github.com/mpcoder1111/Spashta-CKG
    - For database models, use `spashta_ckg consumers <ModelName>` to verify all query and update sites.
 3. **Verify Routing & Couplings**:
    - When altering URLs or views, call `spashta_routes()` (or run `spashta_ckg routes`) to ensure template `{% url %}` tags and HTMX event listeners remain intact.
-4. **Rescan Before Commit & Periodically**:
-   - **Always run `spashta_ckg scan` (or call `spashta_scan()`) before creating a git commit** to ensure `.spashta/` graph memory is synchronized with active changes.
+4. **Refresh After Edits & Rescan Before Commit**:
+   - **After editing files**: Run `spashta_ckg refresh --file "<edited_files>"` (or call `spashta_refresh()`) to synchronize graph state in ~20ms.
+   - **Before creating a git commit**: Always run `spashta_ckg scan` (or call `spashta_scan()`) to ensure `.spashta/` graph memory is pristine.
    - Audit with `spashta_dead_code()` to ensure no broken or orphaned code is committed.
 ```
 
@@ -158,6 +155,7 @@ This repository uses **Spashta-CKG** (https://github.com/mpcoder1111/Spashta-CKG
 | `spashta_ckg init` | Initializes project `profile.json` with detected languages and exclusions | `spashta_ckg init --exclude misc,docs` |
 | `spashta_ckg config` | Views or updates active profile configuration and exclusion list | `spashta_ckg config --add-exclude legacy` |
 | `spashta_ckg scan` | Scans project across all languages and builds `.spashta/` CKG cache | `spashta_ckg scan --exclude misc` |
+| `spashta_ckg refresh` | Fast incremental refresh: re-parses only modified or specified files in ~20ms | `spashta_ckg refresh --file app/views.py` |
 | `spashta_ckg impact <symbol>` | Upstream blast-radius: who calls or depends on this symbol? | `spashta_ckg impact UserForm` |
 | `spashta_ckg dependencies <symbol>` | Downstream dependencies: what does this symbol call/use? | `spashta_ckg dependencies home_view` |
 | `spashta_ckg dead-code [lang]` | Detects unused code across `css`, `js`, or `py` | `spashta_ckg dead-code css` |

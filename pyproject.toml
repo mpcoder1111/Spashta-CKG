@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spashta_ckg"
-version = "3.2.1"
+version = "3.2.2"
 description = "Full-stack Code Knowledge Graph (CKG) for Python, JavaScript, HTML, and CSS"
 readme = "README.md"
 requires-python = ">=3.9"

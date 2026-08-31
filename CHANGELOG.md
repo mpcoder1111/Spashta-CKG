@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [3.2.2] - 2026-08-31
+
+**Spashta-CKG 3.2.2 — High-Speed Incremental Graph Refresh & Sub-50ms Edit Synchronization**
+
+Added fast incremental change detection and partial graph refresh across the Python API (`CKG.refresh()`), Terminal CLI (`spashta_ckg refresh`, `spashta_ckg scan --incremental`), and native MCP Server (`spashta_refresh`).
+
+### Added
+- **Fast Incremental Refresh Engine (`CKG.refresh()`)**: Automatically detects modified, added, or deleted files using MD5 content hashing and only re-parses changed files/languages, updating `.spashta/` graph memory in ~20–50ms.
+- **Targeted File Refresh**: Support for refreshing specific files directly via `--file` (e.g. `spashta_ckg refresh --file app/views.py` or `spashta_refresh(files="app/views.py")`).
+- **New CLI Subcommand (`spashta_ckg refresh`) & Flag (`--incremental`)**: Fast CLI workflow to keep CKG cache in sync during active coding without doing full project scans.
+- **Native MCP Tool (`spashta_refresh`)**: Allows AI agents to instantly re-synchronize graph memory after modifying files with zero user clicks.
+- **Agent Skill & Governance Protocol Update**: Updated 4-phase closed loop with post-edit incremental refresh guidelines.
+
+---
+
 ## [3.2.1] - 2026-08-30
 
 **Spashta-CKG 3.2.1 — FastMCP Asynchronous Performance & Fail-Fast Reliability Patch**

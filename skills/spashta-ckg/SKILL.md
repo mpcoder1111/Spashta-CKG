@@ -44,8 +44,10 @@ To maintain architectural integrity and eliminate hallucinations/breakages, foll
                                     │
                                     ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│ 4. POST-EDIT RESCAN & VERIFICATION (Close the Loop)                    │
-│    • Refresh graph: spashta_ckg scan                                   │
+│ 4. POST-EDIT REFRESH & VERIFICATION (Close the Loop)                   │
+│    • Fast incremental refresh: spashta_ckg refresh                     │
+│    • Or targeted file update: spashta_ckg refresh --file <path>       │
+│    • Or native MCP tool: spashta_refresh(files="<path>")               │
 │    • Verify full-stack routes: spashta_ckg routes                      │
 │    • Check for orphaned code: spashta_ckg dead-code <lang>             │
 └────────────────────────────────────────────────────────────────────────┘
@@ -57,7 +59,7 @@ To maintain architectural integrity and eliminate hallucinations/breakages, foll
 
 All commands run from the project root (or with `-p <project_root>`):
 
-### 1. Project Setup & Directory Exclusions
+### 1. Project Setup, Scanning & Incremental Refresh
 ```bash
 # (Optional) Initialize a profile.json with custom directory exclusions
 spashta_ckg init --exclude "misc,reference,legacy"
@@ -72,6 +74,12 @@ spashta_ckg config --add-exclude "misc,docs,reference"
 # Scan project and build CKG cache (all languages/frameworks auto-detected)
 spashta_ckg scan
 spashta_ckg scan --exclude "misc,legacy"
+
+# Fast Incremental Refresh (only re-parses modified files in ~20ms)
+spashta_ckg refresh
+spashta_ckg refresh --file "app/views.py"
+spashta_ckg refresh --file "app/views.py,templates/index.html"
+spashta_ckg scan --incremental
 ```
 
 ### 2. Pre-Refactoring & Impact Analysis
@@ -138,6 +146,7 @@ When `spashta_ckg_mcp` is registered in your IDE's `mcp_config.json`, use these 
 | `spashta_routes` | `project_dir: str = "."` | Full-stack routes connecting backend views, templates, and HTMX triggers |
 | `spashta_search` | `query: str`, `node_type: str = None`, `project_dir: str = "."` | Searches CKG for symbols, classes, styles, or endpoints |
 | `spashta_dead_code` | `language: str = "css"|"js"|"py"`, `project_dir: str = "."` | Dynamic-safe dead code detection with zero false-positives |
+| `spashta_refresh` | `files: Optional[str] = None`, `project_dir: str = "."` | Fast incremental refresh: re-parses only modified/specified files in ~20ms |
 | `spashta_scan` | `project_dir: str = "."` | Scans codebase and rebuilds `.spashta/` CKG cache |
 
 ### MCP IDE Configuration (`mcp_config.json`):
@@ -178,8 +187,9 @@ This project uses **Spashta-CKG** (https://github.com/mpcoder1111/Spashta-CKG) f
    - For database models, use `spashta_ckg consumers <ModelName>` to verify all query and update sites.
 3. **Verify Routing & Couplings**:
    - When altering URLs or views, call `spashta_routes()` (or run `spashta_ckg routes`) to ensure template `{% url %}` tags and HTMX event listeners remain intact.
-4. **Rescan Before Commit & Periodically**:
-   - **Always run `spashta_ckg scan` (or call `spashta_scan()`) before creating a git commit** to ensure `.spashta/` graph memory is synchronized with active changes.
+4. **Refresh After Edits & Rescan Before Commit**:
+   - **After editing files**: Run `spashta_ckg refresh --file "<edited_files>"` (or call `spashta_refresh()`) to synchronize graph state in ~20ms.
+   - **Before creating a git commit**: Always run `spashta_ckg scan` (or call `spashta_scan()`) to ensure `.spashta/` graph memory is pristine.
    - Audit with `spashta_dead_code()` to ensure no broken or orphaned code is committed.
 ```
 

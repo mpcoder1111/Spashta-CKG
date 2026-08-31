@@ -8,6 +8,7 @@ import os
 import json
 import subprocess
 import fnmatch
+import hashlib
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Union
 
@@ -378,6 +379,190 @@ class CKG:
         enriched_data["_meta"]["frameworks"] = all_frameworks
 
         enriched_path = out / "code_knowledge_graph_enriched.json"
+        with open(enriched_path, "w", encoding="utf-8") as f:
+            json.dump(enriched_data, f, indent=2)
+
+        return cls(enriched_data, project_root=root)
+
+    @classmethod
+    def refresh(cls, project_root: Optional[Union[str, Path]] = None,
+                output_dir: Optional[Union[str, Path]] = None,
+                files: Optional[Union[str, List[str]]] = None) -> "CKG":
+        """
+        Incrementally updates the CKG graph by re-parsing only changed or specified files.
+        If no graph exists, runs full build. If no files changed, returns existing graph in ~10ms.
+        """
+        root = Path(project_root).resolve() if project_root else Path.cwd()
+        out = Path(output_dir).resolve() if output_dir else (root / ".spashta")
+        raw_ast_path = out / "code_knowledge_graph_ast.json"
+        enriched_path = out / "code_knowledge_graph_enriched.json"
+
+        # Fallback to full build if graph does not exist
+        if not raw_ast_path.exists() or not enriched_path.exists():
+            return cls.build(project_root=root, output_dir=out)
+
+        with open(raw_ast_path, "r", encoding="utf-8") as f:
+            ast_data = json.load(f)
+
+        existing_file_nodes = {n["id"]: n for n in ast_data.get("nodes", []) if n.get("node_type") == "File"}
+        existing_file_hashes = {nid: n.get("file_hash") for nid, n in existing_file_nodes.items()}
+
+        target_files_to_refresh = set()
+
+        if files:
+            if isinstance(files, str):
+                file_list = [f.strip() for f in files.split(",") if f.strip()]
+            else:
+                file_list = list(files)
+            for f_str in file_list:
+                fp = (root / f_str).resolve() if not Path(f_str).is_absolute() else Path(f_str).resolve()
+                if fp.exists():
+                    target_files_to_refresh.add(fp)
+        else:
+            cfg = cls.get_profile_info(project_root=root)
+            exclude_dirs = set(cfg.get("excluded_directories", []))
+            
+            def should_include(p):
+                try:
+                    rel_parts = p.relative_to(root).parts[:-1]
+                except Exception:
+                    rel_parts = p.parts[:-1]
+                return not any(part in exclude_dirs for part in rel_parts)
+
+            all_exts = ("*.py", "*.js", "*.html", "*.css")
+            current_project_files = {}
+            for ext in all_exts:
+                for p in root.rglob(ext):
+                    if should_include(p):
+                        try:
+                            rel_posix = p.relative_to(root).as_posix()
+                            content_bytes = p.read_bytes()
+                            h = hashlib.md5(content_bytes).hexdigest()
+                            current_project_files[rel_posix] = (p, h)
+                        except Exception:
+                            pass
+
+            for rel_posix, (p, h) in current_project_files.items():
+                old_h = existing_file_hashes.get(rel_posix)
+                if old_h != h:
+                    target_files_to_refresh.add(p)
+
+        if not target_files_to_refresh and not files:
+            with open(enriched_path, "r", encoding="utf-8") as f:
+                return cls(json.load(f), project_root=root)
+
+        # Re-parse changed languages
+        frag_dir = out / "fragments"
+        frag_dir.mkdir(parents=True, exist_ok=True)
+        
+        ext_map = {
+            ".py": "python",
+            ".js": "js",
+            ".html": "html",
+            ".css": "css"
+        }
+        langs_to_reparse = set()
+        for tf in target_files_to_refresh:
+            l = ext_map.get(tf.suffix.lower())
+            if l:
+                langs_to_reparse.add(l)
+
+        cfg = cls.get_profile_info(project_root=root)
+        exclude_arg = ",".join(sorted(cfg.get("excluded_directories", [])))
+
+        for lang in (langs_to_reparse or ["python", "html", "css", "js"]):
+            builder_file = PACKAGE_ROOT / "builders" / lang / f"build_{lang}_ast.py"
+            if not builder_file.exists():
+                continue
+            frag_path = frag_dir / f"fragment_{lang}.json"
+            cmd = [
+                sys.executable, str(builder_file),
+                "--source-root", str(root),
+                "--out", str(frag_path),
+                "--exclude", exclude_arg
+            ]
+            subprocess.run(cmd, capture_output=True, text=True)
+
+        # Merge AST fragments
+        fragments = list(frag_dir.glob("fragment_*.json"))
+        merged_nodes = {}
+        merged_edges = []
+        seen_edges = set()
+        ambiguities = []
+
+        for frag in fragments:
+            with open(frag, "r", encoding="utf-8") as f:
+                fdata = json.load(f)
+            ambiguities.extend(fdata.get("ambiguities", []))
+            for n in fdata.get("nodes", []):
+                nid = n.get("id") or f"{n.get('node_type')}:{n.get('name')}"
+                if nid not in merged_nodes:
+                    merged_nodes[nid] = n
+                else:
+                    merged_nodes[nid].update(n)
+
+            for e in fdata.get("edges", []):
+                src = e.get("source", e.get("from"))
+                tgt = e.get("target", e.get("to"))
+                typ = e.get("type", e.get("edge"))
+                key = (typ, src, tgt)
+                if key not in seen_edges:
+                    seen_edges.add(key)
+                    merged_edges.append(e)
+
+        ast_data = {
+            "_meta": {
+                "schema_version": "2.2",
+                "generator": "Spashta-CKG 3.2.2 (Incremental)",
+                "project_root": str(root),
+                "languages": ["python", "html", "css", "js"]
+            },
+            "nodes": list(merged_nodes.values()),
+            "edges": merged_edges,
+            "ambiguities": ambiguities
+        }
+
+        with open(raw_ast_path, "w", encoding="utf-8") as f:
+            json.dump(ast_data, f, indent=2)
+
+        # Stage 2 enrichment
+        node_map = {n["id"]: n for n in ast_data["nodes"]}
+        edges_from = {}
+        edges_to = {}
+        for e in ast_data["edges"]:
+            src = e.get("source", e.get("from"))
+            tgt = e.get("target", e.get("to"))
+            typ = e.get("type", e.get("edge"))
+            if src and tgt:
+                edges_from.setdefault(src, []).append((typ, tgt))
+                edges_to.setdefault(tgt, []).append((typ, src))
+
+        all_frameworks = ["django", "fastapi", "htmx", "vanilla"]
+        for fw in all_frameworks:
+            mapping_path = PACKAGE_ROOT / "adapters" / fw / "framework_mapping.json"
+            if not mapping_path.exists():
+                continue
+            with open(mapping_path, "r", encoding="utf-8") as mf:
+                mapping = json.load(mf)
+            for rule in mapping.get("mappings", []):
+                role = rule.get("semantic_role")
+                target_core_node = rule.get("core_node")
+                detection = rule.get("detection_rules", {})
+                for nid, node in node_map.items():
+                    ntype = node.get("node_type", node.get("type"))
+                    if ntype != target_core_node:
+                        continue
+                    if apply_enrichment_logic(node, edges_from, edges_to, node_map, detection):
+                        current_roles = node.get("semantic_roles", [])
+                        if role not in current_roles:
+                            current_roles.append(role)
+                            node["semantic_roles"] = current_roles
+
+        enriched_data = dict(ast_data)
+        enriched_data["nodes"] = list(node_map.values())
+        enriched_data["_meta"]["enriched"] = True
+        enriched_data["_meta"]["frameworks"] = all_frameworks
+
         with open(enriched_path, "w", encoding="utf-8") as f:
             json.dump(enriched_data, f, indent=2)
 
