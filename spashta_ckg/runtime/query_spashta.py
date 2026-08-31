@@ -398,7 +398,20 @@ def smart_search(graph, query, type_filter=None, app_filter=None):
                 continue
             
         results.append(node)
-            
+
+    # Sort results by exact match relevance
+    def match_rank(n):
+        nid = n.get("id", "")
+        nname = n.get("name", "")
+        if nid == query: return 0
+        if nname == query: return 1
+        if nid.endswith(f"::{query}"): return 2
+        if nid.lower() == query_lower: return 3
+        if nname.lower() == query_lower: return 4
+        if nid.lower().endswith(f"::{query_lower}"): return 5
+        return 6
+
+    results.sort(key=match_rank)
     return results[:50]
 
 
@@ -408,29 +421,52 @@ def smart_search(graph, query, type_filter=None, app_filter=None):
 
 def get_node(graph, node_id):
     """
-    Retrieves a specific node by its ID.
-    Auto-detects file paths and tries File: prefix if exact match fails.
+    Retrieves a specific node by its ID, symbol name, or file path.
+    Supports exact ID match, file paths, bare symbol names, and scoped identifiers.
 
     Args:
         graph: The loaded CKG
-        node_id: Exact node ID (e.g., "app/views.py::login")
+        node_id: Exact node ID, symbol name, or file path
 
     Returns:
         dict or None: The node object, or None if not found.
     """
-    # Exact match first
-    for node in graph.get("nodes", []):
-        if node["id"] == node_id:
+    nodes = graph.get("nodes", [])
+
+    # 1. Exact match by ID
+    for node in nodes:
+        if node.get("id") == node_id:
             return node
 
-    # Auto-detect: if node_id looks like a file path, try with File: prefix
+    # 2. Auto-detect: if node_id looks like a file path, try with File: prefix
     if "::" not in node_id and not node_id.startswith("File:"):
         file_extensions = (".py", ".html", ".css", ".js", ".json", ".yaml", ".yml", ".txt", ".md")
         if any(node_id.endswith(ext) for ext in file_extensions):
             prefixed = f"File:{node_id}"
-            for node in graph.get("nodes", []):
-                if node["id"] == prefixed:
+            for node in nodes:
+                if node.get("id") == prefixed:
                     return node
+
+    # 3. Exact match by symbol name
+    for node in nodes:
+        if node.get("name") == node_id:
+            return node
+
+    # 4. Suffix match by ::symbol
+    for node in nodes:
+        if node.get("id", "").endswith(f"::{node_id}"):
+            return node
+
+    # 5. Case-insensitive exact match by symbol name
+    node_id_lower = node_id.lower()
+    for node in nodes:
+        if node.get("name", "").lower() == node_id_lower:
+            return node
+
+    # 6. Case-insensitive suffix match by ::symbol
+    for node in nodes:
+        if node.get("id", "").lower().endswith(f"::{node_id_lower}"):
+            return node
 
     return None
 
@@ -756,6 +792,11 @@ def get_call_graph(graph, node_id):
             "summary": {"outgoing_count": 1, "incoming_count": 1}
         }
     """
+    # Resolve bare symbol or prefix to canonical node ID
+    target_node = get_node(graph, node_id)
+    if target_node:
+        node_id = target_node.get("id", node_id)
+
     edges = get_edges_list(graph)
     
     # Outgoing: What does this function call?
@@ -834,8 +875,13 @@ def read_content(graph, node_id):
     if not file_path:
         return {"error": "No file path for node"}
     
-    # Strict path resolution from PROJECT_ROOT (as defined in profile.json)
-    target_path = PROJECT_ROOT / file_path
+    # Strict path resolution from graph project root or PROJECT_ROOT
+    root = Path(graph.get("_meta", {}).get("project_root", PROJECT_ROOT))
+    target_path = root / file_path if not Path(file_path).is_absolute() else Path(file_path)
+    if not target_path.exists() and (PROJECT_ROOT / file_path).exists():
+        target_path = PROJECT_ROOT / file_path
+    if not target_path.exists() and Path(file_path).exists():
+        target_path = Path(file_path)
     
     if not target_path.exists():
         return {"error": f"File not found at: {target_path}"}

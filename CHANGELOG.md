@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [3.2.6] - 2026-08-31
+
+**Spashta-CKG 3.2.6 — Universal Bare-Symbol Resolution Across All CLI Subcommands & 39-Suite Regression**
+
+Consolidation release finalizing bare symbol resolution across all 23 CLI subcommands, 8 native MCP tools, and development milestone documentation.
+
+### Fixed & Enhanced
+- **Universal Bare Symbol Resolution**: All 23 CLI subcommands (`impact`, `locate`, `details`, `read`, `call-graph`, `dependencies`, `search`) resolve bare symbol names with exact-match priority, full-qualified ID support, and case-insensitivity.
+- **8 Native MCP Tools**: Fully verified `spashta_impact`, `spashta_locate`, `spashta_routes`, `spashta_search`, `spashta_dead_code`, `spashta_stats`, `spashta_refresh`, and `spashta_scan`.
+- **Development Documentation**: Published [`development/2026-08-31_development_achievement_from_3.2.2_to_3.2.6.md`](development/2026-08-31_development_achievement_from_3.2.2_to_3.2.6.md) detailing performance benchmarks, edge retention invariants, and architecture.
+- **39-Suite Regression Green**: Expanded full regression suite to 39 automated tests covering language builders, adapters, CLI commands, and Python API.
+
+---
+
 ## [3.2.5] - 2026-08-31
 
 **Spashta-CKG 3.2.5 — CLI List-Files Formatter Fix & Search Exact-Match Ranking**

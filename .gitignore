@@ -42,6 +42,3 @@ agent_work/
 # Spashta Local Cache & Artifacts
 .spashta/
 
-# Local Scratch & Development Notes
-development/
-

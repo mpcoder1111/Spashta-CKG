@@ -95,7 +95,7 @@ spashta_ckg dependencies "MyFunctionOrClass"
 spashta_ckg scope-check "TargetSymbol" --analyzed "app/views.py,app/models.py"
 ```
 
-### 2. Precise Code Navigation (Without Context Bloat)
+### 3. Precise Code Navigation (Without Context Bloat)
 ```bash
 # Pinpoint exact file path, start line, and end line
 spashta_ckg locate "calculate_total"
@@ -111,7 +111,7 @@ spashta_ckg search "api" --app "billing"
 spashta_ckg consumers "Order"
 ```
 
-### 3. Full-Stack Routing & Cross-Language Couplings
+### 4. Full-Stack Routing & Cross-Language Couplings
 ```bash
 # Map URL routes to backend views, template tags, and HTMX triggers
 spashta_ckg routes
@@ -123,7 +123,7 @@ spashta_ckg class-usage "btn-primary"
 spashta_ckg dup-styles
 ```
 
-### 4. Dead Code & Quality Auditing
+### 5. Dead Code & Quality Auditing
 ```bash
 # Audit dead code across CSS, JS, or Python (dynamic-syntax safe)
 spashta_ckg dead-code css

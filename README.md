@@ -2,7 +2,7 @@
 
 > **Spashta** (स्पष्ट) = *Clarity* in Sanskrit. Deterministic Code Knowledge Graph & Impact Engine for Python, JavaScript, HTML, and CSS.
 
-[![Version](https://img.shields.io/badge/version-3.2.5-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.2.6-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
 
@@ -65,6 +65,8 @@ spashta_ckg impact SectionBlock --depth 2 --json
 
 # 5. Find dead code across Python, JS, or CSS with zero false-positives
 spashta_ckg dead-code css
+```
+
 > 💡 **Why Directory Exclusions Matter**:  
 > Spashta automatically ignores standard folders (`.git`, `venv`, `node_modules`, `__pycache__`, `build`, `dist`). If your repository has non-production or duplicate code (`misc/`, `_archive/`, `legacy_backup/`, `fixtures/`), excluding them via `spashta_ckg init --exclude "..."` or `profile.json` ensures you get 100% accurate symbol references without false duplicate definitions.
 

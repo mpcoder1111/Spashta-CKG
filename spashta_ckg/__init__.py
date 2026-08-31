@@ -1,5 +1,5 @@
 """
-Spashta CKG (Code Knowledge Graph) v3.2.5
+Spashta CKG (Code Knowledge Graph) v3.2.6
 
 Full-stack multi-language code intelligence, impact analysis, dead-code detection,
 high-speed incremental refresh, CLI, and Model Context Protocol (MCP) server for Python, JavaScript, HTML, and CSS.
@@ -7,5 +7,5 @@ high-speed incremental refresh, CLI, and Model Context Protocol (MCP) server for
 
 from spashta_ckg.engine import CKG
 
-__version__ = "3.2.5"
+__version__ = "3.2.6"
 __all__ = ["CKG", "__version__"]

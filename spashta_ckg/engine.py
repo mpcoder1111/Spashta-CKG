@@ -14,7 +14,7 @@ from typing import Dict, List, Any, Optional, Union
 
 # Base package directory
 PACKAGE_ROOT = Path(__file__).resolve().parent
-__version__ = "3.2.5"
+__version__ = "3.2.6"
 
 def apply_enrichment_logic(node: Dict[str, Any], edges_from: Dict[str, List], edges_to: Dict[str, List], node_map: Dict[str, Any], detection_rules: Dict[str, Any]) -> bool:
     """Evaluates 9 deterministic detection rules against a node to assign semantic roles."""
