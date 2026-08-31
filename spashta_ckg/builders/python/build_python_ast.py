@@ -1215,6 +1215,7 @@ class RelationWalker(ast.NodeVisitor):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--source-root", required=True, help="Root directory or file to parse")
+    parser.add_argument("--files", default=None, help="Comma-separated specific files to parse relative to source-root")
     parser.add_argument("--out", required=True, help="Path to write output AST JSON")
     parser.add_argument("--exclude", default=None, help="Comma-separated directories to exclude")
     args = parser.parse_args()
@@ -1231,8 +1232,13 @@ def main():
     
     enforcer = SchemaEnforcer(mapping, edges_schema)
     
-    # SCAN FILES (Support Single File or Directory)
-    if root.is_file():
+    # SCAN FILES (Support Specific Files, Single File, or Directory)
+    if getattr(args, "files", None):
+        root_dir = root
+        raw_files = [f.strip() for f in args.files.split(",") if f.strip()]
+        py_files = [Path(f).resolve() if Path(f).is_absolute() else (root_dir / f).resolve() for f in raw_files]
+        py_files = sorted([p for p in py_files if p.exists() and p.suffix == ".py"])
+    elif root.is_file():
         # Case: Unit Test or Single File Scan
         root_dir = root.parent
         py_files = [root]

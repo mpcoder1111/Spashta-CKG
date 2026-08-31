@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [3.2.3] - 2026-08-31
+
+**Spashta-CKG 3.2.3 — Targeted AST Builder Execution & mtime Caching Performance Optimization**
+
+Major performance overhaul for incremental refresh, replacing full-repository language scans with targeted single-file parsing and `mtime` change gating.
+
+### Fixed & Optimized
+- **Targeted `--files` Builder Execution**: Enhanced `build_python_ast.py`, `build_js_ast.py`, `build_html_ast.py`, and `build_css_ast.py` with `--files` parameter. When refreshing 1 or 2 modified files, AST builders now parse only those specific files in ~0.03s rather than re-scanning the entire repository.
+- **Fast `mtime` + Size Change Gating**: Added `.spashta/scan_meta.json` tracking timestamps and sizes per file. Unchanged projects return instantly in ~5ms without computing disk hashes.
+- **Granular Subgraph Splicing**: Surgically replaces only affected node and edge subgraphs in memory before re-running Stage 2 semantic enrichment rules.
+- **Updated CLI Banner & Docstrings**: Modernized `cli.py` description banner and quickstart epilog to reflect 3.2.3 incremental workflows.
+
+---
+
 ## [3.2.2] - 2026-08-31
 
 **Spashta-CKG 3.2.2 — High-Speed Incremental Graph Refresh & Sub-50ms Edit Synchronization**

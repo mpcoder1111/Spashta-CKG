@@ -382,6 +382,22 @@ class CKG:
         with open(enriched_path, "w", encoding="utf-8") as f:
             json.dump(enriched_data, f, indent=2)
 
+        # Write scan_meta.json for instant mtime-based incremental refreshes
+        try:
+            meta = {}
+            for n in ast_data.get("nodes", []):
+                if n.get("node_type") in ("File", "Stylesheet", "Template"):
+                    rel = n.get("id")
+                    h = n.get("file_hash") or n.get("hash")
+                    fpath = root / rel
+                    if fpath.exists():
+                        st = fpath.stat()
+                        meta[rel] = {"mtime": st.st_mtime, "size": st.st_size, "hash": h}
+            with open(out / "scan_meta.json", "w", encoding="utf-8") as f:
+                json.dump(meta, f, indent=2)
+        except Exception:
+            pass
+
         return cls(enriched_data, project_root=root)
 
     @classmethod
@@ -390,7 +406,7 @@ class CKG:
                 files: Optional[Union[str, List[str]]] = None) -> "CKG":
         """
         Incrementally updates the CKG graph by re-parsing only changed or specified files.
-        If no graph exists, runs full build. If no files changed, returns existing graph in ~10ms.
+        If no graph exists, runs full build. If no files changed, returns existing graph in ~5ms.
         """
         root = Path(project_root).resolve() if project_root else Path.cwd()
         out = Path(output_dir).resolve() if output_dir else (root / ".spashta")
@@ -404,10 +420,19 @@ class CKG:
         with open(raw_ast_path, "r", encoding="utf-8") as f:
             ast_data = json.load(f)
 
-        existing_file_nodes = {n["id"]: n for n in ast_data.get("nodes", []) if n.get("node_type") == "File"}
-        existing_file_hashes = {nid: n.get("file_hash") for nid, n in existing_file_nodes.items()}
+        existing_file_nodes = {n["id"]: n for n in ast_data.get("nodes", []) if n.get("node_type") in ("File", "Stylesheet", "Template")}
+        existing_file_hashes = {nid: n.get("file_hash") or n.get("hash") for nid, n in existing_file_nodes.items()}
 
         target_files_to_refresh = set()
+        deleted_files = set()
+        meta_path = out / "scan_meta.json"
+        cached_meta = {}
+        if meta_path.exists():
+            try:
+                with open(meta_path, "r", encoding="utf-8") as f:
+                    cached_meta = json.load(f)
+            except Exception:
+                pass
 
         if files:
             if isinstance(files, str):
@@ -418,6 +443,9 @@ class CKG:
                 fp = (root / f_str).resolve() if not Path(f_str).is_absolute() else Path(f_str).resolve()
                 if fp.exists():
                     target_files_to_refresh.add(fp)
+                else:
+                    rel_posix = fp.relative_to(root).as_posix() if fp.is_relative_to(root) else f_str
+                    deleted_files.add(rel_posix)
         else:
             cfg = cls.get_profile_info(project_root=root)
             exclude_dirs = set(cfg.get("excluded_directories", []))
@@ -436,22 +464,61 @@ class CKG:
                     if should_include(p):
                         try:
                             rel_posix = p.relative_to(root).as_posix()
-                            content_bytes = p.read_bytes()
-                            h = hashlib.md5(content_bytes).hexdigest()
-                            current_project_files[rel_posix] = (p, h)
+                            st = p.stat()
+                            cur_mtime = st.st_mtime
+                            cur_size = st.st_size
+                            meta_entry = cached_meta.get(rel_posix, {})
+                            
+                            # Fast-path: if mtime & size match cached meta, skip hashing
+                            if meta_entry.get("mtime") == cur_mtime and meta_entry.get("size") == cur_size:
+                                current_project_files[rel_posix] = (p, meta_entry.get("hash"))
+                            else:
+                                content_bytes = p.read_bytes()
+                                h = hashlib.md5(content_bytes).hexdigest()
+                                current_project_files[rel_posix] = (p, h)
+                                cached_meta[rel_posix] = {"mtime": cur_mtime, "size": cur_size, "hash": h}
+                                if existing_file_hashes.get(rel_posix) != h:
+                                    target_files_to_refresh.add(p)
                         except Exception:
                             pass
 
-            for rel_posix, (p, h) in current_project_files.items():
-                old_h = existing_file_hashes.get(rel_posix)
-                if old_h != h:
-                    target_files_to_refresh.add(p)
+            for old_rel in existing_file_nodes.keys():
+                if old_rel not in current_project_files:
+                    deleted_files.add(old_rel)
+                    cached_meta.pop(old_rel, None)
 
-        if not target_files_to_refresh and not files:
+        # Fast exit if nothing changed
+        if not target_files_to_refresh and not deleted_files and not files:
             with open(enriched_path, "r", encoding="utf-8") as f:
                 return cls(json.load(f), project_root=root)
 
-        # Re-parse changed languages
+        # Build set of affected file relative paths
+        affected_rel_paths = set(deleted_files)
+        for tf in target_files_to_refresh:
+            try:
+                affected_rel_paths.add(tf.relative_to(root).as_posix())
+            except Exception:
+                affected_rel_paths.add(tf.name)
+
+        # Filter out existing nodes/edges belonging to affected files
+        def is_node_affected(n):
+            nid = n.get("id", "")
+            fpath = n.get("file_path") or n.get("file") or ""
+            for aff in affected_rel_paths:
+                if fpath == aff or nid == aff or nid.startswith(f"{aff}::"):
+                    return True
+            return False
+
+        remaining_nodes = [n for n in ast_data.get("nodes", []) if not is_node_affected(n)]
+        removed_node_ids = {n["id"] for n in ast_data.get("nodes", []) if is_node_affected(n)}
+
+        remaining_edges = [
+            e for e in ast_data.get("edges", [])
+            if (e.get("source", e.get("from")) not in removed_node_ids) and
+               (e.get("target", e.get("to")) not in removed_node_ids)
+        ]
+
+        # Re-parse only the changed files by language
         frag_dir = out / "fragments"
         frag_dir.mkdir(parents=True, exist_ok=True)
         
@@ -461,54 +528,59 @@ class CKG:
             ".html": "html",
             ".css": "css"
         }
-        langs_to_reparse = set()
+        
+        files_by_lang = {}
         for tf in target_files_to_refresh:
             l = ext_map.get(tf.suffix.lower())
             if l:
-                langs_to_reparse.add(l)
+                rel = tf.relative_to(root).as_posix() if tf.is_relative_to(root) else tf.as_posix()
+                files_by_lang.setdefault(l, []).append(rel)
 
         cfg = cls.get_profile_info(project_root=root)
         exclude_arg = ",".join(sorted(cfg.get("excluded_directories", [])))
 
-        for lang in (langs_to_reparse or ["python", "html", "css", "js"]):
+        new_nodes = list(remaining_nodes)
+        new_edges = list(remaining_edges)
+        seen_edges = {(e.get("type", e.get("edge")), e.get("source", e.get("from")), e.get("target", e.get("to"))) for e in remaining_edges}
+        node_map = {n["id"]: n for n in remaining_nodes}
+
+        for lang, lang_files in files_by_lang.items():
             builder_file = PACKAGE_ROOT / "builders" / lang / f"build_{lang}_ast.py"
             if not builder_file.exists():
                 continue
-            frag_path = frag_dir / f"fragment_{lang}.json"
+            frag_path = frag_dir / f"fragment_{lang}_refresh.json"
+            files_arg = ",".join(lang_files)
             cmd = [
                 sys.executable, str(builder_file),
                 "--source-root", str(root),
+                "--files", files_arg,
                 "--out", str(frag_path),
                 "--exclude", exclude_arg
             ]
-            subprocess.run(cmd, capture_output=True, text=True)
+            res = subprocess.run(cmd, capture_output=True, text=True)
+            if res.returncode == 0 and frag_path.exists():
+                with open(frag_path, "r", encoding="utf-8") as f:
+                    fdata = json.load(f)
+                for n in fdata.get("nodes", []):
+                    nid = n.get("id") or f"{n.get('node_type')}:{n.get('name')}"
+                    if nid not in node_map:
+                        node_map[nid] = n
+                        new_nodes.append(n)
+                    else:
+                        node_map[nid].update(n)
 
-        # Merge AST fragments
-        fragments = list(frag_dir.glob("fragment_*.json"))
-        merged_nodes = {}
-        merged_edges = []
-        seen_edges = set()
-        ambiguities = []
-
-        for frag in fragments:
-            with open(frag, "r", encoding="utf-8") as f:
-                fdata = json.load(f)
-            ambiguities.extend(fdata.get("ambiguities", []))
-            for n in fdata.get("nodes", []):
-                nid = n.get("id") or f"{n.get('node_type')}:{n.get('name')}"
-                if nid not in merged_nodes:
-                    merged_nodes[nid] = n
-                else:
-                    merged_nodes[nid].update(n)
-
-            for e in fdata.get("edges", []):
-                src = e.get("source", e.get("from"))
-                tgt = e.get("target", e.get("to"))
-                typ = e.get("type", e.get("edge"))
-                key = (typ, src, tgt)
-                if key not in seen_edges:
-                    seen_edges.add(key)
-                    merged_edges.append(e)
+                for e in fdata.get("edges", []):
+                    src = e.get("source", e.get("from"))
+                    tgt = e.get("target", e.get("to"))
+                    typ = e.get("type", e.get("edge"))
+                    key = (typ, src, tgt)
+                    if key not in seen_edges:
+                        seen_edges.add(key)
+                        new_edges.append(e)
+                try:
+                    frag_path.unlink()
+                except Exception:
+                    pass
 
         ast_data = {
             "_meta": {
@@ -517,16 +589,15 @@ class CKG:
                 "project_root": str(root),
                 "languages": ["python", "html", "css", "js"]
             },
-            "nodes": list(merged_nodes.values()),
-            "edges": merged_edges,
-            "ambiguities": ambiguities
+            "nodes": new_nodes,
+            "edges": new_edges,
+            "ambiguities": ast_data.get("ambiguities", [])
         }
 
         with open(raw_ast_path, "w", encoding="utf-8") as f:
             json.dump(ast_data, f, indent=2)
 
         # Stage 2 enrichment
-        node_map = {n["id"]: n for n in ast_data["nodes"]}
         edges_from = {}
         edges_to = {}
         for e in ast_data["edges"]:
@@ -565,6 +636,20 @@ class CKG:
 
         with open(enriched_path, "w", encoding="utf-8") as f:
             json.dump(enriched_data, f, indent=2)
+
+        try:
+            for n in ast_data.get("nodes", []):
+                if n.get("node_type") in ("File", "Stylesheet", "Template"):
+                    rel = n.get("id")
+                    h = n.get("file_hash") or n.get("hash")
+                    fpath = root / rel
+                    if fpath.exists():
+                        st = fpath.stat()
+                        cached_meta[rel] = {"mtime": st.st_mtime, "size": st.st_size, "hash": h}
+            with open(out / "scan_meta.json", "w", encoding="utf-8") as f:
+                json.dump(cached_meta, f, indent=2)
+        except Exception:
+            pass
 
         return cls(enriched_data, project_root=root)
 

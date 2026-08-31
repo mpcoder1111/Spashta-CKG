@@ -463,6 +463,7 @@ def _iter_js_files(root: Path, cli_exclude=None) -> List[Path]:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Spashta JS builder")
     parser.add_argument("--source-root", default=".")
+    parser.add_argument("--files", default=None, help="Comma-separated specific files to parse relative to source-root")
     parser.add_argument("--out", default="runtime/fragment_js.json")
     parser.add_argument("--exclude", default=None, help="Comma-separated directories to exclude")
     args = parser.parse_args()
@@ -475,8 +476,14 @@ def main() -> None:
     ts_parser = Parser(Language(tsjs.language()))
 
     root = Path(args.source_root).resolve()
-    files = [root] if root.is_file() else _iter_js_files(root)
-    root_dir = root.parent if root.is_file() else root
+    if getattr(args, "files", None):
+        raw_files = [f.strip() for f in args.files.split(",") if f.strip()]
+        files = [Path(f).resolve() if Path(f).is_absolute() else (root / f).resolve() for f in raw_files]
+        files = sorted([p for p in files if p.exists() and p.suffix == ".js"])
+        root_dir = root
+    else:
+        files = [root] if root.is_file() else _iter_js_files(root, cli_exclude=args.exclude)
+        root_dir = root.parent if root.is_file() else root
 
     # parse once; reuse the same tree for both passes (stable node ids for scope attribution)
     parsed: List[Tuple[str, "Node"]] = []

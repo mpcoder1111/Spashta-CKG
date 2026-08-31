@@ -1,6 +1,6 @@
 """
 Spashta CLI ('sp' / 'spashta') - Universal Command Line Interface for Humans and AI Agents.
-Exposes all Spashta 2.1, 2.2, and 3.0 capabilities under one unified command.
+Exposes all Spashta multi-language scanning, incremental refresh, impact analysis, and routing capabilities.
 """
 
 import sys
@@ -29,17 +29,21 @@ Quickstart Workflow:
      spashta_ckg scan
      spashta_ckg scan --exclude "misc,legacy"
 
-  4. Blast-radius impact analysis (pre-refactoring):
+  4. Fast incremental refresh after code edits:
+     spashta_ckg refresh
+     spashta_ckg refresh --file "app/views.py"
+
+  5. Blast-radius impact analysis (pre-refactoring):
      spashta_ckg impact "MyFunctionOrClass" --depth 2 --json
 
-  5. Inspect full-stack routes & dead code:
+  6. Inspect full-stack routes & dead code:
      spashta_ckg routes
      spashta_ckg dead-code css
 """
 
     parser = argparse.ArgumentParser(
         prog="spashta_ckg",
-        description="Spashta CKG v3.0 - Full-Stack Code Knowledge Graph & Impact Engine",
+        description="Spashta CKG v3.2.3 - Full-Stack Code Knowledge Graph & Fast Incremental Engine",
         epilog=help_epilog,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )

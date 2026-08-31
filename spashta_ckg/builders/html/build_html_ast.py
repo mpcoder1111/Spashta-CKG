@@ -469,12 +469,13 @@ def _emit_inline_script_usage(ctx, scanned):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Spashta HTML AST Builder")
-    parser.add_argument("--source-root", default=".")
-    parser.add_argument("--out", default="runtime/output.json")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source-root", required=True, help="Root directory or file to parse")
+    parser.add_argument("--files", default=None, help="Comma-separated specific files to parse relative to source-root")
+    parser.add_argument("--out", required=True, help="Path to write output AST JSON")
     parser.add_argument("--exclude", default=None, help="Comma-separated directories to exclude")
     args = parser.parse_args()
-
+    
     root = Path(args.source_root).resolve()
     
     # Load Configuration
@@ -489,8 +490,13 @@ def main():
     # Initialize Components
     enforcer = SchemaEnforcer(edges_schema)
     
-    # SCAN FILES (Support Single File or Directory)
-    if root.is_file():
+    # SCAN FILES (Support Specific Files, Single File, or Directory)
+    if getattr(args, "files", None):
+        root_dir = root
+        raw_files = [f.strip() for f in args.files.split(",") if f.strip()]
+        html_files = [Path(f).resolve() if Path(f).is_absolute() else (root_dir / f).resolve() for f in raw_files]
+        html_files = sorted([p for p in html_files if p.exists() and p.suffix == ".html"])
+    elif root.is_file():
         # Case: Unit Test or Single File Scan
         root_dir = root.parent
         html_files = [root]

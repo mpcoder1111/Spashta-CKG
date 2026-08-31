@@ -333,8 +333,9 @@ def _model_animations(ctx, clean_content: str, cfg: dict) -> str:
 
 def main():
     parser = argparse.ArgumentParser(description="Spashta CSS AST Builder")
-    parser.add_argument("--source-root", default=".")
-    parser.add_argument("--out", default="runtime/output.json")
+    parser.add_argument("--source-root", required=True, help="Root directory or file to parse")
+    parser.add_argument("--files", default=None, help="Comma-separated specific files to parse relative to source-root")
+    parser.add_argument("--out", required=True, help="Path to write output AST JSON")
     parser.add_argument("--exclude", default=None, help="Comma-separated directories to exclude")
     args = parser.parse_args()
 
@@ -356,7 +357,12 @@ def main():
     print(f"DEBUG: Source Root: {root} | Exists: {root.exists()} | Is File: {root.is_file()}")
     
     css_files = []
-    if root.is_file():
+    if getattr(args, "files", None):
+        raw_files = [f.strip() for f in args.files.split(",") if f.strip()]
+        css_files = [Path(f).resolve() if Path(f).is_absolute() else (root / f).resolve() for f in raw_files]
+        css_files = sorted([p for p in css_files if p.exists() and p.suffix == ".css"])
+        ctx.root_path = root
+    elif root.is_file():
          if root.suffix == ".css":
              # If mapping Root is a file, set context root to its parent so relative paths work?
              # Or keep root as file? BuildContext uses root for relative paths.

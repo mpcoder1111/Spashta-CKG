@@ -2,7 +2,7 @@
 
 > **Spashta** (स्पष्ट) = *Clarity* in Sanskrit. Deterministic Code Knowledge Graph & Impact Engine for Python, JavaScript, HTML, and CSS.
 
-[![Version](https://img.shields.io/badge/version-3.2.2-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.2.3-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
 
