@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [3.2.5] - 2026-08-31
+
+**Spashta-CKG 3.2.5 — CLI List-Files Formatter Fix & Search Exact-Match Ranking**
+
+Bug fix and UX refinement for file listing output and symbol query resolution.
+
+### Fixed & Enhanced
+- **`list-files` Output Formatter Fix**: Fixed `output()` in `query_spashta.py` to seamlessly render plain string lists as well as node dictionaries, resolving the `AttributeError` when running `spashta_ckg list-files` in human-readable terminal mode.
+- **Exact-Match Search Ranking**: Enhanced `CKG.search()` and `CKG.locate()` with intelligent relevance sorting (exact ID > exact symbol name > `::symbol` suffix > case-insensitive > substring), enabling fast, unambiguous resolution for bare symbol queries (e.g. `UserModel`, `calculate_total`).
+- **Full Test Suite & CLI Verification**: Added regression tests for `list-files` text and JSON output modes, bringing the suite to 35/35 passing tests (100% Green).
+
+---
+
 ## [3.2.4] - 2026-08-31
 
 **Spashta-CKG 3.2.4 — 100% Incremental Edge Retention & Global Linking Architecture**

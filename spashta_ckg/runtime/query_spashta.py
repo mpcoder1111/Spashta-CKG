@@ -898,7 +898,12 @@ def output(data, as_json=False):
         if isinstance(data, list):
             print(f"Found {len(data)} items:")
             for item in data:
-                print(f"  - {item.get('id')} ({item.get('node_type')})")
+                if isinstance(item, dict):
+                    item_id = item.get('id') or item.get('name') or str(item)
+                    item_type = f" ({item.get('node_type')})" if item.get('node_type') else ""
+                    print(f"  - {item_id}{item_type}")
+                else:
+                    print(f"  - {item}")
         elif isinstance(data, dict):
             if "content" in data:
                 print(f"--- Code ({data.get('mode')}) ---")

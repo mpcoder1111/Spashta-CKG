@@ -14,7 +14,7 @@ from typing import Dict, List, Any, Optional, Union
 
 # Base package directory
 PACKAGE_ROOT = Path(__file__).resolve().parent
-__version__ = "3.2.4"
+__version__ = "3.2.5"
 
 def apply_enrichment_logic(node: Dict[str, Any], edges_from: Dict[str, List], edges_to: Dict[str, List], node_map: Dict[str, Any], detection_rules: Dict[str, Any]) -> bool:
     """Evaluates 9 deterministic detection rules against a node to assign semantic roles."""
@@ -724,7 +724,7 @@ class CKG:
         return cls(enriched_data, project_root=root)
 
     def search(self, query: str, node_type: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Finds nodes matching query string and optional node_type."""
+        """Finds nodes matching query string and optional node_type, prioritized by exact match relevance."""
         q = query.lower()
         results = []
         for n in self.nodes:
@@ -734,6 +734,20 @@ class CKG:
             nid = (n.get("id") or "").lower()
             if q in name or q in nid:
                 results.append(n)
+
+        # Sort: exact ID > exact name > ::symbol suffix > case-insensitive > substring
+        def match_rank(n):
+            nid = n.get("id") or ""
+            nname = n.get("name") or ""
+            if nid == query: return 0
+            if nname == query: return 1
+            if nid.endswith(f"::{query}"): return 2
+            if nid.lower() == q: return 3
+            if nname.lower() == q: return 4
+            if nid.lower().endswith(f"::{q}"): return 5
+            return 6
+
+        results.sort(key=match_rank)
         return results
 
     def locate(self, symbol: str) -> Optional[Dict[str, Any]]:
