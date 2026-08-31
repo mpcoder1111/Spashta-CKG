@@ -143,9 +143,11 @@ When `spashta_ckg_mcp` is registered in your IDE's `mcp_config.json`, use these 
 | Native MCP Tool | Parameters | Purpose / Returned Subgraph |
 | :--- | :--- | :--- |
 | `spashta_impact` | `symbol: str`, `depth: int = 3`, `project_dir: str = "."` | Upstream blast radius: who calls or depends on this symbol before editing |
+| `spashta_locate` | `symbol: str`, `project_dir: str = "."` | Pinpoint exact file path, start line, and end line of a symbol |
 | `spashta_routes` | `project_dir: str = "."` | Full-stack routes connecting backend views, templates, and HTMX triggers |
 | `spashta_search` | `query: str`, `node_type: str = None`, `project_dir: str = "."` | Searches CKG for symbols, classes, styles, or endpoints |
 | `spashta_dead_code` | `language: str = "css"|"js"|"py"`, `project_dir: str = "."` | Dynamic-safe dead code detection with zero false-positives |
+| `spashta_stats` | `project_dir: str = "."` | High-level graph statistics, node breakdowns, and semantic role counts |
 | `spashta_refresh` | `files: Optional[str] = None`, `project_dir: str = "."` | Fast incremental refresh: re-parses only modified/specified files in ~20ms |
 | `spashta_scan` | `project_dir: str = "."` | Scans codebase and rebuilds `.spashta/` CKG cache |
 

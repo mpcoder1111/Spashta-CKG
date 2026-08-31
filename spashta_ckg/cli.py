@@ -43,7 +43,7 @@ Quickstart Workflow:
 
     parser = argparse.ArgumentParser(
         prog="spashta_ckg",
-        description="Spashta CKG v3.2.3 - Full-Stack Code Knowledge Graph & Fast Incremental Engine",
+        description="Spashta CKG v3.2.4 - Full-Stack Code Knowledge Graph & Fast Incremental Engine",
         epilog=help_epilog,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )

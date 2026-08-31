@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [3.2.4] - 2026-08-31
+
+**Spashta-CKG 3.2.4 — 100% Incremental Edge Retention & Global Linking Architecture**
+
+Comprehensive architectural fix for incremental graph synchronization, resolving incoming caller edge loss and cross-file symbol resolution.
+
+### Fixed & Enhanced
+- **100% Incoming Edge Retention**: Refactored graph edge splicing in `CKG.refresh()`. Outgoing edges from modified files are refreshed, while incoming caller edges from external files are strictly retained as long as the target symbol exists in the new AST.
+- **Global Symbol Linking with `--existing-ast`**: AST builders (`build_python_ast.py`, `build_js_ast.py`, `build_html_ast.py`) now accept `--existing-ast` to pre-populate the global symbol table, allowing single-file incremental builders to resolve external function calls and cross-file relations.
+- **Accurate Physical File Path Mapping**: Discriminated physical source files from synthetic AST nodes (`Template` child tags, `File:` prefixed JS identifiers), eliminating false-positive file deletion detections.
+- **Automated Version Guard**: Incremental refreshes automatically detect cache version mismatches and perform a full clean scan to prevent cross-version graph drift.
+- **Atomic Disk Writes**: Graph JSON files are written to `.tmp` buffers and atomically swapped via `os.replace` to prevent corrupted caches on abrupt process termination.
+- **New MCP Server Tools (`spashta_locate` & `spashta_stats`)**: Expanded native MCP server tools to a complete 8-tool intelligence suite, exposing precise symbol location and high-level graph health statistics for AI agents.
+- **Dedicated Regression Suite**: Added `verify_incremental_edge_retention.py` enforcing 100% exact equality of node and edge counts on targeted and plain refreshes.
+
+---
+
 ## [3.2.3] - 2026-08-31
 
 **Spashta-CKG 3.2.3 — Targeted AST Builder Execution & mtime Caching Performance Optimization**

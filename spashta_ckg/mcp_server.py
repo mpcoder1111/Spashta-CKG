@@ -63,6 +63,19 @@ async def spashta_scan(project_dir: str = ".") -> str:
     return json.dumps(ckg.stats(), indent=2)
 
 @mcp.tool()
+async def spashta_locate(symbol: str, project_dir: str = ".") -> str:
+    """Locate the exact file path, start line, and end line of a function, class, route, or template symbol."""
+    ckg = _get_ckg(project_dir)
+    res = ckg.locate(symbol)
+    return json.dumps(res or {"symbol": symbol, "found": False}, indent=2)
+
+@mcp.tool()
+async def spashta_stats(project_dir: str = ".") -> str:
+    """Get high-level summary statistics, node breakdowns, edge types, and semantic role counts for the Code Knowledge Graph."""
+    ckg = _get_ckg(project_dir)
+    return json.dumps(ckg.stats(), indent=2)
+
+@mcp.tool()
 async def spashta_refresh(files: Optional[str] = None, project_dir: str = ".") -> str:
     """Fast incremental refresh: re-parse only changed or specified files (e.g. after code edits) in milliseconds."""
     root = Path(project_dir).resolve() if project_dir and project_dir != "." else Path.cwd()

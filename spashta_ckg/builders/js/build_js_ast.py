@@ -464,6 +464,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Spashta JS builder")
     parser.add_argument("--source-root", default=".")
     parser.add_argument("--files", default=None, help="Comma-separated specific files to parse relative to source-root")
+    parser.add_argument("--existing-ast", default=None, help="Path to existing raw AST JSON for global symbol resolution")
     parser.add_argument("--out", default="runtime/fragment_js.json")
     parser.add_argument("--exclude", default=None, help="Comma-separated directories to exclude")
     args = parser.parse_args()
@@ -484,6 +485,23 @@ def main() -> None:
     else:
         files = [root] if root.is_file() else _iter_js_files(root, cli_exclude=args.exclude)
         root_dir = root.parent if root.is_file() else root
+
+    defs_by_name: Dict[str, List[str]] = {}
+
+    # Pre-populate definitions from existing AST if provided
+    if getattr(args, "existing_ast", None) and Path(args.existing_ast).exists():
+        try:
+            with open(args.existing_ast, "r", encoding="utf-8") as f:
+                prev_ast = json.load(f)
+            reparse_rel_set = {p.relative_to(root_dir).as_posix() for p in files}
+            for n in prev_ast.get("nodes", []):
+                fpath = n.get("file_path") or n.get("file") or (n["id"].split("::")[0] if "::" in n.get("id", "") else "")
+                if fpath not in reparse_rel_set and n.get("id"):
+                    ctx.registry[n["id"]] = n
+                    if n.get("name"):
+                        defs_by_name.setdefault(n["name"], []).append(n["id"])
+        except Exception:
+            pass
 
     # parse once; reuse the same tree for both passes (stable node ids for scope attribution)
     parsed: List[Tuple[str, "Node"]] = []

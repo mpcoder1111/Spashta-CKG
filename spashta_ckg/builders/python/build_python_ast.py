@@ -1216,6 +1216,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--source-root", required=True, help="Root directory or file to parse")
     parser.add_argument("--files", default=None, help="Comma-separated specific files to parse relative to source-root")
+    parser.add_argument("--existing-ast", default=None, help="Path to existing raw AST JSON for global symbol resolution")
     parser.add_argument("--out", required=True, help="Path to write output AST JSON")
     parser.add_argument("--exclude", default=None, help="Comma-separated directories to exclude")
     args = parser.parse_args()
@@ -1266,6 +1267,19 @@ def main():
         py_files = sorted([p for p in root.rglob("*.py") if should_include(p)])
 
     ctx = BuildContext(root_dir, instr, enforcer)
+
+    # Pre-populate global symbol registry from existing AST if provided
+    if getattr(args, "existing_ast", None) and Path(args.existing_ast).exists():
+        try:
+            with open(args.existing_ast, "r", encoding="utf-8") as f:
+                prev_ast = json.load(f)
+            reparse_rel_set = {p.relative_to(root_dir).as_posix() for p in py_files}
+            for n in prev_ast.get("nodes", []):
+                fpath = n.get("file_path") or n.get("file") or (n["id"].split("::")[0] if "::" in n.get("id", "") else "")
+                if fpath not in reparse_rel_set and n.get("id"):
+                    ctx.registry[n["id"]] = n
+        except Exception as e:
+            ctx.logs.append({"warning": f"Could not load existing AST: {e}"})
     
     print(f"Scanning {len(py_files)} files...")
     
