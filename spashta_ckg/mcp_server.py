@@ -32,55 +32,61 @@ def _get_ckg(project_dir: str = ".") -> CKG:
         )
 
 @mcp.tool()
-async def spashta_impact(symbol: str, depth: int = 3, project_dir: str = ".") -> str:
+async def spashta_impact(symbol: str, depth: int = 3, project_dir: str = ".") -> dict:
     """Calculate blast radius: what views, templates, styles, and functions depend on or call a given symbol before you edit or refactor it."""
     ckg = _get_ckg(project_dir)
-    return json.dumps(ckg.impact(symbol, depth=depth), indent=2)
+    return ckg.impact(symbol, depth=depth)
 
 @mcp.tool()
-async def spashta_routes(project_dir: str = ".") -> str:
+async def spashta_can_delete(symbol: str, depth: int = 3, project_dir: str = ".") -> dict:
+    """Evaluate whether a symbol can be safely deleted without breaking working code. Distinguishes production blockers from test-only blockers."""
+    ckg = _get_ckg(project_dir)
+    return ckg.can_delete(symbol, depth=depth)
+
+@mcp.tool()
+async def spashta_routes(project_dir: str = ".") -> list:
     """List all full-stack routes and see how backend views, frontend templates, and HTMX triggers connect."""
     ckg = _get_ckg(project_dir)
-    return json.dumps(ckg.routes(), indent=2)
+    return ckg.routes()
 
 @mcp.tool()
-async def spashta_search(query: str, node_type: Optional[str] = None, project_dir: str = ".") -> str:
-    """Search the Code Knowledge Graph for symbols, styles, routes, or components."""
+async def spashta_search(query: str, node_type: Optional[str] = None, project_dir: str = ".") -> list:
+    """Search the Code Knowledge Graph for symbols, styles, routes, or components with compact output by default."""
     ckg = _get_ckg(project_dir)
-    return json.dumps(ckg.search(query, node_type=node_type), indent=2)
+    return ckg.search(query, node_type=node_type)
 
 @mcp.tool()
-async def spashta_dead_code(language: Optional[str] = None, project_dir: str = ".") -> str:
-    """Find unreferenced dead code across Python, JavaScript, and CSS with high precision."""
+async def spashta_dead_code(language: Optional[str] = None, project_dir: str = ".") -> dict:
+    """Find unreferenced dead code across Python, JavaScript, and CSS with audit provenance."""
     ckg = _get_ckg(project_dir)
-    return json.dumps(ckg.dead_code(language=language), indent=2)
+    return ckg.dead_code(language=language)
 
 @mcp.tool()
-async def spashta_scan(project_dir: str = ".") -> str:
+async def spashta_scan(project_dir: str = ".") -> dict:
     """Scan or rebuild the full multi-language Code Knowledge Graph for a project."""
     root = Path(project_dir).resolve() if project_dir and project_dir != "." else Path.cwd()
     ckg = CKG.build(project_root=root)
-    return json.dumps(ckg.stats(), indent=2)
+    return ckg.stats()
 
 @mcp.tool()
-async def spashta_locate(symbol: str, project_dir: str = ".") -> str:
-    """Locate the exact file path, start line, and end line of a function, class, route, or template symbol."""
+async def spashta_locate(symbol: str, project_dir: str = ".") -> dict:
+    """Locate the exact file path, start line, and end line of a function, class, route, or template symbol with ambiguity detection."""
     ckg = _get_ckg(project_dir)
     res = ckg.locate(symbol)
-    return json.dumps(res or {"symbol": symbol, "found": False}, indent=2)
+    return res or {"symbol": symbol, "found": False}
 
 @mcp.tool()
-async def spashta_stats(project_dir: str = ".") -> str:
+async def spashta_stats(project_dir: str = ".") -> dict:
     """Get high-level summary statistics, node breakdowns, edge types, and semantic role counts for the Code Knowledge Graph."""
     ckg = _get_ckg(project_dir)
-    return json.dumps(ckg.stats(), indent=2)
+    return ckg.stats()
 
 @mcp.tool()
-async def spashta_refresh(files: Optional[str] = None, project_dir: str = ".") -> str:
+async def spashta_refresh(files: Optional[str] = None, project_dir: str = ".") -> dict:
     """Fast incremental refresh: re-parse only changed or specified files (e.g. after code edits) in milliseconds."""
     root = Path(project_dir).resolve() if project_dir and project_dir != "." else Path.cwd()
     ckg = CKG.refresh(project_root=root, files=files)
-    return json.dumps(ckg.stats(), indent=2)
+    return ckg.stats()
 
 def main():
     """Starts the official MCP server on stdio transport or displays help if invoked from CLI."""

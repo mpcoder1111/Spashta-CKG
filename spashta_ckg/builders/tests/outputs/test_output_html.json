@@ -2,7 +2,7 @@
   "_meta": {
     "builder": "build_html_ast.py",
     "builder_version": "2.0-strict",
-    "generated_at": "2026-08-30T15:16:00.638623"
+    "generated_at": "2026-09-01T08:14:50.397552"
   },
   "nodes": [
     {
@@ -183,7 +183,7 @@
   ],
   "ambiguities": [
     {
-      "id": "8e235c6e-7e85-4ed2-a9a3-fe01c74243e2",
+      "id": "c3a343cb-dffa-45d7-8eee-0c1f6674dc4d",
       "kind": "external_reference_unmodeled",
       "source_file": "html_dummy.html",
       "source_scope": "html_dummy.html",

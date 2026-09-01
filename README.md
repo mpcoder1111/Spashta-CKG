@@ -2,7 +2,7 @@
 
 > **Spashta** (स्पष्ट) = *Clarity* in Sanskrit. Deterministic Code Knowledge Graph & Impact Engine for Python, JavaScript, HTML, and CSS.
 
-[![Version](https://img.shields.io/badge/version-3.2.6-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.2.7-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
 
@@ -26,6 +26,7 @@ pip install git+https://github.com/mpcoder1111/Spashta-CKG.git
 | :--- | :--- |
 | 💸 **Wasted Tokens**: Agent reads dozens of files trying to understand structure. | ⚡ **~60% Token Savings & Coding Time**: Agent queries exact dependency subgraphs instantly. |
 | 💥 **Hidden Breakages**: Modifying a Python view or CSS class breaks unseen templates or JS handlers. | 🛡️ **Instant Blast-Radius (`impact`)**: See all affected callers across Python, JS, HTML, and CSS before editing. |
+| 🗑️ **Unsafe Deletions**: Deleting a function breaks runtime callers or leaves orphaned test files. | ⚖️ **Safe Deletion Decision Tool (`can-delete`)**: Distinguishes real production blockers from deletable test-only callers. |
 | 👻 **False-Positive Dead Code**: Cleaning dead CSS deletes classes dynamically applied in templates. | 🎯 **Dynamic Accuracy**: Tracks BEM modifiers, HTMX swaps, and JS `classList` usages. |
 | 🗺️ **Scattered Routing**: Finding which template, view, and HTMX trigger connect to a URL requires manual grepping. | 🔗 **Full-Stack Route Map (`routes`)**: Complete request flow mapped in milliseconds. |
 
@@ -50,7 +51,7 @@ Spashta auto-detects all supported languages (**Python, JavaScript, HTML, CSS**)
 
 #### Quickstart Workflow:
 ```bash
-# 1. (Optional) Initialize project exclusions in profile.json
+# 1. (Optional) Initialize project exclusions in .spashta.json
 spashta_ckg init --exclude "misc,reference,legacy,docs"
 
 # 2. View or update directory exclusions anytime
@@ -63,12 +64,15 @@ spashta_ckg scan
 # 4. Check blast-radius before editing a function, class, or CSS class
 spashta_ckg impact SectionBlock --depth 2 --json
 
-# 5. Find dead code across Python, JS, or CSS with zero false-positives
+# 5. Evaluate if a symbol can be safely deleted
+spashta_ckg can-delete SectionBlock --json
+
+# 6. Find dead code across Python, JS, or CSS with zero false-positives
 spashta_ckg dead-code css
 ```
 
 > 💡 **Why Directory Exclusions Matter**:  
-> Spashta automatically ignores standard folders (`.git`, `venv`, `node_modules`, `__pycache__`, `build`, `dist`). If your repository has non-production or duplicate code (`misc/`, `_archive/`, `legacy_backup/`, `fixtures/`), excluding them via `spashta_ckg init --exclude "..."` or `profile.json` ensures you get 100% accurate symbol references without false duplicate definitions.
+> Spashta automatically ignores standard folders (`.git`, `venv`, `node_modules`, `__pycache__`, `build`, `dist`). If your repository has non-production or duplicate code (`misc/`, `_archive/`, `legacy_backup/`, `fixtures/`), excluding them via `spashta_ckg init --exclude "..."` or `.spashta.json` ensures you get 100% accurate symbol references without false duplicate definitions.
 
 ---
 
@@ -88,7 +92,7 @@ Connect Spashta directly to **Antigravity, Cursor, Claude Desktop, or VS Code** 
 ```
 *(If installed inside a project `.venv`, specify the direct path: e.g. `"command": ".venv/Scripts/spashta_ckg_mcp.exe"` on Windows or `".venv/bin/spashta_ckg_mcp"` on Linux/macOS).*
 
-*Your AI agent now has native, zero-click IDE tools (`spashta_impact`, `spashta_locate`, `spashta_routes`, `spashta_search`, `spashta_dead_code`, `spashta_stats`, `spashta_refresh`, `spashta_scan`)!*
+*Your AI agent now has 9 native, zero-click IDE tools (`spashta_impact`, `spashta_can_delete`, `spashta_locate`, `spashta_routes`, `spashta_search`, `spashta_dead_code`, `spashta_stats`, `spashta_refresh`, `spashta_scan`)!*
 
 ---
 
@@ -105,9 +109,13 @@ ckg_updated = CKG.refresh(files=["app/views.py"])
 
 # Perform blast-radius analysis
 report = ckg.impact("product_detail")
-print(f"Impacted components: {report['impact_count']}")
-for node in report["impacted_nodes"]:
+print(f"Impacted components: {report['summary']['total_items']}")
+for node in report["items"]:
     print(f" - [{node['node_type']}] {node['name']} ({node['file_path']})")
+
+# Safe deletion verification
+del_verdict = ckg.can_delete("product_detail")
+print(f"Can safely delete: {del_verdict['can_delete']}")
 ```
 
 ---
@@ -136,6 +144,7 @@ This repository uses **Spashta-CKG** (https://github.com/mpcoder1111/Spashta-CKG
    - Before modifying, renaming, or deleting any function, class, model, route, or CSS class:
      - **If MCP is active**: Call `spashta_impact(symbol="<SymbolName>")`.
      - **If CLI only**: Run `spashta_ckg impact <SymbolName> --depth 2 --json`.
+     - **If deleting code**: Run `spashta_can_delete(symbol="<SymbolName>")` or `spashta_ckg can-delete <SymbolName>`.
    - Inspect all returned callers across Python, JavaScript, HTML templates, and CSS stylesheets.
 2. **Pinpoint, Don't Guess**:
    - Use `spashta_ckg locate <SymbolName>` (or `spashta_search`) to find exact file paths and line ranges instead of speculative reading.
@@ -154,16 +163,17 @@ This repository uses **Spashta-CKG** (https://github.com/mpcoder1111/Spashta-CKG
 
 | Command | Description | Example |
 | :--- | :--- | :--- |
-| `spashta_ckg init` | Initializes project `profile.json` with detected languages and exclusions | `spashta_ckg init --exclude misc,docs` |
+| `spashta_ckg init` | Initializes project `.spashta.json` with detected languages and exclusions | `spashta_ckg init --exclude misc,docs` |
 | `spashta_ckg config` | Views or updates active profile configuration and exclusion list | `spashta_ckg config --add-exclude legacy` |
 | `spashta_ckg scan` | Scans project across all languages and builds `.spashta/` CKG cache | `spashta_ckg scan --exclude misc` |
 | `spashta_ckg refresh` | Fast incremental refresh: re-parses only modified or specified files in ~20ms | `spashta_ckg refresh --file app/views.py` |
 | `spashta_ckg impact <symbol>` | Upstream blast-radius: who calls or depends on this symbol? | `spashta_ckg impact UserForm` |
+| `spashta_ckg can-delete <symbol>` | High-level decision tool: evaluates if symbol can be safely deleted | `spashta_ckg can-delete UserForm` |
 | `spashta_ckg dependencies <symbol>` | Downstream dependencies: what does this symbol call/use? | `spashta_ckg dependencies home_view` |
 | `spashta_ckg dead-code [lang]` | Detects unused code across `css`, `js`, or `py` | `spashta_ckg dead-code css` |
 | `spashta_ckg routes` | Maps full-stack URL endpoints to views and templates | `spashta_ckg routes` |
-| `spashta_ckg search <query>` | Searches nodes by name or ID (supports `--type` and `--app`) | `spashta_ckg search auth --type Function` |
-| `spashta_ckg locate <symbol>` | Pinpoints exact file path and line numbers | `spashta_ckg locate calculate_total` |
+| `spashta_ckg search <query>` | Searches nodes by name or ID (supports `--type`, `--app`, `--full`) | `spashta_ckg search auth --type Function` |
+| `spashta_ckg locate <symbol>` | Pinpoints exact file path and line numbers (supports `--full`) | `spashta_ckg locate calculate_total` |
 | `spashta_ckg read <symbol>` | Reads raw source code of a node without opening files | `spashta_ckg read calculate_total` |
 | `spashta_ckg class-usage <class>` | Shows where a CSS class is defined and used in HTML/JS | `spashta_ckg class-usage .btn-primary` |
 | `spashta_ckg dup-styles` | Finds duplicate CSS definitions and identical `@keyframes` | `spashta_ckg dup-styles` |

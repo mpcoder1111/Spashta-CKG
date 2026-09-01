@@ -82,11 +82,16 @@ spashta_ckg refresh --file "app/views.py,templates/index.html"
 spashta_ckg scan --incremental
 ```
 
-### 2. Pre-Refactoring & Impact Analysis
+### 2. Pre-Refactoring, Impact & Safe Deletion Analysis
 ```bash
 # Calculate blast-radius: who calls or depends on this symbol?
 spashta_ckg impact "MyFunctionOrClass"
 spashta_ckg impact "MyFunctionOrClass" --depth 3 --json
+
+# Safe Deletion Decision: can this symbol be deleted safely?
+# Distinguishes production blockers (unsafe) from test-only blockers (safe + requires test updates)
+spashta_ckg can-delete "MyFunctionOrClass"
+spashta_ckg can-delete "MyFunctionOrClass" --json
 
 # What does this symbol depend on? (Outgoing calls, imports, models)
 spashta_ckg dependencies "MyFunctionOrClass"
@@ -103,9 +108,10 @@ spashta_ckg locate "calculate_total"
 # Read source code of a node directly from disk
 spashta_ckg read "calculate_total"
 
-# Search nodes by name, ID, or semantic role
+# Search nodes by name, ID, or semantic role (compact by default, --full for docstrings)
 spashta_ckg search "Order" --type Model
 spashta_ckg search "api" --app "billing"
+spashta_ckg search "UserModel" --full
 
 # Find all ORM usage sites for a Django/FastAPI model (Graph + Grep hybrid)
 spashta_ckg consumers "Order"
@@ -143,10 +149,11 @@ When `spashta_ckg_mcp` is registered in your IDE's `mcp_config.json`, use these 
 | Native MCP Tool | Parameters | Purpose / Returned Subgraph |
 | :--- | :--- | :--- |
 | `spashta_impact` | `symbol: str`, `depth: int = 3`, `project_dir: str = "."` | Upstream blast radius: who calls or depends on this symbol before editing |
+| `spashta_can_delete` | `symbol: str`, `depth: int = 3`, `project_dir: str = "."` | High-level decision tool: evaluates if symbol can be safely deleted |
 | `spashta_locate` | `symbol: str`, `project_dir: str = "."` | Pinpoint exact file path, start line, and end line of a symbol |
 | `spashta_routes` | `project_dir: str = "."` | Full-stack routes connecting backend views, templates, and HTMX triggers |
 | `spashta_search` | `query: str`, `node_type: str = None`, `project_dir: str = "."` | Searches CKG for symbols, classes, styles, or endpoints |
-| `spashta_dead_code` | `language: str = "css"|"js"|"py"`, `project_dir: str = "."` | Dynamic-safe dead code detection with zero false-positives |
+| `spashta_dead_code` | `language: str = "css"|"js"|"py"`, `project_dir: str = "."` | Dynamic-safe dead code detection with audit provenance |
 | `spashta_stats` | `project_dir: str = "."` | High-level graph statistics, node breakdowns, and semantic role counts |
 | `spashta_refresh` | `files: Optional[str] = None`, `project_dir: str = "."` | Fast incremental refresh: re-parses only modified/specified files in ~20ms |
 | `spashta_scan` | `project_dir: str = "."` | Scans codebase and rebuilds `.spashta/` CKG cache |

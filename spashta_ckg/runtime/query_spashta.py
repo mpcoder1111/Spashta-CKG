@@ -403,16 +403,269 @@ def smart_search(graph, query, type_filter=None, app_filter=None):
     def match_rank(n):
         nid = n.get("id", "")
         nname = n.get("name", "")
-        if nid == query: return 0
-        if nname == query: return 1
-        if nid.endswith(f"::{query}"): return 2
-        if nid.lower() == query_lower: return 3
-        if nname.lower() == query_lower: return 4
-        if nid.lower().endswith(f"::{query_lower}"): return 5
-        return 6
+        ntype = n.get("node_type", "")
+        # Primary rank
+        if nid == query: base = 0
+        elif nname == query: base = 1
+        elif nid.endswith(f"::{query}"): base = 2
+        elif nid.lower() == query_lower: base = 3
+        elif nname.lower() == query_lower: base = 4
+        elif nid.lower().endswith(f"::{query_lower}"): base = 5
+        else: base = 6
+        # Secondary tiering (higher weight -> lower sorting index)
+        type_w = TYPE_WEIGHTS.get(ntype, 10)
+        return (base, -type_w)
 
     results.sort(key=match_rank)
     return results[:50]
+
+
+def make_compact_node(n, include_full=False):
+    """Formats a node for agent consumption. Omit heavy docstrings by default (never truncate)."""
+    if include_full:
+        return n
+    fpath = n.get("file_path") or (n.get("id", "").split("::")[0] if "::" in n.get("id", "") else None)
+    if fpath and fpath.startswith("File:"):
+        fpath = fpath[5:]
+    return {
+        "id": n.get("id"),
+        "name": n.get("name"),
+        "node_type": n.get("node_type"),
+        "file_path": fpath,
+        "line_start": n.get("line_start"),
+        "line_end": n.get("line_end"),
+        "semantic_roles": n.get("semantic_roles", [])
+    }
+
+
+# =============================================================================
+# SYMBOL TYPE PRECEDENCE & AMBIGUITY HIERARCHY
+# =============================================================================
+
+TYPE_WEIGHTS = {
+    # Tier 1: Executable Core Constructs & Callables (Highest precedence)
+    "Function": 100,
+    "Method": 100,
+    "AsyncFunction": 100,
+    "Class": 95,
+    "View": 95,
+    "Route": 90,
+    # Tier 2: Structural File-Level Containers
+    "Module": 80,
+    "File": 80,
+    "Package": 80,
+    "Template": 75,
+    "Stylesheet": 75,
+    # Tier 3: Domain Models & Adapter Abstractions
+    "DataModel": 65,
+    "Form": 60,
+    "Signal": 60,
+    "Component": 60,
+    # Tier 4: Leaf-Level Properties & Variables
+    "Field": 40,
+    "Property": 40,
+    "Variable": 35,
+    "Parameter": 30,
+    # Tier 5: Styling Selectors
+    "StyleClass": 20,
+    "StyleID": 20,
+    "Keyframes": 20
+}
+
+
+def resolve_symbol_node(graph, node_id, node_type_filter=None):
+    """
+    Finds matching nodes for query with type weighting and ambiguity detection.
+    
+    Returns:
+        tuple: (primary_node, is_ambiguous, alternatives_list)
+    """
+    nodes = graph.get("nodes", [])
+    if not node_id:
+        return None, False, []
+
+    # 1. Exact ID match (unambiguous)
+    for n in nodes:
+        if n.get("id") == node_id:
+            return n, False, []
+
+    # 2. Auto-detect: if node_id looks like a file path, try with File: prefix
+    if "::" not in node_id and not node_id.startswith("File:"):
+        file_extensions = (".py", ".html", ".css", ".js", ".json", ".yaml", ".yml", ".txt", ".md")
+        if any(node_id.endswith(ext) for ext in file_extensions):
+            prefixed = f"File:{node_id}"
+            for n in nodes:
+                if n.get("id") == prefixed:
+                    return n, False, []
+
+    # 3. Exact match by symbol name
+    exact_matches = [n for n in nodes if n.get("name") == node_id]
+    if node_type_filter:
+        exact_matches = [n for n in exact_matches if n.get("node_type") == node_type_filter]
+
+    if exact_matches:
+        exact_matches.sort(key=lambda n: TYPE_WEIGHTS.get(n.get("node_type"), 10), reverse=True)
+        winner = exact_matches[0]
+        alts = [
+            {
+                "id": n.get("id"),
+                "name": n.get("name"),
+                "node_type": n.get("node_type"),
+                "file_path": n.get("file_path") or (n.get("id", "").split("::")[0] if "::" in n.get("id", "") else None),
+                "line_start": n.get("line_start")
+            }
+            for n in exact_matches[1:]
+        ]
+        return winner, len(exact_matches) > 1, alts
+
+    # 4. Suffix match by ::symbol
+    suffix_matches = [n for n in nodes if n.get("id", "").endswith(f"::{node_id}")]
+    if suffix_matches:
+        suffix_matches.sort(key=lambda n: TYPE_WEIGHTS.get(n.get("node_type"), 10), reverse=True)
+        winner = suffix_matches[0]
+        alts = [
+            {
+                "id": n.get("id"),
+                "name": n.get("name"),
+                "node_type": n.get("node_type"),
+                "file_path": n.get("file_path") or (n.get("id", "").split("::")[0] if "::" in n.get("id", "") else None),
+                "line_start": n.get("line_start")
+            }
+            for n in suffix_matches[1:]
+        ]
+        return winner, len(suffix_matches) > 1, alts
+
+    # 5. Case-insensitive symbol name
+    node_id_lower = node_id.lower()
+    case_name_matches = [n for n in nodes if (n.get("name") or "").lower() == node_id_lower]
+    if case_name_matches:
+        case_name_matches.sort(key=lambda n: TYPE_WEIGHTS.get(n.get("node_type"), 10), reverse=True)
+        winner = case_name_matches[0]
+        alts = [
+            {
+                "id": n.get("id"),
+                "name": n.get("name"),
+                "node_type": n.get("node_type"),
+                "file_path": n.get("file_path") or (n.get("id", "").split("::")[0] if "::" in n.get("id", "") else None),
+                "line_start": n.get("line_start")
+            }
+            for n in case_name_matches[1:]
+        ]
+        return winner, len(case_name_matches) > 1, alts
+
+    # 6. Case-insensitive suffix match
+    case_suffix_matches = [n for n in nodes if (n.get("id") or "").lower().endswith(f"::{node_id_lower}")]
+    if case_suffix_matches:
+        case_suffix_matches.sort(key=lambda n: TYPE_WEIGHTS.get(n.get("node_type"), 10), reverse=True)
+        winner = case_suffix_matches[0]
+        alts = [
+            {
+                "id": n.get("id"),
+                "name": n.get("name"),
+                "node_type": n.get("node_type"),
+                "file_path": n.get("file_path") or (n.get("id", "").split("::")[0] if "::" in n.get("id", "") else None),
+                "line_start": n.get("line_start")
+            }
+            for n in case_suffix_matches[1:]
+        ]
+        return winner, len(case_suffix_matches) > 1, alts
+
+    return None, False, []
+
+
+def check_freshness(project_root=None):
+    """
+    Inspects scan_meta.json to determine if any tracked source files have been modified or deleted.
+    Executes in ~1-2ms without loading ASTs.
+    """
+    root = Path(project_root).resolve() if project_root else PROJECT_ROOT
+    meta_candidates = [
+        root / ".spashta" / "scan_meta.json",
+        root / "runtime" / "scan_meta.json"
+    ]
+    meta_path = next((p for p in meta_candidates if p.exists()), None)
+    
+    stale_files = []
+    if meta_path:
+        try:
+            with open(meta_path, "r", encoding="utf-8") as f:
+                scan_meta = json.load(f)
+            for rel_path, entry in scan_meta.items():
+                if isinstance(entry, dict) and "mtime" in entry:
+                    fpath = root / rel_path
+                    if fpath.exists():
+                        cur_mtime = fpath.stat().st_mtime
+                        if cur_mtime > entry["mtime"] + 0.001:
+                            stale_files.append(rel_path)
+                    else:
+                        stale_files.append(rel_path)
+        except Exception:
+            pass
+
+    return {
+        "version": "3.2.7",
+        "graph_built_at": None,
+        "is_stale": len(stale_files) > 0,
+        "staleness_check": "mtime-manifest",
+        "stale_files_count": len(stale_files),
+        "stale_files": sorted(stale_files)
+    }
+
+
+def make_envelope(
+    command,
+    status="ok",
+    target=None,
+    items=None,
+    summary=None,
+    ambiguous=False,
+    alternatives=None,
+    provenance=None,
+    error=None,
+    suggestions=None,
+    project_root=None,
+    extra=None
+):
+    """
+    Builds the standardized universal response envelope for all Spashta queries.
+    Status is strictly one of: 'ok', 'not_found', 'error'.
+    """
+    if items is None:
+        items = []
+    if alternatives is None:
+        alternatives = []
+    if summary is None:
+        summary = {}
+
+    if "total_items" not in summary:
+        summary["total_items"] = len(items)
+    if "returned_items" not in summary:
+        summary["returned_items"] = len(items)
+    if "truncated" not in summary:
+        summary["truncated"] = summary["returned_items"] < summary["total_items"]
+
+    freshness = check_freshness(project_root)
+
+    env = {
+        "status": status,
+        "command": command,
+        "target": target or {},
+        "ambiguous": ambiguous,
+        "alternatives": alternatives,
+        "summary": summary,
+        "items": items,
+        "provenance": provenance or {},
+        "_meta": freshness
+    }
+
+    if error:
+        env["error"] = error
+    if suggestions:
+        env["suggestions"] = suggestions
+    if extra:
+        env.update(extra)
+
+    return env
 
 
 # =============================================================================
@@ -431,44 +684,8 @@ def get_node(graph, node_id):
     Returns:
         dict or None: The node object, or None if not found.
     """
-    nodes = graph.get("nodes", [])
-
-    # 1. Exact match by ID
-    for node in nodes:
-        if node.get("id") == node_id:
-            return node
-
-    # 2. Auto-detect: if node_id looks like a file path, try with File: prefix
-    if "::" not in node_id and not node_id.startswith("File:"):
-        file_extensions = (".py", ".html", ".css", ".js", ".json", ".yaml", ".yml", ".txt", ".md")
-        if any(node_id.endswith(ext) for ext in file_extensions):
-            prefixed = f"File:{node_id}"
-            for node in nodes:
-                if node.get("id") == prefixed:
-                    return node
-
-    # 3. Exact match by symbol name
-    for node in nodes:
-        if node.get("name") == node_id:
-            return node
-
-    # 4. Suffix match by ::symbol
-    for node in nodes:
-        if node.get("id", "").endswith(f"::{node_id}"):
-            return node
-
-    # 5. Case-insensitive exact match by symbol name
-    node_id_lower = node_id.lower()
-    for node in nodes:
-        if node.get("name", "").lower() == node_id_lower:
-            return node
-
-    # 6. Case-insensitive suffix match by ::symbol
-    for node in nodes:
-        if node.get("id", "").lower().endswith(f"::{node_id_lower}"):
-            return node
-
-    return None
+    winner, _, _ = resolve_symbol_node(graph, node_id)
+    return winner
 
 
 # Cross-emitter placeholder node types: Spashta emits ONE placeholder per emitter, joined BY NAME
@@ -907,6 +1124,159 @@ def read_content(graph, node_id):
         
     except Exception as e:
         return {"error": str(e)}
+
+
+def _get_suggestions(graph, query, max_suggestions=5):
+    """Finds near-match suggestions for a missing symbol."""
+    suggestions = []
+    q_lower = (query or "").lower()
+    for n in graph.get("nodes", []):
+        name = (n.get("name") or "").lower()
+        nid = (n.get("id") or "").lower()
+        if q_lower in name or q_lower in nid:
+            suggestions.append(n.get("id"))
+            if len(suggestions) >= max_suggestions:
+                break
+    return suggestions
+
+
+def node_not_found_response(graph, node_id, command=None, project_root=None):
+    """
+    Returns standardized universal error envelope when a node is not found in the graph.
+    """
+    return make_envelope(
+        command=command or "query",
+        status="not_found",
+        target={"query": node_id},
+        error=f"Node not found: {node_id}",
+        suggestions=_get_suggestions(graph, node_id),
+        project_root=project_root
+    )
+
+
+# =============================================================================
+# HIGH-LEVEL DECISION TOOL (can_delete)
+# =============================================================================
+
+def can_delete(graph, symbol, depth=3, project_root=None):
+    """
+    Evaluates whether a symbol can be safely deleted without breaking working code.
+    
+    Separates production callers from test callers:
+    - Production callers present -> can_delete: false
+    - Test callers only -> can_delete: true with requires_test_updates: [tests/test_x.py]
+    - Zero callers -> can_delete: true with requires_test_updates: []
+    
+    Args:
+        graph: Loaded CKG
+        symbol: Target symbol name or node ID
+        depth: Traversal depth for callers
+        project_root: Optional project root path
+        
+    Returns:
+        dict: Standardized universal envelope with can_delete boolean verdict,
+              blockers breakdown, and test update requirements.
+    """
+    target_node, is_ambiguous, alts = resolve_symbol_node(graph, symbol)
+    if not target_node:
+        return make_envelope(
+            command="can_delete",
+            status="not_found",
+            target={"query": symbol},
+            error=f"Node not found: {symbol}",
+            suggestions=_get_suggestions(graph, symbol),
+            project_root=project_root,
+            extra={
+                "can_delete": False,
+                "blockers": {"production": [], "tests": []},
+                "requires_test_updates": []
+            }
+        )
+
+    target_id = target_node.get("id")
+    impact_results = trace_deps(graph, target_id, "incoming", depth)
+
+    prod_blockers = []
+    test_blockers = []
+    test_files = set()
+
+    for nid, info in impact_results.items():
+        node_obj = get_node(graph, nid)
+        fpath = info.get("file_path") or (node_obj.get("file_path") if node_obj else None) or (nid.split("::")[0] if "::" in nid else "")
+        if fpath.startswith("File:"):
+            fpath = fpath[5:]
+        
+        caller_name = info.get("name") or (node_obj.get("name") if node_obj else nid.split("::")[-1])
+        ntype = info.get("node_type") or (node_obj.get("node_type") if node_obj else "Unknown")
+        line_start = info.get("line_start") or (node_obj.get("line_start") if node_obj else None)
+
+        blocker_entry = {
+            "id": nid,
+            "name": caller_name,
+            "node_type": ntype,
+            "file_path": fpath,
+            "line_start": line_start,
+            "relation": info.get("edge_type", "calls")
+        }
+
+        # Classify test caller vs production caller
+        norm_fpath = fpath.replace("\\", "/").lower()
+        is_test = (
+            "/tests/" in norm_fpath or
+            norm_fpath.startswith("tests/") or
+            "test_" in norm_fpath or
+            "_test.py" in norm_fpath or
+            "_tests.py" in norm_fpath or
+            norm_fpath.endswith("tests.py") or
+            ntype == "TestCase" or
+            "test_case" in (node_obj.get("semantic_roles", []) if node_obj else [])
+        )
+
+        if is_test:
+            test_blockers.append(blocker_entry)
+            if fpath:
+                test_files.add(fpath)
+        else:
+            prod_blockers.append(blocker_entry)
+
+    can_del = len(prod_blockers) == 0
+    req_tests = sorted(list(test_files)) if can_del and len(test_blockers) > 0 else []
+
+    target_info = {
+        "query": symbol,
+        "resolved_id": target_id,
+        "name": target_node.get("name"),
+        "node_type": target_node.get("node_type"),
+        "file_path": target_node.get("file_path") or (target_id.split("::")[0] if "::" in target_id else None),
+        "line_start": target_node.get("line_start")
+    }
+
+    summary = {
+        "total_blockers": len(prod_blockers) + len(test_blockers),
+        "production_blockers": len(prod_blockers),
+        "test_blockers": len(test_blockers),
+        "returned_items": len(prod_blockers) + len(test_blockers),
+        "truncated": False
+    }
+
+    return make_envelope(
+        command="can_delete",
+        status="ok",
+        target=target_info,
+        items=prod_blockers + test_blockers,
+        summary=summary,
+        ambiguous=is_ambiguous,
+        alternatives=alts,
+        project_root=project_root,
+        extra={
+            "can_delete": can_del,
+            "blockers": {
+                "production": prod_blockers,
+                "tests": test_blockers
+            },
+            "requires_test_updates": req_tests
+        }
+    )
 
 
 # =============================================================================

@@ -14,7 +14,7 @@ from typing import Dict, List, Any, Optional, Union
 
 # Base package directory
 PACKAGE_ROOT = Path(__file__).resolve().parent
-__version__ = "3.2.6"
+__version__ = "3.2.7"
 
 def apply_enrichment_logic(node: Dict[str, Any], edges_from: Dict[str, List], edges_to: Dict[str, List], node_map: Dict[str, Any], detection_rules: Dict[str, Any]) -> bool:
     """Evaluates 9 deterministic detection rules against a node to assign semantic roles."""
@@ -120,6 +120,7 @@ class CKG:
     """
     def __init__(self, data: Dict[str, Any], project_root: Optional[Path] = None):
         self.data = data
+        self.graph_data = data
         self.project_root = Path(project_root) if project_root else Path.cwd()
         self.nodes = data.get("nodes", [])
         self.edges = data.get("edges", [])
@@ -161,6 +162,7 @@ class CKG:
         """Retrieves active project exclusions and config location."""
         root = Path(project_root).resolve() if project_root else Path.cwd()
         candidates = [
+            root / ".spashta.json",
             root / "profile.json",
             root / ".spashta" / "profile.json",
             PACKAGE_ROOT / "project" / "profile.json"
@@ -187,11 +189,13 @@ class CKG:
     def init_profile(cls, project_root: Optional[Union[str, Path]] = None,
                      excluded_dirs: Optional[List[str]] = None,
                      force: bool = False) -> Path:
-        """Generates a clean, directory-exclusion profile.json in the target project root."""
+        """Generates a clean, directory-exclusion .spashta.json in the target project root."""
         root = Path(project_root).resolve() if project_root else Path.cwd()
-        target_path = root / "profile.json"
-        if target_path.exists() and not force:
-            raise FileExistsError(f"profile.json already exists at {target_path}. Use force=True to overwrite.")
+        target_path = root / ".spashta.json"
+        legacy_path = root / "profile.json"
+        if (target_path.exists() or legacy_path.exists()) and not force:
+            exist_file = target_path if target_path.exists() else legacy_path
+            raise FileExistsError(f"Configuration profile already exists at {exist_file}. Use force=True to overwrite.")
 
         default_excludes = ["venv", ".venv", "env", "node_modules", ".git", "build", "dist", "Spashta-CKG", "_archive"]
         if excluded_dirs:
@@ -217,10 +221,16 @@ class CKG:
     def update_profile(cls, project_root: Optional[Union[str, Path]] = None,
                        set_exclude: Optional[List[str]] = None,
                        add_exclude: Optional[List[str]] = None) -> dict:
-        """Updates or creates profile.json with modified directory exclusions."""
+        """Updates or creates .spashta.json with modified directory exclusions."""
         root = Path(project_root).resolve() if project_root else Path.cwd()
-        target_path = root / "profile.json"
-        if not target_path.exists():
+        if (root / ".spashta.json").exists():
+            target_path = root / ".spashta.json"
+        elif (root / "profile.json").exists():
+            target_path = root / "profile.json"
+        elif (root / ".spashta" / "profile.json").exists():
+            target_path = root / ".spashta" / "profile.json"
+        else:
+            target_path = root / ".spashta.json"
             cls.init_profile(project_root=root)
         
         with open(target_path, "r", encoding="utf-8") as f:
@@ -255,6 +265,7 @@ class CKG:
 
         # Profile detection for exclusions
         candidates = [
+            root / ".spashta.json",
             root / "profile.json",
             root / ".spashta" / "profile.json",
             PACKAGE_ROOT / "project" / "profile.json"
@@ -723,101 +734,112 @@ class CKG:
 
         return cls(enriched_data, project_root=root)
 
-    def search(self, query: str, node_type: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Finds nodes matching query string and optional node_type, prioritized by exact match relevance."""
-        q = query.lower()
-        results = []
-        for n in self.nodes:
-            if node_type and (n.get("node_type") != node_type and n.get("type") != node_type):
-                continue
-            name = (n.get("name") or "").lower()
-            nid = (n.get("id") or "").lower()
-            if q in name or q in nid:
-                results.append(n)
-
-        # Sort: exact ID > exact name > ::symbol suffix > case-insensitive > substring
-        def match_rank(n):
-            nid = n.get("id") or ""
-            nname = n.get("name") or ""
-            if nid == query: return 0
-            if nname == query: return 1
-            if nid.endswith(f"::{query}"): return 2
-            if nid.lower() == q: return 3
-            if nname.lower() == q: return 4
-            if nid.lower().endswith(f"::{q}"): return 5
-            return 6
-
-        results.sort(key=match_rank)
-        return results
+    def search(self, query: str, node_type: Optional[str] = None, include_full: bool = False) -> List[Dict[str, Any]]:
+        """Finds nodes matching query string and optional node_type, prioritized by exact match relevance and symbol type tiering."""
+        from spashta_ckg.runtime.query_spashta import smart_search, make_compact_node
+        raw_results = smart_search(self.graph_data, query, type_filter=node_type)
+        if include_full:
+            return raw_results
+        return [make_compact_node(n, include_full=False) for n in raw_results]
 
     def locate(self, symbol: str) -> Optional[Dict[str, Any]]:
-        """Finds file path, line numbers, and metadata for a symbol."""
-        matches = self.search(symbol)
-        if matches:
-            m = matches[0]
-            fpath = m.get("file_path") or m.get("file") or m.get("scope")
-            if not fpath and "::" in m.get("id", ""):
-                fpath = m.get("id", "").split("::")[0]
+        """Finds file path, line numbers, and metadata for a symbol with type weighting."""
+        from spashta_ckg.runtime.query_spashta import resolve_symbol_node
+        winner, is_ambiguous, alts = resolve_symbol_node(self.graph_data, symbol)
+        if winner:
+            fpath = winner.get("file_path") or winner.get("file") or winner.get("scope")
+            if not fpath and "::" in winner.get("id", ""):
+                fpath = winner.get("id", "").split("::")[0]
+            if fpath and fpath.startswith("File:"):
+                fpath = fpath[5:]
             return {
-                "id": m.get("id"),
-                "name": m.get("name"),
-                "node_type": m.get("node_type") or m.get("type"),
+                "id": winner.get("id"),
+                "name": winner.get("name"),
+                "node_type": winner.get("node_type") or winner.get("type"),
                 "file_path": fpath,
-                "line_start": m.get("line_start"),
-                "line_end": m.get("line_end"),
-                "semantic_roles": m.get("semantic_roles", [])
+                "line_start": winner.get("line_start"),
+                "line_end": winner.get("line_end"),
+                "semantic_roles": winner.get("semantic_roles", []),
+                "ambiguous": is_ambiguous,
+                "alternatives": alts
             }
         return None
 
     def impact(self, symbol: str, depth: int = 3) -> Dict[str, Any]:
-        """Calculates upstream blast-radius: who depends on or calls this symbol."""
-        target_nodes = self.search(symbol)
-        if not target_nodes:
-            return {"target": symbol, "found": False, "impacted_nodes": [], "edges": []}
+        """Calculates upstream blast-radius: who depends on or calls this symbol, returned in universal envelope schema."""
+        from spashta_ckg.runtime.query_spashta import resolve_symbol_node, trace_deps, make_envelope, get_node
+        target_node, is_ambiguous, alts = resolve_symbol_node(self.graph_data, symbol)
+        if not target_node:
+            return make_envelope(
+                command="impact",
+                status="not_found",
+                target={"query": symbol},
+                error=f"Node not found: {symbol}",
+                project_root=self.project_root
+            )
 
-        target = target_nodes[0]
-        target_id = target.get("id") or target.get("name")
+        target_id = target_node.get("id")
+        impact_map = trace_deps(self.graph_data, target_id, "incoming", depth)
 
-        impacted_nodes = {}
-        relevant_edges = []
-        visited = set()
-        queue = [(target_id, 0)]
+        impacted_items = []
+        breakdown = {}
+        for nid, info in impact_map.items():
+            n = get_node(self.graph_data, nid)
+            ntype = info.get("node_type") or (n.get("node_type") if n else "Unknown")
+            breakdown[ntype] = breakdown.get(ntype, 0) + 1
+            fpath = info.get("file_path") or (n.get("file_path") if n else None) or (nid.split("::")[0] if "::" in nid else "")
+            if fpath.startswith("File:"): fpath = fpath[5:]
+            impacted_items.append({
+                "id": nid,
+                "name": info.get("name") or (n.get("name") if n else nid.split("::")[-1]),
+                "node_type": ntype,
+                "file_path": fpath,
+                "line_start": info.get("line_start") or (n.get("line_start") if n else None),
+                "relation": info.get("relation") or info.get("edge_type", "calls"),
+                "depth": info.get("depth", 1)
+            })
 
-        while queue:
-            curr_id, curr_depth = queue.pop(0)
-            if curr_id in visited or curr_depth >= depth:
-                continue
-            visited.add(curr_id)
+        # Check if all callers share identical parent module (discriminating check)
+        parent_modules = {item.get("file_path", "") for item in impacted_items}
+        is_discriminating = len(parent_modules) > 1 or len(impacted_items) <= 1
 
-            for e in self.edges:
-                t = e.get("target", e.get("to"))
-                s = e.get("source", e.get("from"))
-                if t == curr_id or (curr_id in str(t)):
-                    relevant_edges.append(e)
-                    if s in self._node_by_id and s not in impacted_nodes:
-                        node_obj = self._node_by_id[s]
-                        impacted_nodes[s] = {
-                            "id": s,
-                            "name": node_obj.get("name"),
-                            "node_type": node_obj.get("node_type") or node_obj.get("type"),
-                            "semantic_roles": node_obj.get("semantic_roles", []),
-                            "file_path": node_obj.get("file_path"),
-                            "line_start": node_obj.get("line_start"),
-                            "edge_type": e.get("type", e.get("edge"))
-                        }
-                        queue.append((s, curr_depth + 1))
-
-        return {
-            "target": target_id,
-            "found": True,
-            "target_node": target,
-            "impact_count": len(impacted_nodes),
-            "impacted_nodes": list(impacted_nodes.values()),
-            "edges": relevant_edges
+        target_info = {
+            "query": symbol,
+            "resolved_id": target_id,
+            "name": target_node.get("name"),
+            "node_type": target_node.get("node_type"),
+            "file_path": target_node.get("file_path") or (target_id.split("::")[0] if "::" in target_id else None),
+            "line_start": target_node.get("line_start"),
+            "line_end": target_node.get("line_end")
         }
 
+        summary = {
+            "total_items": len(impacted_items),
+            "returned_items": len(impacted_items),
+            "truncated": False,
+            "discriminating": is_discriminating,
+            "breakdown": breakdown
+        }
+
+        return make_envelope(
+            command="impact",
+            status="ok",
+            target=target_info,
+            items=impacted_items,
+            summary=summary,
+            ambiguous=is_ambiguous,
+            alternatives=alts,
+            project_root=self.project_root
+        )
+
+    def can_delete(self, symbol: str, depth: int = 3) -> Dict[str, Any]:
+        """Evaluates whether a symbol can be safely deleted without breaking working code."""
+        from spashta_ckg.runtime.query_spashta import can_delete as qs_can_delete
+        return qs_can_delete(self.graph_data, symbol, depth=depth, project_root=self.project_root)
+
     def dead_code(self, language: Optional[str] = None) -> Dict[str, Any]:
-        """Identifies definitions with zero inbound usage edges."""
+        """Identifies definitions with zero inbound usage edges with provenance."""
+        from spashta_ckg.runtime.query_spashta import make_envelope
         referenced_targets = set()
         for e in self.edges:
             t = e.get("target", e.get("to"))
@@ -825,6 +847,7 @@ class CKG:
                 referenced_targets.add(str(t))
 
         dead_items = []
+        breakdown = {}
         for n in self.nodes:
             ntype = n.get("node_type") or n.get("type")
             nid = n.get("id") or n.get("name")
@@ -846,6 +869,7 @@ class CKG:
             )
 
             if not is_referenced:
+                breakdown[ntype] = breakdown.get(ntype, 0) + 1
                 dead_items.append({
                     "id": nid,
                     "name": name,
@@ -855,11 +879,35 @@ class CKG:
                     "line_start": n.get("line_start")
                 })
 
-        return {
+        all_files = {n.get("file_path") for n in self.nodes if n.get("file_path")}
+
+        summary = {
             "total_candidates": len(dead_items),
-            "language_filter": language,
-            "dead_items": dead_items
+            "total_items": len(dead_items),
+            "returned_items": len(dead_items),
+            "truncated": False,
+            "breakdown": breakdown
         }
+
+        provenance = {
+            "files_analyzed": len(all_files),
+            "symbols_considered": len(self.nodes),
+            "language_filter": language
+        }
+
+        return make_envelope(
+            command="dead_code",
+            status="ok",
+            items=dead_items,
+            summary=summary,
+            provenance=provenance,
+            project_root=self.project_root,
+            extra={
+                "total_candidates": len(dead_items),
+                "language_filter": language,
+                "dead_items": dead_items
+            }
+        )
 
     def routes(self) -> List[Dict[str, Any]]:
         """Extracts full route map linking templates, views, and endpoints."""
@@ -892,7 +940,8 @@ class CKG:
         return route_list
 
     def stats(self) -> Dict[str, Any]:
-        """Returns high-level graph statistics."""
+        """Returns high-level graph statistics in standardized schema."""
+        from spashta_ckg.runtime.query_spashta import check_freshness
         type_counts = {}
         role_counts = {}
         for n in self.nodes:
@@ -907,9 +956,16 @@ class CKG:
             edge_counts[t] = edge_counts.get(t, 0) + 1
 
         return {
+            "status": "ok",
+            "command": "stats",
             "total_nodes": len(self.nodes),
             "total_edges": len(self.edges),
+            "nodes": len(self.nodes),
+            "edges": len(self.edges),
+            "ambiguities": len(self.graph_data.get("ambiguities", [])),
             "node_breakdown": type_counts,
             "semantic_roles": role_counts,
-            "edge_breakdown": edge_counts
+            "edge_breakdown": edge_counts,
+            "meta": self.graph_data.get("_meta", {}),
+            "_meta": check_freshness(self.project_root)
         }

@@ -3,7 +3,7 @@
     "builder": "build_python_ast.py",
     "builder_version": "2.0-strict",
     "schema_version": "1.4",
-    "generated_at": "2026-08-30T15:16:00.132594"
+    "generated_at": "2026-09-01T08:14:39.389047"
   },
   "nodes": [
     {
@@ -319,7 +319,7 @@
   ],
   "ambiguities": [
     {
-      "id": "778172f5-f9e6-41c8-8d15-94d276dba83c",
+      "id": "6c50ea24-f4ea-451e-a9c7-da6f9f665632",
       "kind": "import_module_unknown",
       "source_file": "python_dummy.py",
       "source_scope": "python_dummy.py",
@@ -329,7 +329,7 @@
       "resolver": "agent"
     },
     {
-      "id": "950e011a-bd33-4ef4-b13e-c20eafc882fd",
+      "id": "3650bbdb-db13-4aa4-b833-8749b44d8286",
       "kind": "import_module_unknown",
       "source_file": "python_dummy.py",
       "source_scope": "python_dummy.py",
@@ -339,7 +339,7 @@
       "resolver": "agent"
     },
     {
-      "id": "8f3a94f1-9068-476f-9aec-d864aa21da90",
+      "id": "cad68c11-3046-4c7c-a313-9f2635ba785b",
       "kind": "import_module_unknown",
       "source_file": "python_dummy.py",
       "source_scope": "python_dummy.py",
@@ -349,7 +349,7 @@
       "resolver": "agent"
     },
     {
-      "id": "712aef49-dfa4-4e35-9895-a34b1a2d34ce",
+      "id": "cae338c2-af6d-45d7-a209-0f225aaa3eb7",
       "kind": "import_module_unknown",
       "source_file": "python_dummy.py",
       "source_scope": "python_dummy.py",
@@ -359,7 +359,7 @@
       "resolver": "agent"
     },
     {
-      "id": "1a99053e-0be7-400c-a1be-673837870305",
+      "id": "65c31dcf-8f40-4555-aa04-233485d8f1ea",
       "kind": "import_module_unknown",
       "source_file": "python_dummy.py",
       "source_scope": "python_dummy.py",
@@ -369,7 +369,7 @@
       "resolver": "agent"
     },
     {
-      "id": "6699812d-8015-4a73-943b-215b0f9bb0e5",
+      "id": "768785a4-0896-4127-886d-9b9ec26028d1",
       "kind": "schema_violation",
       "source_file": "python_dummy.py",
       "source_scope": "python_dummy.py",
@@ -379,7 +379,7 @@
       "resolver": "agent"
     },
     {
-      "id": "f8467757-47e8-460c-a1b0-f45bf1944e18",
+      "id": "34fa3291-18af-4d0f-a085-3725477585f9",
       "kind": "schema_violation",
       "source_file": "python_dummy.py",
       "source_scope": "python_dummy.py",
@@ -389,7 +389,7 @@
       "resolver": "agent"
     },
     {
-      "id": "8982c688-9dcc-4127-b343-06add2133934",
+      "id": "66c64f6b-8f59-4ea8-af3a-5537914a014c",
       "kind": "schema_violation",
       "source_file": "python_dummy.py",
       "source_scope": "python_dummy.py::BaseClass",
@@ -399,7 +399,7 @@
       "resolver": "agent"
     },
     {
-      "id": "118e38d9-50a9-42d4-a44f-7307f548856d",
+      "id": "7a6199ba-9427-4906-b604-e10876f724e1",
       "kind": "call_target_unknown",
       "source_file": "python_dummy.py",
       "source_scope": "python_dummy.py::error_func",
@@ -409,7 +409,7 @@
       "resolver": "agent"
     },
     {
-      "id": "d265989e-7def-4ffe-be6e-0887c1a2ccc5",
+      "id": "29a070dc-a7e7-48e4-bc7f-ba38a7150829",
       "kind": "call_target_unknown",
       "source_file": "python_dummy.py",
       "source_scope": "python_dummy.py::view",
@@ -419,7 +419,7 @@
       "resolver": "agent"
     },
     {
-      "id": "627c6ecb-01d5-4160-ae6b-77cd4821f860",
+      "id": "41079c59-0959-4200-a4f8-245a79c170f7",
       "kind": "call_target_unknown",
       "source_file": "python_dummy.py",
       "source_scope": "python_dummy.py::view",

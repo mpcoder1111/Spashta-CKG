@@ -3,7 +3,7 @@
     "builder": "build_js_ast.py",
     "builder_version": "0.1-mvp",
     "schema_version": "1.4",
-    "generated_at": "2026-08-30T15:16:01.675797"
+    "generated_at": "2026-09-01T08:14:46.118375"
   },
   "nodes": [
     {
@@ -186,7 +186,7 @@
   ],
   "ambiguities": [
     {
-      "id": "99704912-7f6e-42da-a778-b48705b14f32",
+      "id": "51185f3e-1a75-4e19-a0d6-7e363516c3d1",
       "kind": "unresolved_call",
       "source_file": "js_dummy.js",
       "source_scope": "js_dummy.js::L23",
@@ -196,7 +196,7 @@
       "resolver": "agent"
     },
     {
-      "id": "e9ae0f4b-6ca5-4e8d-a73c-afa4acfa6810",
+      "id": "784083f1-03f8-4eb2-bd9c-7702c85c0e30",
       "kind": "unresolved_selector",
       "source_file": "js_dummy.js",
       "source_scope": "js_dummy.js::L44",

@@ -1,0 +1,15 @@
+One minor observation, not worth filing
+read evidence resolves to a dataclass field (evidence: str) rather than the evidence() function at retrieval/evidence.py:84. Seven nodes share that exact name; the tie-break picked a Variable over a Function. Cosmetic — read with a qualified id works, and search shows all seven.
+----
+
+.mcp.json, .spashta/, profile.json
+
+---
+
+From text transform project
+undretand what is the meaning..
+
+
+"And we've already seen its limitation: 4,271 nodes / 5,678 edges, but only about 252 call edges, so we shouldn't pretend its call graph explains runtime behaviour."
+
+---------

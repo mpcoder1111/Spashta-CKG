@@ -81,6 +81,11 @@ Quickstart Workflow:
     p_impact.add_argument("node_id", help="Target symbol name or node ID")
     p_impact.add_argument("--depth", "-d", type=int, default=3, help="Max traversal depth (default: 3)")
 
+    # 4b. Safe Deletion Decision Tool (3.2.7)
+    p_candel = subparsers.add_parser("can-delete", parents=[common], help="Evaluate if a symbol can be safely deleted without breaking working code")
+    p_candel.add_argument("node_id", help="Target symbol name or node ID")
+    p_candel.add_argument("--depth", "-d", type=int, default=3, help="Max traversal depth (default: 3)")
+
     # 5. Dependencies (2.1, 2.2)
     p_deps = subparsers.add_parser("dependencies", aliases=["deps"], parents=[common], help="What does this symbol depend on? (Outgoing edges)")
     p_deps.add_argument("node_id", help="Target symbol name or node ID")
@@ -106,10 +111,12 @@ Quickstart Workflow:
     p_search.add_argument("query", help="Search query string")
     p_search.add_argument("--type", "-t", default=None, help="Filter by node type (e.g. Function, Route, StyleClass)")
     p_search.add_argument("--app", help="Filter by Django/sub-app directory prefix")
+    p_search.add_argument("--full", action="store_true", help="Include full docstrings and metadata (compact by default)")
 
     # 11. Locate (2.1, 2.2)
     p_locate = subparsers.add_parser("locate", parents=[common], help="Locate exact file path, start line, and end line of a symbol")
     p_locate.add_argument("node_id", help="Target symbol or node ID")
+    p_locate.add_argument("--full", action="store_true", help="Include full docstrings and metadata")
 
     # 12. Read Source (2.1)
     p_read = subparsers.add_parser("read", parents=[common], help="Read the actual source code of a node from disk")
@@ -118,6 +125,7 @@ Quickstart Workflow:
     # 13. Details (2.1)
     p_details = subparsers.add_parser("details", parents=[common], help="Get complete JSON metadata for a node")
     p_details.add_argument("node_id", help="Target symbol or node ID")
+    p_details.add_argument("--full", action="store_true", help="Include full docstrings and raw AST properties")
 
     # 14. Consumers (2.1)
     p_consumers = subparsers.add_parser("consumers", parents=[common], help="Find all ORM usage sites for a model (graph + grep hybrid)")
@@ -313,54 +321,181 @@ Quickstart Workflow:
         # Run query_spashta command logic
         cmd = args.command
         if cmd == "search":
-            res = qs.smart_search(graph, args.query, getattr(args, "type", None), getattr(args, "app", None))
+            raw_res = qs.smart_search(graph, args.query, getattr(args, "type", None), getattr(args, "app", None))
+            include_full = getattr(args, "full", False)
+            res = [qs.make_compact_node(n, include_full=include_full) for n in raw_res]
             if args.json:
                 total_nodes = len(graph.get("nodes", []))
-                qs.output({
-                    "results": res,
-                    "metadata": {
-                        "total_matches": len(res),
-                        "total_searched": total_nodes,
-                        "query": args.query,
-                        "type_filter": getattr(args, "type", None),
-                        "app_filter": getattr(args, "app", None),
-                    }
-                }, True)
+                breakdown = {}
+                for n in res:
+                    t = n.get("node_type", "Unknown")
+                    breakdown[t] = breakdown.get(t, 0) + 1
+                env = qs.make_envelope(
+                    command="search",
+                    status="ok",
+                    target={"query": args.query, "type_filter": getattr(args, "type", None), "app_filter": getattr(args, "app", None)},
+                    items=res,
+                    summary={
+                        "total_items": len(res),
+                        "returned_items": len(res),
+                        "truncated": False,
+                        "breakdown": breakdown
+                    },
+                    provenance={"total_searched": total_nodes},
+                    project_root=project_root
+                )
+                qs.output(env, True)
             else:
                 qs.output(res, False)
         elif cmd == "locate":
-            node = qs.get_node(graph, args.node_id)
-            if node:
-                fpath = node.get("file_path", "")
-                if not fpath and "::" in node.get("id", ""):
-                    fpath = node["id"].split("::")[0]
+            winner, is_ambiguous, alts = qs.resolve_symbol_node(graph, args.node_id)
+            if winner:
+                fpath = winner.get("file_path", "")
+                if not fpath and "::" in winner.get("id", ""):
+                    fpath = winner["id"].split("::")[0]
                     if fpath.startswith("File:"): fpath = fpath[5:]
-                loc = {
-                    "id": node["id"],
-                    "file": fpath or node.get("name", "N/A"),
-                    "line_start": node.get("line_start"),
-                    "line_end": node.get("line_end"),
-                    "node_type": node.get("node_type"),
-                    "docstring": node.get("docstring")
+                target_info = {
+                    "query": args.node_id,
+                    "resolved_id": winner["id"],
+                    "name": winner.get("name"),
+                    "node_type": winner.get("node_type"),
+                    "file_path": fpath or winner.get("name", "N/A"),
+                    "line_start": winner.get("line_start"),
+                    "line_end": winner.get("line_end"),
+                    "semantic_roles": winner.get("semantic_roles", [])
                 }
-                qs.output(loc, args.json)
+                if getattr(args, "full", False):
+                    target_info["docstring"] = winner.get("docstring")
+                    target_info["signature"] = winner.get("signature")
+                
+                if args.json:
+                    env = qs.make_envelope(
+                        command="locate",
+                        status="ok",
+                        target=target_info,
+                        items=[target_info],
+                        summary={"total_items": 1, "returned_items": 1, "truncated": False},
+                        ambiguous=is_ambiguous,
+                        alternatives=alts,
+                        project_root=project_root
+                    )
+                    qs.output(env, True)
+                else:
+                    loc = {
+                        "id": winner["id"],
+                        "file": fpath or winner.get("name", "N/A"),
+                        "line_start": winner.get("line_start"),
+                        "line_end": winner.get("line_end"),
+                        "node_type": winner.get("node_type")
+                    }
+                    if is_ambiguous:
+                        loc["ambiguous"] = True
+                        loc["alternatives_count"] = len(alts)
+                    qs.output(loc, False)
             else:
-                qs.output(qs.node_not_found_response(graph, args.node_id), args.json)
+                qs.output(qs.node_not_found_response(graph, args.node_id, command="locate", project_root=project_root), args.json)
         elif cmd == "read":
             qs.output(qs.read_content(graph, args.node_id), args.json)
         elif cmd == "details":
-            node = qs.get_node(graph, args.node_id)
-            qs.output(node if node else qs.node_not_found_response(graph, args.node_id), args.json)
-        elif cmd == "impact":
-            res = qs.trace_deps(graph, args.node_id, "incoming", args.depth)
-            if args.json:
-                coverage = qs.build_layer_coverage(res)
-                qs.output({"results": res, **coverage}, True)
+            winner, is_ambiguous, alts = qs.resolve_symbol_node(graph, args.node_id)
+            if winner:
+                if args.json:
+                    env = qs.make_envelope(
+                        command="details",
+                        status="ok",
+                        target={"query": args.node_id, "resolved_id": winner.get("id"), "node_type": winner.get("node_type")},
+                        items=[winner],
+                        summary={"total_items": 1, "returned_items": 1, "truncated": False},
+                        ambiguous=is_ambiguous,
+                        alternatives=alts,
+                        project_root=project_root
+                    )
+                    qs.output(env, True)
+                else:
+                    qs.output(winner, False)
             else:
-                qs.output(res, False)
+                qs.output(qs.node_not_found_response(graph, args.node_id, command="details", project_root=project_root), args.json)
+        elif cmd == "impact":
+            ckg = CKG(graph, project_root=project_root)
+            env = ckg.impact(args.node_id, depth=args.depth)
+            if args.json:
+                qs.output(env, True)
+            else:
+                if env.get("status") != "ok":
+                    print(f"Error: {env.get('error', 'Node not found')}")
+                else:
+                    items = env.get("items", [])
+                    print(f"\nBlast Radius for '{args.node_id}' ({len(items)} callers, depth {args.depth}):")
+                    for it in items:
+                        print(f"  - [{it.get('node_type')}] {it.get('name')} ({it.get('file_path')}:{it.get('line_start')}) [{it.get('relation')}]")
+        elif cmd == "can-delete":
+            ckg = CKG(graph, project_root=project_root)
+            env = ckg.can_delete(args.node_id, depth=args.depth)
+            if args.json:
+                qs.output(env, True)
+            else:
+                if env.get("status") != "ok":
+                    print(f"Error: {env.get('error', 'Node not found')}")
+                else:
+                    can_del = env.get("can_delete", False)
+                    print(f"\nCan Delete '{args.node_id}'? -> {'YES' if can_del else 'NO (Blocked)'}")
+                    prod_b = env.get("blockers", {}).get("production", [])
+                    test_b = env.get("blockers", {}).get("tests", [])
+                    if prod_b:
+                        print(f"\nProduction Blockers ({len(prod_b)}):")
+                        for b in prod_b:
+                            print(f"  - [{b.get('node_type')}] {b.get('name')} ({b.get('file_path')}:{b.get('line_start')})")
+                    if test_b:
+                        print(f"\nTest Blockers ({len(test_b)}):")
+                        for b in test_b:
+                            print(f"  - [{b.get('node_type')}] {b.get('name')} ({b.get('file_path')}:{b.get('line_start')})")
+                    req_t = env.get("requires_test_updates", [])
+                    if req_t:
+                        print(f"\nRequired Test Updates ({len(req_t)} files):")
+                        for f in req_t:
+                            print(f"  - {f}")
         elif cmd in ("dependencies", "deps"):
-            res = qs.trace_deps(graph, args.node_id, "outgoing", args.depth)
-            qs.output(res, args.json)
+            target_node, is_ambiguous, alts = qs.resolve_symbol_node(graph, args.node_id)
+            if not target_node:
+                qs.output(qs.node_not_found_response(graph, args.node_id, command="dependencies", project_root=project_root), args.json)
+            else:
+                raw_deps = qs.trace_deps(graph, target_node.get("id"), "outgoing", args.depth)
+                items = []
+                breakdown = {}
+                for nid, info in raw_deps.items():
+                    n = qs.get_node(graph, nid)
+                    ntype = info.get("node_type") or (n.get("node_type") if n else "Unknown")
+                    breakdown[ntype] = breakdown.get(ntype, 0) + 1
+                    fpath = info.get("file_path") or (n.get("file_path") if n else None) or (nid.split("::")[0] if "::" in nid else "")
+                    if fpath.startswith("File:"): fpath = fpath[5:]
+                    items.append({
+                        "id": nid,
+                        "name": info.get("name") or (n.get("name") if n else nid.split("::")[-1]),
+                        "node_type": ntype,
+                        "file_path": fpath,
+                        "line_start": info.get("line_start") or (n.get("line_start") if n else None),
+                        "relation": info.get("relation") or info.get("edge_type", "uses"),
+                        "depth": info.get("depth", 1)
+                    })
+                if args.json:
+                    env = qs.make_envelope(
+                        command="dependencies",
+                        status="ok",
+                        target={"query": args.node_id, "resolved_id": target_node.get("id"), "node_type": target_node.get("node_type")},
+                        items=items,
+                        summary={
+                            "total_items": len(items),
+                            "returned_items": len(items),
+                            "truncated": False,
+                            "breakdown": breakdown
+                        },
+                        ambiguous=is_ambiguous,
+                        alternatives=alts,
+                        project_root=project_root
+                    )
+                    qs.output(env, True)
+                else:
+                    qs.output(raw_deps, False)
         elif cmd == "call-graph":
             res = qs.get_call_graph(graph, args.node_id)
             qs.output(res, args.json)

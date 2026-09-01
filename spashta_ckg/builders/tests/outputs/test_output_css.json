@@ -2,7 +2,7 @@
   "_meta": {
     "builder": "build_css_ast.py",
     "builder_version": "1.0-strict",
-    "generated_at": "2026-08-30T15:16:01.129845"
+    "generated_at": "2026-09-01T08:14:55.189069"
   },
   "nodes": [
     {
@@ -359,7 +359,7 @@
   ],
   "ambiguities": [
     {
-      "id": "7b94b8ad-3ef2-4581-ad4e-b6f68574cb6b",
+      "id": "c6ff71c1-a2bf-4c77-b680-4a50c4327c61",
       "kind": "responsive_breakpoint",
       "source_file": "css_dummy.css",
       "source_scope": "css_dummy.css",
@@ -369,7 +369,7 @@
       "resolver": "agent"
     },
     {
-      "id": "72ff8bcc-d63f-4db1-8104-b06691016b49",
+      "id": "5db06cc2-09c7-442c-b6bb-9bfe8f028b36",
       "kind": "import_target_unresolved",
       "source_file": "css_dummy.css",
       "source_scope": "css_dummy.css",

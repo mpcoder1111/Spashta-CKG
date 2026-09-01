@@ -6,6 +6,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [3.2.7] - 2026-09-01
+
+**Spashta-CKG 3.2.7 — Agent-Native UX Evolution, Universal Response Envelope & Safe Deletion Decision Engine**
+
+Major agent-native evolution introducing universal response envelopes across all interfaces, high-level safe deletion decision tools, symbol type hierarchy tiering, and sub-millisecond graph staleness detection.
+
+### Fixed & Enhanced
+- **Universal Response Envelope Standard**: Standardized all CLI `--json`, Python API, and MCP tool responses into a uniform schema (`status`, `command`, `target`, `ambiguous`, `alternatives`, `summary`, `items`, `provenance`, `_meta`). `status` is strictly one of `{"ok", "not_found", "error"}`.
+- **Safe Deletion Decision Engine (`can_delete` / `can-delete`)**:
+  - Distinguishes production blockers from test-only callers:
+    - Production callers present $\rightarrow$ `can_delete: false`, `requires_test_updates: []`.
+    - Test callers only $\rightarrow$ `can_delete: true`, `requires_test_updates: ["tests/test_x.py"]` (valid deletion with attached test updates).
+    - Zero callers $\rightarrow$ `can_delete: true`, `requires_test_updates: []`.
+  - Exposed as CLI `spashta_ckg can-delete <symbol>`, Python API `CKG.can_delete()`, and MCP tool `spashta_can_delete()`.
+- **Symbol Type Precedence Tiering & Ambiguity Flagging**:
+  - Implemented 5-tier symbol precedence in `resolve_symbol_node` (`Functions/Classes (100-95)` > `Modules/Templates (80-75)` > `DataModels/Forms/Signals (65-60)` > `Fields/Variables/Parameters (40-30)` > `Stylesheets/Selectors (20)`).
+  - Correctly breaks ties on exact-match collisions (e.g. `evidence` function vs `evidence: str` field) and sets `ambiguous: true` with populated `alternatives`.
+- **mtime Freshness Signal & Staleness Guardrail**:
+  - Embedded `_meta.is_stale` and `_meta.stale_files` checked against `.spashta/scan_meta.json` in ~1ms without loading ASTs.
+- **Compact Output by Default**:
+  - Node listings omit heavy docstrings by default to save tokens.
+  - Added `--full` flag on CLI (`search`, `locate`, `details`) and `include_full=True` on Python API. Full docstrings are never truncated.
+- **Tracked Configuration Hygiene**:
+  - Added priority support for root `.spashta.json` tracked dotfile alongside backward-compatible `profile.json` and `.spashta/profile.json`.
+- **9-Tool Native MCP Server Suite**:
+  - Added `spashta_can_delete` and updated all MCP tools to return structured dictionaries for native agent consumption.
+- **Agent Contract Regression Suite**:
+  - Added `verify_agent_contract_and_decision_tools.py` verifying all 7 agent contract groups (100% Green).
+
+---
+
 ## [3.2.6] - 2026-08-31
 
 **Spashta-CKG 3.2.6 — Universal Bare-Symbol Resolution Across All CLI Subcommands & 39-Suite Regression**
