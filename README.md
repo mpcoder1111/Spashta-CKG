@@ -2,7 +2,7 @@
 
 > **Spashta** (स्पष्ट) = *Clarity* in Sanskrit. Deterministic Code Knowledge Graph & Impact Engine for Python, JavaScript, HTML, and CSS.
 
-[![Version](https://img.shields.io/badge/version-3.2.7-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.2.8-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
 
@@ -92,7 +92,7 @@ Connect Spashta directly to **Antigravity, Cursor, Claude Desktop, or VS Code** 
 ```
 *(If installed inside a project `.venv`, specify the direct path: e.g. `"command": ".venv/Scripts/spashta_ckg_mcp.exe"` on Windows or `".venv/bin/spashta_ckg_mcp"` on Linux/macOS).*
 
-*Your AI agent now has 9 native, zero-click IDE tools (`spashta_impact`, `spashta_can_delete`, `spashta_locate`, `spashta_routes`, `spashta_search`, `spashta_dead_code`, `spashta_stats`, `spashta_refresh`, `spashta_scan`)!*
+*Your AI agent now has 10 native, zero-click IDE tools (`spashta_impact`, `spashta_dependencies`, `spashta_can_delete`, `spashta_locate`, `spashta_routes`, `spashta_search`, `spashta_dead_code`, `spashta_stats`, `spashta_refresh`, `spashta_scan`)!*
 
 ---
 

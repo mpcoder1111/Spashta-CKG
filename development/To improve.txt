@@ -1,15 +1,33 @@
-One minor observation, not worth filing
-read evidence resolves to a dataclass field (evidence: str) rather than the evidence() function at retrieval/evidence.py:84. Seven nodes share that exact name; the tie-break picked a Variable over a Function. Cosmetic — read with a qualified id works, and search shows all seven.
-----
+3.2.7 is safe for our work. Everything we depend on is verified: the edge-retention invariant holds, the envelope is consistent, the freshness signal works,
+Four things worth sending back, none blocking.
 
-.mcp.json, .spashta/, profile.json
+3.2.7 verdict for our usage: improved, with no regressions
 
----
+IMPROVED   consistent envelope — removes the one defect that produced a wrong answer
+           for me (I parsed the top level and got "zero blast radius" for six symbols)
+IMPROVED   is_stale in every response — the staleness hazard I had to write into
+           CLAUDE.md as a standing warning is now mechanical
+IMPROVED   can_delete — replaces my 3-step search→impact→read workflow with one call
+IMPROVED   truncated / total_items — a silently-subset blast radius is now impossible
+IMPROVED   compact by default, 61% smaller; --full never truncates docstrings, which
+           matters here because our docstrings carry the reasoning
+IMPROVED   ambiguous + alternatives — `locate evidence` no longer silently picks one
+           of seven
+UNCHANGED  edge-retention invariant holds; scan 17.7s, graph 4,276/5,682
+NO REGRESSIONS FOUND across CLI, Python API and MCP
+The four items I flagged are polish, not defects. Nothing degraded.
+-----------
 
-From text transform project
-undretand what is the meaning..
+1  MCP returns text, not structuredContent — a raw MCP client still needs json.loads,
+   so the advertised "0 decoding" isn't visible at the protocol level
+2  MCP `locate` returns a bare node; CLI `locate` returns the full envelope.
+   Same command, two shapes — the inconsistency the envelope work targeted
+3  can_delete is 18 KB for one boolean + 39 blockers. Compact-by-default doesn't
+   reach it; a summary_only mode would help most where context costs most
+4  graph_built_at: null and provenance: {} are declared but unpopulated
 
+Plus one clarification: discriminating measures variety within a response, not whether a symbol's answer differs from other symbols' — all six compiler passes still return discriminating: true while being byte-identical to each other. Honestly, a single-query API can't compute what I asked for; documenting the flag's actual meaning is the better fix.
 
-"And we've already seen its limitation: 4,271 nodes / 5,678 edges, but only about 252 call edges, so we shouldn't pretend its call graph explains runtime behaviour."
+And a correction to relay: .mcp.json did not move and cannot — it belongs to Claude Code, not Spashta. Only the profile gained .spashta.json, which they placed at the root exactly as recommended, so it stays trackable.
 
----------
+-------------------

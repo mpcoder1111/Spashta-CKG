@@ -14,7 +14,19 @@ from typing import Dict, List, Any, Optional, Union
 
 # Base package directory
 PACKAGE_ROOT = Path(__file__).resolve().parent
-__version__ = "3.2.7"
+__version__ = "3.2.8"
+
+def _safe_replace(src: Union[str, Path], dst: Union[str, Path], max_retries: int = 5, delay: float = 0.05) -> None:
+    """Safely replace a file with retry logic to avoid transient Windows WinError 32 file lock latency."""
+    import time
+    for attempt in range(max_retries):
+        try:
+            os.replace(src, dst)
+            return
+        except OSError:
+            if attempt == max_retries - 1:
+                raise
+            time.sleep(delay)
 
 def apply_enrichment_logic(node: Dict[str, Any], edges_from: Dict[str, List], edges_to: Dict[str, List], node_map: Dict[str, Any], detection_rules: Dict[str, Any]) -> bool:
     """Evaluates 9 deterministic detection rules against a node to assign semantic roles."""
@@ -332,12 +344,16 @@ class CKG:
                     seen_edges.add(key)
                     merged_edges.append(e)
 
+        from datetime import datetime, timezone
+        built_timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
         ast_data = {
             "_meta": {
                 "schema_version": "2.2",
                 "generator": f"Spashta-CKG {__version__}",
                 "project_root": str(root),
-                "languages": all_languages
+                "languages": all_languages,
+                "built_at": built_timestamp
             },
             "nodes": list(merged_nodes.values()),
             "edges": merged_edges,
@@ -672,8 +688,7 @@ class CKG:
         tmp_raw = raw_ast_path.with_suffix(".json.tmp")
         with open(tmp_raw, "w", encoding="utf-8") as f:
             json.dump(ast_data, f, indent=2)
-        import os
-        os.replace(tmp_raw, raw_ast_path)
+        _safe_replace(tmp_raw, raw_ast_path)
 
         # Stage 2 enrichment
         edges_from = {}
@@ -716,7 +731,7 @@ class CKG:
         tmp_enriched = enriched_path.with_suffix(".json.tmp")
         with open(tmp_enriched, "w", encoding="utf-8") as f:
             json.dump(enriched_data, f, indent=2)
-        os.replace(tmp_enriched, enriched_path)
+        _safe_replace(tmp_enriched, enriched_path)
 
         try:
             for n in ast_data.get("nodes", []):
@@ -742,9 +757,9 @@ class CKG:
             return raw_results
         return [make_compact_node(n, include_full=False) for n in raw_results]
 
-    def locate(self, symbol: str) -> Optional[Dict[str, Any]]:
-        """Finds file path, line numbers, and metadata for a symbol with type weighting."""
-        from spashta_ckg.runtime.query_spashta import resolve_symbol_node
+    def locate(self, symbol: str) -> Dict[str, Any]:
+        """Finds file path, line numbers, and metadata for a symbol in universal envelope schema."""
+        from spashta_ckg.runtime.query_spashta import resolve_symbol_node, make_envelope, _get_suggestions
         winner, is_ambiguous, alts = resolve_symbol_node(self.graph_data, symbol)
         if winner:
             fpath = winner.get("file_path") or winner.get("file") or winner.get("scope")
@@ -752,18 +767,41 @@ class CKG:
                 fpath = winner.get("id", "").split("::")[0]
             if fpath and fpath.startswith("File:"):
                 fpath = fpath[5:]
-            return {
+            target_info = {
                 "id": winner.get("id"),
+                "resolved_id": winner.get("id"),
                 "name": winner.get("name"),
                 "node_type": winner.get("node_type") or winner.get("type"),
                 "file_path": fpath,
                 "line_start": winner.get("line_start"),
                 "line_end": winner.get("line_end"),
-                "semantic_roles": winner.get("semantic_roles", []),
-                "ambiguous": is_ambiguous,
-                "alternatives": alts
+                "semantic_roles": winner.get("semantic_roles", [])
             }
-        return None
+            return make_envelope(
+                command="locate",
+                status="ok",
+                target=target_info,
+                items=[target_info],
+                summary={"total_items": 1, "returned_items": 1, "truncated": False},
+                ambiguous=is_ambiguous,
+                alternatives=alts,
+                project_root=self.project_root,
+                extra={
+                    "id": winner.get("id"),
+                    "file_path": fpath,
+                    "name": winner.get("name"),
+                    "node_type": winner.get("node_type") or winner.get("type")
+                }
+            )
+        return make_envelope(
+            command="locate",
+            status="not_found",
+            target={"query": symbol},
+            error=f"Node not found: {symbol}",
+            suggestions=_get_suggestions(self.graph_data, symbol),
+            project_root=self.project_root,
+            extra={"found": False}
+        )
 
     def impact(self, symbol: str, depth: int = 3) -> Dict[str, Any]:
         """Calculates upstream blast-radius: who depends on or calls this symbol, returned in universal envelope schema."""
@@ -821,6 +859,12 @@ class CKG:
             "breakdown": breakdown
         }
 
+        all_files = {n.get("file_path") for n in self.nodes if n.get("file_path")}
+        provenance = {
+            "files_analyzed": len(all_files),
+            "symbols_considered": len(self.nodes)
+        }
+
         return make_envelope(
             command="impact",
             status="ok",
@@ -829,13 +873,77 @@ class CKG:
             summary=summary,
             ambiguous=is_ambiguous,
             alternatives=alts,
+            provenance=provenance,
             project_root=self.project_root
         )
 
-    def can_delete(self, symbol: str, depth: int = 3) -> Dict[str, Any]:
+    def can_delete(self, symbol: str, depth: int = 3, summary_only: bool = False) -> Dict[str, Any]:
         """Evaluates whether a symbol can be safely deleted without breaking working code."""
         from spashta_ckg.runtime.query_spashta import can_delete as qs_can_delete
-        return qs_can_delete(self.graph_data, symbol, depth=depth, project_root=self.project_root)
+        return qs_can_delete(self.graph_data, symbol, depth=depth, project_root=self.project_root, summary_only=summary_only)
+
+    def dependencies(self, symbol: str, depth: int = 3) -> Dict[str, Any]:
+        """Calculates downstream outgoing dependencies: what functions, models, and symbols this symbol depends on or calls."""
+        from spashta_ckg.runtime.query_spashta import resolve_symbol_node, trace_deps, make_envelope, get_node
+        target_node, is_ambiguous, alts = resolve_symbol_node(self.graph_data, symbol)
+        if not target_node:
+            return make_envelope(
+                command="dependencies",
+                status="not_found",
+                target={"query": symbol},
+                error=f"Node not found: {symbol}",
+                project_root=self.project_root
+            )
+
+        target_id = target_node.get("id")
+        raw_deps = trace_deps(self.graph_data, target_id, "outgoing", depth)
+        items = []
+        breakdown = {}
+        for nid, info in raw_deps.items():
+            n = get_node(self.graph_data, nid)
+            ntype = info.get("node_type") or (n.get("node_type") if n else "Unknown")
+            breakdown[ntype] = breakdown.get(ntype, 0) + 1
+            fpath = info.get("file_path") or (n.get("file_path") if n else None) or (nid.split("::")[0] if "::" in nid else "")
+            if fpath.startswith("File:"): fpath = fpath[5:]
+            items.append({
+                "id": nid,
+                "name": info.get("name") or (n.get("name") if n else nid.split("::")[-1]),
+                "node_type": ntype,
+                "file_path": fpath,
+                "line_start": info.get("line_start") or (n.get("line_start") if n else None),
+                "relation": info.get("relation") or info.get("edge_type", "uses"),
+                "depth": info.get("depth", 1)
+            })
+
+        all_files = {n.get("file_path") for n in self.nodes if n.get("file_path")}
+        provenance = {
+            "files_analyzed": len(all_files),
+            "symbols_considered": len(self.nodes)
+        }
+
+        return make_envelope(
+            command="dependencies",
+            status="ok",
+            target={
+                "query": symbol,
+                "resolved_id": target_id,
+                "name": target_node.get("name"),
+                "node_type": target_node.get("node_type"),
+                "file_path": target_node.get("file_path") or (target_id.split("::")[0] if "::" in target_id else None),
+                "line_start": target_node.get("line_start")
+            },
+            items=items,
+            summary={
+                "total_items": len(items),
+                "returned_items": len(items),
+                "truncated": False,
+                "breakdown": breakdown
+            },
+            ambiguous=is_ambiguous,
+            alternatives=alts,
+            provenance=provenance,
+            project_root=self.project_root
+        )
 
     def dead_code(self, language: Optional[str] = None) -> Dict[str, Any]:
         """Identifies definitions with zero inbound usage edges with provenance."""

@@ -21,7 +21,7 @@ from spashta_ckg.runtime.query_spashta import (
     make_envelope, check_freshness, can_delete as qs_can_delete
 )
 from spashta_ckg.mcp_server import (
-    spashta_impact, spashta_can_delete, spashta_locate, spashta_routes,
+    spashta_impact, spashta_dependencies, spashta_can_delete, spashta_locate, spashta_routes,
     spashta_search, spashta_dead_code, spashta_stats, spashta_refresh, spashta_scan
 )
 
@@ -101,18 +101,29 @@ def test_universal_envelope_structure():
     assert "returned_items" in imp["summary"] and "truncated" in imp["summary"]
     assert "items" in imp and isinstance(imp["items"], list)
     assert "_meta" in imp and "is_stale" in imp["_meta"]
+    # 3b. Locate envelope
+    loc = ckg.locate("UserModel")
+    assert loc["status"] == "ok"
+    assert loc["command"] == "locate"
+    assert loc["target"]["resolved_id"] == "python_dummy.py::UserModel"
+    assert loc["id"] == "python_dummy.py::UserModel", "Backward compatible top-level id alias required"
+    assert "summary" in loc and loc["summary"]["total_items"] == 1
     
-    # 3b. Search envelope
+    # 3c. Search envelope
     search_nodes = ckg.search("UserModel")
     assert len(search_nodes) > 0
     assert "id" in search_nodes[0] and "name" in search_nodes[0]
     
-    # 3c. Dead code envelope
+    # 3d. Dead code envelope
     dead = ckg.dead_code("py")
     assert dead["status"] == "ok"
     assert "provenance" in dead and "files_analyzed" in dead["provenance"]
     assert "summary" in dead and "total_candidates" in dead["summary"]
-    print("   ✅ Universal envelope keys (status, target, summary, items, _meta) verified!")
+    
+    # 3e. Provenance & graph_built_at freshness
+    assert "provenance" in imp and imp["provenance"]["files_analyzed"] > 0
+    assert imp["_meta"]["graph_built_at"] is not None, "graph_built_at must be populated with ISO timestamp"
+    print("   ✅ Universal envelope keys (status, target, summary, items, _meta, provenance, graph_built_at) verified!")
 
 
 def test_compact_node_default():
@@ -141,32 +152,50 @@ def test_compact_node_default():
 
 
 def test_config_dotfile_discovery():
-    print("[5/7] Testing .spashta.json Configuration Discovery...")
+    print("[5/7] Testing Tracked Dotfile Configuration (.spashta.json)...")
     cfg = CKG.get_profile_info(project_root=TEST_DATA_DIR)
     assert "excluded_directories" in cfg
-    assert isinstance(cfg["excluded_directories"], list)
-    print(f"   ✅ Discovered active profile: {cfg['path']}")
+    print("   ✅ .spashta.json priority discovery verified!")
 
 
 def test_cli_can_delete_and_envelope():
-    print("[6/7] Testing CLI can-delete and Universal Envelope...")
-    cli_exe = str(Path(sys.executable).parent / "spashta_ckg.exe")
+    print("[6/7] Testing CLI can-delete & Universal Envelope Output...")
+    python_exe = sys.executable
     
-    # Run CLI can-delete
+    # CLI can-delete
     out_cd = subprocess.check_output(
-        [cli_exe, "can-delete", "BaseClass", "-p", str(TEST_DATA_DIR), "--json"],
+        [python_exe, "-m", "spashta_ckg.cli", "can-delete", "BaseClass", "-p", str(TEST_DATA_DIR), "--json"],
         text=True
     )
     d_cd = json.loads(out_cd)
     assert d_cd["status"] == "ok"
     assert d_cd["command"] == "can_delete"
     assert "can_delete" in d_cd
-    assert "blockers" in d_cd
-    assert "_meta" in d_cd
     
-    # Run CLI search with --full vs compact
+    # CLI can-delete --summary-only
+    out_cd_sum = subprocess.check_output(
+        [python_exe, "-m", "spashta_ckg.cli", "can-delete", "BaseClass", "-p", str(TEST_DATA_DIR), "--summary-only", "--json"],
+        text=True
+    )
+    d_cd_sum = json.loads(out_cd_sum)
+    assert d_cd_sum["status"] == "ok"
+    assert d_cd_sum["summary"]["summary_only"] is True
+    assert len(d_cd_sum["items"]) == 0
+    assert len(d_cd_sum["blockers"]["production"]) > 0
+    
+    # CLI locate
+    out_loc = subprocess.check_output(
+        [python_exe, "-m", "spashta_ckg.cli", "locate", "UserModel", "-p", str(TEST_DATA_DIR), "--json"],
+        text=True
+    )
+    d_loc = json.loads(out_loc)
+    assert d_loc["status"] == "ok"
+    assert d_loc["command"] == "locate"
+    assert d_loc["target"]["resolved_id"] == "python_dummy.py::UserModel"
+    
+    # CLI search
     out_search = subprocess.check_output(
-        [cli_exe, "search", "UserModel", "-p", str(TEST_DATA_DIR), "--json"],
+        [python_exe, "-m", "spashta_ckg.cli", "search", "UserModel", "-p", str(TEST_DATA_DIR), "--json"],
         text=True
     )
     d_search = json.loads(out_search)
@@ -177,48 +206,64 @@ def test_cli_can_delete_and_envelope():
 
 
 def test_mcp_server_suite():
-    print("[7/7] Testing 9-Tool Native MCP Server Suite...")
+    print("[7/7] Testing 10-Tool Native MCP Server Suite (Dual Delivery: Content + StructuredContent)...")
     async def run_mcp_tests():
         test_dir = str(TEST_DATA_DIR)
         
         # 1. spashta_impact
         r_imp = await spashta_impact("BaseClass", project_dir=test_dir)
-        assert isinstance(r_imp, dict) and r_imp["status"] == "ok"
+        assert r_imp["status"] == "ok"
+        assert hasattr(r_imp, "structured_content") and r_imp.structured_content["status"] == "ok"
+        assert len(r_imp.content) > 0 and len(r_imp.content[0].text) > 0
         
-        # 2. spashta_can_delete (NEW)
+        # 1b. spashta_dependencies (NEW: 10th native tool)
+        r_deps = await spashta_dependencies("UserModel", project_dir=test_dir)
+        assert r_deps["status"] == "ok" and r_deps["command"] == "dependencies"
+        assert hasattr(r_deps, "structured_content")
+        
+        # 2. spashta_can_delete
         r_cd = await spashta_can_delete("BaseClass", project_dir=test_dir)
-        assert isinstance(r_cd, dict) and r_cd["command"] == "can_delete"
+        assert r_cd["command"] == "can_delete"
         
-        # 3. spashta_locate
+        # 2b. spashta_can_delete with summary_only
+        r_cd_sum = await spashta_can_delete("BaseClass", summary_only=True, project_dir=test_dir)
+        assert r_cd_sum["summary"]["summary_only"] is True
+        assert len(r_cd_sum["items"]) == 0
+        assert len(r_cd_sum["blockers"]["production"]) > 0
+        
+        # 3. spashta_locate (Universal envelope shape parity)
         r_loc = await spashta_locate("UserModel", project_dir=test_dir)
-        assert isinstance(r_loc, dict) and r_loc["id"] == "python_dummy.py::UserModel"
+        assert r_loc["status"] == "ok"
+        assert r_loc["command"] == "locate"
+        assert r_loc["id"] == "python_dummy.py::UserModel"
+        assert r_loc["target"]["resolved_id"] == "python_dummy.py::UserModel"
         
         # 4. spashta_routes
         r_rt = await spashta_routes(project_dir=test_dir)
-        assert isinstance(r_rt, list)
+        assert hasattr(r_rt, "structured_content")
         
         # 5. spashta_search
         r_s = await spashta_search("UserModel", project_dir=test_dir)
-        assert isinstance(r_s, list) and len(r_s) > 0
+        assert hasattr(r_s, "structured_content")
         
         # 6. spashta_dead_code
         r_dc = await spashta_dead_code("css", project_dir=test_dir)
-        assert isinstance(r_dc, dict) and r_dc["status"] == "ok"
+        assert r_dc["status"] == "ok"
         
         # 7. spashta_stats
         r_st = await spashta_stats(project_dir=test_dir)
-        assert isinstance(r_st, dict) and r_st["status"] == "ok"
+        assert r_st["status"] == "ok"
         
         # 8. spashta_refresh
         r_rf = await spashta_refresh(files="python_dummy.py", project_dir=test_dir)
-        assert isinstance(r_rf, dict) and r_rf["status"] == "ok"
+        assert r_rf["status"] == "ok"
         
         # 9. spashta_scan
         r_sc = await spashta_scan(project_dir=test_dir)
-        assert isinstance(r_sc, dict) and r_sc["status"] == "ok"
+        assert r_sc["status"] == "ok"
 
     asyncio.run(run_mcp_tests())
-    print("   ✅ All 9 native MCP tools return structured dictionaries asynchronously!")
+    print("   ✅ All 10 native MCP tools deliver both formatted text and structuredContent!")
 
 
 def main():

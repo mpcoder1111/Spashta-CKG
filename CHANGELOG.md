@@ -6,6 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [3.2.8] - 2026-09-01
+
+**Spashta-CKG 3.2.8 — Protocol Dual-Delivery, 10th Native MCP Tool, Token Optimization & Windows Resilience**
+
+Comprehensive agent-native polish delivering protocol-level native structuredContent decoding, the 10th zero-click MCP tool (`spashta_dependencies`), extreme payload compression for safe deletion, universal envelope parity across CLI and MCP, and Windows file lock resilience.
+
+### Added & Enhanced
+- **Protocol-Level MCP Dual-Delivery (`SpashtaMCPResult`)**:
+  - Implemented `SpashtaMCPResult(CallToolResult)` delivering both formatted JSON text (`content`) for text-based clients (e.g. Claude Code) AND decoded native objects (`structured_content`) for structuredContent-aware MCP clients, achieving **zero decoding latency**.
+- **10th Native Zero-Click MCP Tool (`spashta_dependencies`)**:
+  - Added downstream outgoing dependency inspection tool across MCP (`spashta_dependencies`), Python API (`CKG.dependencies`), and CLI (`dependencies`).
+  - Provides full bidirectional situational awareness: upstream blast radius (`impact`) + downstream outgoing calls/imports (`dependencies`).
+- **`can_delete` Payload Optimization (`--summary-only` / `summary_only=True`)**:
+  - Added compact summary-only mode to condense large blocker payloads from ~18 KB down to ~350 bytes for symbols with dozens of callers.
+- **Universal Envelope Parity for `locate`**:
+  - Standardized `CKG.locate()` and MCP `spashta_locate` to return the standardized universal envelope schema (`status`, `command`, `target`, `summary`, `items`, `ambiguous`, `alternatives`, `_meta`) while preserving backward-compatible top-level aliases (`id`, `file_path`).
+- **Populated Metadata Fields (`graph_built_at` & `provenance`)**:
+  - Dynamically populates `_meta.graph_built_at` with an ISO-8601 UTC timestamp and `provenance` with dataset metrics (`files_analyzed`, `symbols_considered`).
+- **Windows File Lock Resilience**:
+  - Introduced `_safe_replace` with retry logic for atomic graph cache updates under transient Windows file locking.
+- **Comprehensive CLI & MCP `--help` Documentation**:
+  - Enriched `spashta_ckg --help` and subcommand help with explicit Universal Response Envelope schemas, core decision commands, and parameter explanations.
+  - Enriched `spashta_ckg_mcp --help` with full 10-tool catalog, parameters, descriptions, and ready-to-copy `mcp_config.json`.
+- **Streamlined Agent Skill (`SKILL.md`)**:
+  - Condensed skill by 56% (from 231 to 122 lines) into a high-density, agent-effective action matrix without data loss, and added periodic governance update directives.
+
+---
+
 ## [3.2.7] - 2026-09-01
 
 **Spashta-CKG 3.2.7 — Agent-Native UX Evolution, Universal Response Envelope & Safe Deletion Decision Engine**

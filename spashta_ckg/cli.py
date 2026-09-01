@@ -7,92 +7,134 @@ import sys
 import json
 import argparse
 from pathlib import Path
-from spashta_ckg.engine import CKG
+from spashta_ckg.engine import CKG, __version__
 import spashta_ckg.runtime.query_spashta as qs
 
 def main():
     help_epilog = """
-Supported Languages & Couplings (Auto-Detected):
+Universal Response Envelope (--json mode for AI Agents):
+  All query commands output a strictly predictable JSON envelope when --json is provided:
+    {
+      "status": "ok" | "not_found" | "error",
+      "command": "impact" | "dependencies" | "can_delete" | "locate" | "search" | ...,
+      "target": {
+        "query": "UserModel",
+        "resolved_id": "app/models.py::UserModel",
+        "node_type": "Class",
+        "file_path": "app/models.py",
+        "line_start": 45
+      },
+      "ambiguous": false,                  # True if exact-name collision was resolved via type weighting
+      "alternatives": [],                  # Populated with alternative nodes if ambiguous is true
+      "summary": {
+        "total_items": 4,
+        "returned_items": 4,
+        "truncated": false,                # Explicit signal if items array is capped
+        "discriminating": true             # True if callers span multiple files/modules vs single file
+      },
+      "items": [ ... ],                    # Matched caller/dependency/search nodes
+      "provenance": {                      # Dataset metrics for auditability
+        "files_analyzed": 268,
+        "symbols_considered": 4276
+      },
+      "_meta": {
+        "version": "3.2.8",
+        "graph_built_at": "2026-09-01T15:10:00Z",  # ISO-8601 UTC timestamp of active graph
+        "is_stale": false,                         # Fast ~1ms mtime check against source manifest
+        "staleness_check": "mtime-manifest",
+        "stale_files": []
+      }
+    }
+
+Core Agent Decision & Refactoring Commands:
+  1. Safe Deletion Decision (Single-call pre-refactoring verdict):
+     spashta_ckg can-delete "UserModel" --json
+     spashta_ckg can-delete "UserModel" --summary-only --json  (compact ~350 bytes)
+     Verdict: can_delete=true if only test callers (requires_test_updates populated); false if production callers exist.
+
+  2. Upstream Blast Radius (Inbound callers before modifying code):
+     spashta_ckg impact "calculate_total" --depth 2 --json
+
+  3. Downstream Dependencies (Outbound calls/imports before moving code):
+     spashta_ckg dependencies "calculate_total" --depth 2 --json
+
+  4. Precise Coordinates (Pinpoint file path & line numbers without reading directories):
+     spashta_ckg locate "UserModel" --json
+
+  5. Compact Symbol Search (Token-efficient discovery, --full for docstrings):
+     spashta_ckg search "Order" --type Model --json
+     spashta_ckg search "UserModel" --full --json
+
+  6. Full-Stack Routing & Dead Code Audits:
+     spashta_ckg routes --json
+     spashta_ckg dead-code py --json
+
+Supported Languages & Frameworks (Auto-Detected):
   Languages:   Python (AST), JavaScript (Tree-sitter), HTML5, CSS3
   Frameworks:  Django, FastAPI, HTMX, Vanilla JS
-
-Quickstart Workflow:
-  1. (Optional) Initialize project directory exclusions:
-     spashta_ckg init
-     spashta_ckg init --exclude "misc,reference,legacy"
-
-  2. View or edit excluded directories:
-     spashta_ckg config
-     spashta_ckg config --add-exclude "docs,fixtures"
-
-  3. Scan & build CKG graph:
-     spashta_ckg scan
-     spashta_ckg scan --exclude "misc,legacy"
-
-  4. Fast incremental refresh after code edits:
-     spashta_ckg refresh
-     spashta_ckg refresh --file "app/views.py"
-
-  5. Blast-radius impact analysis (pre-refactoring):
-     spashta_ckg impact "MyFunctionOrClass" --depth 2 --json
-
-  6. Inspect full-stack routes & dead code:
-     spashta_ckg routes
-     spashta_ckg dead-code css
 """
 
     parser = argparse.ArgumentParser(
         prog="spashta_ckg",
-        description="Spashta CKG v3.2.6 - Full-Stack Code Knowledge Graph & Fast Incremental Engine",
+        description=f"Spashta CKG v{__version__} - Full-Stack Code Knowledge Graph & Fast Incremental Engine",
         epilog=help_epilog,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     
     # Common arguments
     common = argparse.ArgumentParser(add_help=False)
-    common.add_argument("--json", action="store_true", help="Output results in machine-readable JSON")
+    common.add_argument("--json", action="store_true", help="Output results in machine-readable JSON (Universal Envelope format)")
     common.add_argument("--project-dir", "-p", default=".", help="Target project root directory (default: .)")
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # 1. Project Initialization (3.0)
-    p_init = subparsers.add_parser("init", parents=[common], help="Initialize a project profile.json with directory exclusions")
+    p_init = subparsers.add_parser("init", parents=[common], help="Initialize a project profile.json with directory exclusions",
+                                   description="Initializes project profile with directory exclusions.")
     p_init.add_argument("--exclude", "-e", help="Comma-separated directories to exclude (e.g. misc,tests,legacy)")
     p_init.add_argument("--force", action="store_true", help="Overwrite existing profile.json if present")
 
     # 2. Configuration Management (3.0)
-    p_cfg = subparsers.add_parser("config", parents=[common], help="View or update excluded directories")
+    p_cfg = subparsers.add_parser("config", parents=[common], help="View or update excluded directories",
+                                  description="Inspect or update active profile configuration (.spashta.json / profile.json).")
     p_cfg.add_argument("--set-exclude", help="Set excluded directories (replaces current list)")
     p_cfg.add_argument("--add-exclude", help="Append directories to exclusion list (e.g. misc,docs)")
 
     # 3. Lifecycle & Scanning (3.0, 3.2.2)
-    p_scan = subparsers.add_parser("scan", aliases=["build"], parents=[common], help="Scan project across all languages and build/refresh CKG graph")
+    p_scan = subparsers.add_parser("scan", aliases=["build"], parents=[common], help="Scan project across all languages and build/refresh CKG graph",
+                                   description="Scans project across Python, JS, HTML, and CSS to construct the Code Knowledge Graph.")
     p_scan.add_argument("--out", "-o", default=None, help="Output directory for CKG artifacts (default: <project_dir>/.spashta)")
     p_scan.add_argument("--exclude", "-e", default=None, help="Comma-separated directories to exclude during this scan")
     p_scan.add_argument("--incremental", "-i", action="store_true", help="Perform fast incremental update of changed files only")
 
     # 3b. Fast Incremental Refresh (3.2.2)
-    p_ref = subparsers.add_parser("refresh", parents=[common], help="Fast incremental refresh: re-parse only modified or specified files")
+    p_ref = subparsers.add_parser("refresh", parents=[common], help="Fast incremental refresh: re-parse only modified or specified files",
+                                  description="Incrementally refreshes graph cache by re-parsing only changed files in milliseconds.")
     p_ref.add_argument("--file", "-f", help="Specific file path(s) to refresh (comma-separated, e.g. app/views.py)")
     p_ref.add_argument("--out", "-o", default=None, help="Output directory for CKG artifacts (default: <project_dir>/.spashta)")
 
     # 4. Impact Analysis (2.1, 2.2, 3.0)
-    p_impact = subparsers.add_parser("impact", parents=[common], help="Calculate blast-radius: who depends on/calls this symbol?")
+    p_impact = subparsers.add_parser("impact", parents=[common], help="Calculate upstream blast radius: who depends on/calls this symbol?",
+                                     description="Traverses upstream callers and dependents across Python, JS, templates, and styles up to --depth. Outputs Universal Envelope with --json.")
     p_impact.add_argument("node_id", help="Target symbol name or node ID")
     p_impact.add_argument("--depth", "-d", type=int, default=3, help="Max traversal depth (default: 3)")
 
     # 4b. Safe Deletion Decision Tool (3.2.7)
-    p_candel = subparsers.add_parser("can-delete", parents=[common], help="Evaluate if a symbol can be safely deleted without breaking working code")
+    p_candel = subparsers.add_parser("can-delete", parents=[common], help="Evaluate if a symbol can be safely deleted without breaking working code",
+                                     description="Evaluates if symbol can be deleted. Returns can_delete: true/false. Separates production blockers from test-only callers (requires_test_updates). Use --summary-only for compact ~350-byte output.")
     p_candel.add_argument("node_id", help="Target symbol name or node ID")
     p_candel.add_argument("--depth", "-d", type=int, default=3, help="Max traversal depth (default: 3)")
+    p_candel.add_argument("--summary-only", "--summary", action="store_true", help="Output compact summary with blocker file paths (~350 B) instead of heavy AST items list")
 
     # 5. Dependencies (2.1, 2.2)
-    p_deps = subparsers.add_parser("dependencies", aliases=["deps"], parents=[common], help="What does this symbol depend on? (Outgoing edges)")
+    p_deps = subparsers.add_parser("dependencies", aliases=["deps"], parents=[common], help="Inspect downstream outgoing dependencies: what does this symbol call or use?",
+                                   description="Traverses outgoing dependencies (functions called, models used, templates included) up to --depth. Outputs Universal Envelope with --json.")
     p_deps.add_argument("node_id", help="Target symbol name or node ID")
     p_deps.add_argument("--depth", "-d", type=int, default=3, help="Max traversal depth")
 
     # 6. Dead Code Audit (2.1, 2.2, 3.0)
-    p_dead = subparsers.add_parser("dead-code", aliases=["dead"], parents=[common], help="Find unreferenced dead code across Python, JS, and CSS")
+    p_dead = subparsers.add_parser("dead-code", aliases=["dead"], parents=[common], help="Find unreferenced dead code across Python, JS, and CSS",
+                                   description="Audits definitions with zero inbound callers across Python, JS, and CSS with dynamic safety checks.")
     p_dead.add_argument("language", nargs="?", choices=["css", "js", "py"], default=None, help="Optional language filter")
 
     # 7. Dead CSS & Keyframes (2.1, 2.2)
@@ -100,21 +142,24 @@ Quickstart Workflow:
     p_dead_css.add_argument("--kind", choices=["class", "keyframes", "all"], default="all", help="Target CSS item kind")
 
     # 8. Full-Stack Routes (2.2, 3.0)
-    subparsers.add_parser("routes", parents=[common], help="List all full-stack routes with connected templates, views, and events")
+    subparsers.add_parser("routes", parents=[common], help="List all full-stack routes with connected templates, views, and events",
+                          description="Maps URL endpoints to backend views, template tags, and HTMX triggers across the full stack.")
 
     # 9. Call Graph (2.1)
     p_cg = subparsers.add_parser("call-graph", parents=[common], help="View function call relationships (callers and callees)")
     p_cg.add_argument("node_id", help="Target function or method name/ID")
 
     # 10. Search (2.1, 2.2)
-    p_search = subparsers.add_parser("search", parents=[common], help="Search nodes by name, ID, or attributes")
+    p_search = subparsers.add_parser("search", parents=[common], help="Search nodes by name, ID, or attributes (compact by default, --full for docstrings)",
+                                     description="Searches indexed symbols. Compact by default to save tokens; use --full to include complete docstrings without truncation.")
     p_search.add_argument("query", help="Search query string")
     p_search.add_argument("--type", "-t", default=None, help="Filter by node type (e.g. Function, Route, StyleClass)")
     p_search.add_argument("--app", help="Filter by Django/sub-app directory prefix")
     p_search.add_argument("--full", action="store_true", help="Include full docstrings and metadata (compact by default)")
 
     # 11. Locate (2.1, 2.2)
-    p_locate = subparsers.add_parser("locate", parents=[common], help="Locate exact file path, start line, and end line of a symbol")
+    p_locate = subparsers.add_parser("locate", parents=[common], help="Locate exact file path, start line, and end line of a symbol",
+                                     description="Pinpoints exact file path, start line, and end line of a symbol with type-weighted tie-breaking and ambiguity detection. Outputs Universal Envelope with --json.")
     p_locate.add_argument("node_id", help="Target symbol or node ID")
     p_locate.add_argument("--full", action="store_true", help="Include full docstrings and metadata")
 
@@ -348,52 +393,31 @@ Quickstart Workflow:
             else:
                 qs.output(res, False)
         elif cmd == "locate":
-            winner, is_ambiguous, alts = qs.resolve_symbol_node(graph, args.node_id)
-            if winner:
-                fpath = winner.get("file_path", "")
-                if not fpath and "::" in winner.get("id", ""):
-                    fpath = winner["id"].split("::")[0]
-                    if fpath.startswith("File:"): fpath = fpath[5:]
-                target_info = {
-                    "query": args.node_id,
-                    "resolved_id": winner["id"],
-                    "name": winner.get("name"),
-                    "node_type": winner.get("node_type"),
-                    "file_path": fpath or winner.get("name", "N/A"),
-                    "line_start": winner.get("line_start"),
-                    "line_end": winner.get("line_end"),
-                    "semantic_roles": winner.get("semantic_roles", [])
-                }
-                if getattr(args, "full", False):
-                    target_info["docstring"] = winner.get("docstring")
-                    target_info["signature"] = winner.get("signature")
-                
-                if args.json:
-                    env = qs.make_envelope(
-                        command="locate",
-                        status="ok",
-                        target=target_info,
-                        items=[target_info],
-                        summary={"total_items": 1, "returned_items": 1, "truncated": False},
-                        ambiguous=is_ambiguous,
-                        alternatives=alts,
-                        project_root=project_root
-                    )
-                    qs.output(env, True)
-                else:
-                    loc = {
-                        "id": winner["id"],
-                        "file": fpath or winner.get("name", "N/A"),
-                        "line_start": winner.get("line_start"),
-                        "line_end": winner.get("line_end"),
-                        "node_type": winner.get("node_type")
-                    }
-                    if is_ambiguous:
-                        loc["ambiguous"] = True
-                        loc["alternatives_count"] = len(alts)
-                    qs.output(loc, False)
+            ckg = CKG(graph, project_root=project_root)
+            env = ckg.locate(args.node_id)
+            if getattr(args, "full", False) and env.get("status") == "ok":
+                winner = qs.get_node(graph, env.get("target", {}).get("resolved_id", args.node_id))
+                if winner:
+                    env["target"]["docstring"] = winner.get("docstring")
+                    env["target"]["signature"] = winner.get("signature")
+            if args.json:
+                qs.output(env, True)
             else:
-                qs.output(qs.node_not_found_response(graph, args.node_id, command="locate", project_root=project_root), args.json)
+                if env.get("status") != "ok":
+                    print(f"Error: {env.get('error', 'Node not found')}")
+                else:
+                    tgt = env.get("target", {})
+                    loc = {
+                        "id": tgt.get("resolved_id") or tgt.get("id"),
+                        "file": tgt.get("file_path") or tgt.get("name", "N/A"),
+                        "line_start": tgt.get("line_start"),
+                        "line_end": tgt.get("line_end"),
+                        "node_type": tgt.get("node_type")
+                    }
+                    if env.get("ambiguous"):
+                        loc["ambiguous"] = True
+                        loc["alternatives_count"] = len(env.get("alternatives", []))
+                    qs.output(loc, False)
         elif cmd == "read":
             qs.output(qs.read_content(graph, args.node_id), args.json)
         elif cmd == "details":
@@ -430,7 +454,8 @@ Quickstart Workflow:
                         print(f"  - [{it.get('node_type')}] {it.get('name')} ({it.get('file_path')}:{it.get('line_start')}) [{it.get('relation')}]")
         elif cmd == "can-delete":
             ckg = CKG(graph, project_root=project_root)
-            env = ckg.can_delete(args.node_id, depth=args.depth)
+            summary_only = getattr(args, "summary_only", False)
+            env = ckg.can_delete(args.node_id, depth=args.depth, summary_only=summary_only)
             if args.json:
                 qs.output(env, True)
             else:
@@ -444,10 +469,22 @@ Quickstart Workflow:
                     if prod_b:
                         print(f"\nProduction Blockers ({len(prod_b)}):")
                         for b in prod_b:
-                            print(f"  - [{b.get('node_type')}] {b.get('name')} ({b.get('file_path')}:{b.get('line_start')})")
+                            if isinstance(b, dict):
+                                print(f"  - [{b.get('node_type')}] {b.get('name')} ({b.get('file_path')}:{b.get('line_start')})")
+                            else:
+                                print(f"  - {b}")
                     if test_b:
                         print(f"\nTest Blockers ({len(test_b)}):")
                         for b in test_b:
+                            if isinstance(b, dict):
+                                print(f"  - [{b.get('node_type')}] {b.get('name')} ({b.get('file_path')}:{b.get('line_start')})")
+                            else:
+                                print(f"  - {b}")
+                    req_t = env.get("requires_test_updates", [])
+                    if req_t:
+                        print(f"\nRequired Test Updates ({len(req_t)} files):")
+                        for f in req_t:
+                            print(f"  - {f}")
                             print(f"  - [{b.get('node_type')}] {b.get('name')} ({b.get('file_path')}:{b.get('line_start')})")
                     req_t = env.get("requires_test_updates", [])
                     if req_t:
@@ -455,47 +492,18 @@ Quickstart Workflow:
                         for f in req_t:
                             print(f"  - {f}")
         elif cmd in ("dependencies", "deps"):
-            target_node, is_ambiguous, alts = qs.resolve_symbol_node(graph, args.node_id)
-            if not target_node:
-                qs.output(qs.node_not_found_response(graph, args.node_id, command="dependencies", project_root=project_root), args.json)
+            ckg = CKG(graph, project_root=project_root)
+            env = ckg.dependencies(args.node_id, depth=args.depth)
+            if args.json:
+                qs.output(env, True)
             else:
-                raw_deps = qs.trace_deps(graph, target_node.get("id"), "outgoing", args.depth)
-                items = []
-                breakdown = {}
-                for nid, info in raw_deps.items():
-                    n = qs.get_node(graph, nid)
-                    ntype = info.get("node_type") or (n.get("node_type") if n else "Unknown")
-                    breakdown[ntype] = breakdown.get(ntype, 0) + 1
-                    fpath = info.get("file_path") or (n.get("file_path") if n else None) or (nid.split("::")[0] if "::" in nid else "")
-                    if fpath.startswith("File:"): fpath = fpath[5:]
-                    items.append({
-                        "id": nid,
-                        "name": info.get("name") or (n.get("name") if n else nid.split("::")[-1]),
-                        "node_type": ntype,
-                        "file_path": fpath,
-                        "line_start": info.get("line_start") or (n.get("line_start") if n else None),
-                        "relation": info.get("relation") or info.get("edge_type", "uses"),
-                        "depth": info.get("depth", 1)
-                    })
-                if args.json:
-                    env = qs.make_envelope(
-                        command="dependencies",
-                        status="ok",
-                        target={"query": args.node_id, "resolved_id": target_node.get("id"), "node_type": target_node.get("node_type")},
-                        items=items,
-                        summary={
-                            "total_items": len(items),
-                            "returned_items": len(items),
-                            "truncated": False,
-                            "breakdown": breakdown
-                        },
-                        ambiguous=is_ambiguous,
-                        alternatives=alts,
-                        project_root=project_root
-                    )
-                    qs.output(env, True)
+                if env.get("status") != "ok":
+                    print(f"Error: {env.get('error', 'Node not found')}")
                 else:
-                    qs.output(raw_deps, False)
+                    items = env.get("items", [])
+                    print(f"\nDependencies for '{args.node_id}' ({len(items)} items, depth {args.depth}):")
+                    for it in items:
+                        print(f"  - [{it.get('node_type')}] {it.get('name')} ({it.get('file_path')}:{it.get('line_start')}) [{it.get('relation')}]")
         elif cmd == "call-graph":
             res = qs.get_call_graph(graph, args.node_id)
             qs.output(res, args.json)

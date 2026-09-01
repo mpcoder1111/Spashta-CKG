@@ -586,7 +586,15 @@ def check_freshness(project_root=None):
     meta_path = next((p for p in meta_candidates if p.exists()), None)
     
     stale_files = []
+    graph_built_at = None
+    
     if meta_path:
+        try:
+            from datetime import datetime, timezone
+            st_mtime = meta_path.stat().st_mtime
+            graph_built_at = datetime.fromtimestamp(st_mtime, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        except Exception:
+            pass
         try:
             with open(meta_path, "r", encoding="utf-8") as f:
                 scan_meta = json.load(f)
@@ -601,10 +609,17 @@ def check_freshness(project_root=None):
                         stale_files.append(rel_path)
         except Exception:
             pass
+    elif (root / ".spashta" / "code_knowledge_graph_enriched.json").exists():
+        try:
+            from datetime import datetime, timezone
+            st_mtime = (root / ".spashta" / "code_knowledge_graph_enriched.json").stat().st_mtime
+            graph_built_at = datetime.fromtimestamp(st_mtime, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        except Exception:
+            pass
 
     return {
-        "version": "3.2.7",
-        "graph_built_at": None,
+        "version": "3.2.8",
+        "graph_built_at": graph_built_at,
         "is_stale": len(stale_files) > 0,
         "staleness_check": "mtime-manifest",
         "stale_files_count": len(stale_files),
@@ -654,16 +669,22 @@ def make_envelope(
         "alternatives": alternatives,
         "summary": summary,
         "items": items,
-        "provenance": provenance or {},
         "_meta": freshness
     }
+
+    if provenance:
+        env["provenance"] = provenance
+    elif provenance is None and extra and "provenance" in extra:
+        env["provenance"] = extra["provenance"]
 
     if error:
         env["error"] = error
     if suggestions:
         env["suggestions"] = suggestions
     if extra:
-        env.update(extra)
+        for k, v in extra.items():
+            if k != "provenance":
+                env[k] = v
 
     return env
 
@@ -1158,7 +1179,7 @@ def node_not_found_response(graph, node_id, command=None, project_root=None):
 # HIGH-LEVEL DECISION TOOL (can_delete)
 # =============================================================================
 
-def can_delete(graph, symbol, depth=3, project_root=None):
+def can_delete(graph, symbol, depth=3, project_root=None, summary_only=False):
     """
     Evaluates whether a symbol can be safely deleted without breaking working code.
     
@@ -1172,6 +1193,7 @@ def can_delete(graph, symbol, depth=3, project_root=None):
         symbol: Target symbol name or node ID
         depth: Traversal depth for callers
         project_root: Optional project root path
+        summary_only: If True, omits verbose items list and returns concise blocker files
         
     Returns:
         dict: Standardized universal envelope with can_delete boolean verdict,
@@ -1251,29 +1273,47 @@ def can_delete(graph, symbol, depth=3, project_root=None):
         "line_start": target_node.get("line_start")
     }
 
-    summary = {
-        "total_blockers": len(prod_blockers) + len(test_blockers),
-        "production_blockers": len(prod_blockers),
-        "test_blockers": len(test_blockers),
-        "returned_items": len(prod_blockers) + len(test_blockers),
-        "truncated": False
-    }
+    if summary_only:
+        items_payload = []
+        summary = {
+            "total_blockers": len(prod_blockers) + len(test_blockers),
+            "production_blockers": len(prod_blockers),
+            "test_blockers": len(test_blockers),
+            "returned_items": 0,
+            "truncated": False,
+            "summary_only": True
+        }
+        blockers_payload = {
+            "production": sorted(list({b["file_path"] for b in prod_blockers if b.get("file_path")})),
+            "tests": sorted(list({b["file_path"] for b in test_blockers if b.get("file_path")}))
+        }
+    else:
+        items_payload = prod_blockers + test_blockers
+        summary = {
+            "total_blockers": len(prod_blockers) + len(test_blockers),
+            "production_blockers": len(prod_blockers),
+            "test_blockers": len(test_blockers),
+            "returned_items": len(prod_blockers) + len(test_blockers),
+            "truncated": False,
+            "summary_only": False
+        }
+        blockers_payload = {
+            "production": prod_blockers,
+            "tests": test_blockers
+        }
 
     return make_envelope(
         command="can_delete",
         status="ok",
         target=target_info,
-        items=prod_blockers + test_blockers,
+        items=items_payload,
         summary=summary,
         ambiguous=is_ambiguous,
         alternatives=alts,
         project_root=project_root,
         extra={
             "can_delete": can_del,
-            "blockers": {
-                "production": prod_blockers,
-                "tests": test_blockers
-            },
+            "blockers": blockers_payload,
             "requires_test_updates": req_tests
         }
     )
