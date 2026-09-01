@@ -181,28 +181,50 @@ When 2 or more nodes match the exact name query and the winner is chosen by type
 
 ---
 
-## 🚦 Part 6: Implementation Sequencing
+## 🚦 Part 6: Implementation Sequencing & Status
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                        SEQUENCED IMPLEMENTATION ROADMAP                                │
+│                        SEQUENCED IMPLEMENTATION ROADMAP & STATUS                       │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
-│ Phase 1: Universal Response Envelope + Truncation Flag                                 │
+│ Phase 1: Universal Response Envelope + Truncation Flag                      [COMPLETE] │
 │          • Standardize status, target, summary, items, and _meta across all tools     │
 │                                                                                        │
-│ Phase 2: Freshness Signal (_meta.is_stale & staleness_check)                           │
-│          • mtime checks over known files manifest                                      │
+│ Phase 2: Freshness Signal (_meta.is_stale & staleness_check)                [COMPLETE] │
+│          • mtime checks over known files manifest in ~1-2ms                            │
 │                                                                                        │
-│ Phase 3: Composite Decision Tool (spashta_can_delete)                                  │
+│ Phase 3: Composite Decision Tool (spashta_can_delete / can-delete)          [COMPLETE] │
 │          • Separate production vs. test blockers + requires_test_updates               │
 │                                                                                        │
-│ Phase 4: Symbol Type Tiering + Ambiguity Flagging                                      │
+│ Phase 4: Symbol Type Tiering + Ambiguity Flagging                           [COMPLETE] │
 │          • Functions/Classes win tie-breaks; surface alternatives                      │
 │                                                                                        │
-│ Phase 5: Compact Output by Default                                                     │
+│ Phase 5: Compact Output by Default                                          [COMPLETE] │
 │          • Omit docstrings by default (never truncate); --full opt-in                  │
 │                                                                                        │
-│ Phase 6: Config Migration to .spashta.json                                             │
+│ Phase 6: Config Migration to .spashta.json                                  [COMPLETE] │
 │          • Root .spashta.json tracked in git, .spashta/ ignored                        │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## 🏆 Part 7: Final Release Sign-Off & Verification (v3.2.7)
+
+* **Release Tag**: `v3.2.7`
+* **Release Commit**: `6be7c15` (`main` branch)
+* **Date Released**: 2026-09-01
+* **Dedicated Verification Suite**: `spashta_ckg/builders/python/verify_agent_contract_and_decision_tools.py` (7/7 Agent Contract Groups Passing, 100% Green)
+* **Full Repository Regressions**: 18/18 feature & language suites Passing (100% Green)
+
+### Verification Summary Matrix
+
+| Feature Tested | Test Case / Validation | Result |
+| :--- | :--- | :--- |
+| **Symbol Type Tiering** | `resolve_symbol_node("evidence")` Function vs Field tie-break | ✅ **PASS** (Function selected, `ambiguous: true`, 2 alternatives) |
+| **`can_delete` Decision Engine** | Production callers vs Test-only callers vs Zero callers | ✅ **PASS** (`can_delete: false` on prod caller; `can_delete: true` + `requires_test_updates` on test caller) |
+| **Universal Response Envelope** | Schema validation across `impact`, `locate`, `search`, `dead_code` | ✅ **PASS** (`status`, `target`, `summary`, `items`, `_meta` verified) |
+| **Docstring Compactness** | Omit docstrings in compact mode; retain full docstrings on `--full` | ✅ **PASS** (Docstrings omitted by default, never truncated when requested) |
+| **Config Hygiene** | `.spashta.json` priority detection over `profile.json` | ✅ **PASS** (Discovered and parsed active configuration) |
+| **CLI & MCP Parity** | `spashta_ckg can-delete --json` and 9 native async MCP tools | ✅ **PASS** (All 9 native MCP tools return structured dictionaries) |
+| **Full Regression Suite** | 18 Language Builders, Adapters & Feature Verification Scripts | ✅ **PASS (18/18 Green)** |
